@@ -1,4 +1,4 @@
-// EXPLOSIVE Interactive Backgrounds for Ashen Wastes Studios
+// STARRY FUTURISTIC Interactive Backgrounds for Ashen Wastes Studios
 (function() {
   const canvas = document.createElement('canvas');
   canvas.id = 'bg-canvas';
@@ -22,11 +22,30 @@
 
   const bgType = document.body.dataset.bg || 'particles';
 
+  // Star field (shared across all pages)
+  const stars = Array.from({ length: 100 }, () => ({
+    x: Math.random() * w, y: Math.random() * h,
+    r: Math.random() * 1.5 + 0.5,
+    twinkle: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.02 + 0.01
+  }));
+
   // Explosion effects array
   const explosions = [];
 
   function createExplosion(x, y) {
     explosions.push({ x, y, radius: 0, maxRadius: 200, alpha: 1, color: `hsl(${Math.random()*30+350}, 100%, 50%)` });
+  }
+
+  function drawStars() {
+    stars.forEach(s => {
+      s.twinkle += s.speed;
+      const alpha = 0.3 + Math.sin(s.twinkle) * 0.3;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fill();
+    });
   }
 
   function drawExplosions() {
@@ -40,7 +59,6 @@
       ctx.globalAlpha = e.alpha;
       ctx.lineWidth = 3;
       ctx.stroke();
-      // Glow
       ctx.beginPath();
       ctx.arc(e.x, e.y, e.radius * 0.7, 0, Math.PI * 2);
       ctx.fillStyle = e.color;
@@ -50,9 +68,27 @@
     });
   }
 
-  // ===== EXPLOSIVE PARTICLES (index) =====
+  function drawFuturisticGrid() {
+    ctx.strokeStyle = 'rgba(220,20,60,0.03)';
+    ctx.lineWidth = 1;
+    const gridSize = 80;
+    for (let x = 0; x < w; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, h);
+      ctx.stroke();
+    }
+    for (let y = 0; y < h; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+      ctx.stroke();
+    }
+  }
+
+  // ===== STARRY PARTICLES (index) =====
   if (bgType === 'particles') {
-    const particles = Array.from({ length: 150 }, () => ({
+    const particles = Array.from({ length: 200 }, () => ({
       x: Math.random()*w, y: Math.random()*h,
       vx: (Math.random()-0.5)*1.5, vy: (Math.random()-0.5)*1.5,
       r: Math.random()*4+1, color: `hsl(${Math.random()*30+350}, 100%, 50%)`
@@ -61,8 +97,9 @@
     function draw() {
       ctx.fillStyle = 'rgba(10,10,15,0.1)';
       ctx.fillRect(0,0,w,h);
+      drawFuturisticGrid();
+      drawStars();
       particles.forEach(p => {
-        // Flee from mouse
         const dx = p.x - mouse.x, dy = p.y - mouse.y;
         const d = Math.sqrt(dx*dx + dy*dy);
         if (d < 250) {
@@ -74,14 +111,11 @@
         p.vx *= 0.96; p.vy *= 0.96;
         if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
         if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
-
-        // Glow trail
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r*3, 0, Math.PI*2);
         ctx.fillStyle = p.color;
         ctx.globalAlpha = 0.2;
         ctx.fill();
-        // Core
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
         ctx.fillStyle = '#fff';
@@ -89,7 +123,6 @@
         ctx.fill();
         ctx.globalAlpha = 1;
       });
-      // Connections
       ctx.globalAlpha = 0.3;
       for (let i = 0; i < particles.length; i++) {
         for (let j = i+1; j < particles.length; j++) {
@@ -112,9 +145,9 @@
     draw();
   }
 
-  // ===== EXPLOSIVE NEURAL (ai, ashen-gpt) =====
+  // ===== STARRY NEURAL (ai, ashen-gpt) =====
   else if (bgType === 'neural') {
-    const nodes = Array.from({ length: 80 }, () => ({
+    const nodes = Array.from({ length: 100 }, () => ({
       x: Math.random()*w, y: Math.random()*h,
       vx: (Math.random()-0.5)*0.8, vy: (Math.random()-0.5)*0.8,
       r: Math.random()*5+2, pulse: Math.random()*Math.PI*2
@@ -123,30 +156,25 @@
     function draw() {
       ctx.fillStyle = 'rgba(10,10,15,0.08)';
       ctx.fillRect(0,0,w,h);
+      drawFuturisticGrid();
+      drawStars();
       nodes.forEach(n => {
         n.pulse += 0.05;
         const d = Math.sqrt((n.x-mouse.x)**2 + (n.y-mouse.y)**2);
-        if (d < 200) {
-          n.r = 5 + Math.sin(n.pulse) * 3 + (200-d)/30;
-        } else {
-          n.r = 3 + Math.sin(n.pulse) * 2;
-        }
+        if (d < 200) n.r = 5 + Math.sin(n.pulse) * 3 + (200-d)/30;
+        else n.r = 3 + Math.sin(n.pulse) * 2;
         n.x += n.vx; n.y += n.vy;
         if (n.x < 0 || n.x > w) n.vx *= -1;
         if (n.y < 0 || n.y > h) n.vy *= -1;
-
-        // Outer glow
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r*3, 0, Math.PI*2);
         ctx.fillStyle = 'rgba(220,20,60,0.3)';
         ctx.fill();
-        // Inner core
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
         ctx.fillStyle = '#fff';
         ctx.fill();
       });
-      // Connections
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i+1; j < nodes.length; j++) {
           const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
@@ -167,7 +195,7 @@
     draw();
   }
 
-  // ===== EXPLOSIVE MATRIX (chat) =====
+  // ===== STARRY MATRIX (chat) =====
   else if (bgType === 'matrix') {
     const fontSize = 16;
     const columns = Math.floor(w / fontSize);
@@ -180,6 +208,8 @@
     function draw() {
       ctx.fillStyle = 'rgba(10,10,15,0.06)';
       ctx.fillRect(0,0,w,h);
+      drawFuturisticGrid();
+      drawStars();
       ctx.font = `bold ${fontSize}px monospace`;
       drops.forEach((drop, i) => {
         const x = i * fontSize;
@@ -191,17 +221,11 @@
             const alpha = ci === 0 ? 1 : 0.2 * (1 - ci/drop.chars.length);
             ctx.fillStyle = `rgba(220,20,60,${alpha + glow})`;
             ctx.fillText(char, x, y);
-            // Bright lead character
-            if (ci === 0) {
-              ctx.fillStyle = '#fff';
-              ctx.fillText(char, x, y);
-            }
+            if (ci === 0) { ctx.fillStyle = '#fff'; ctx.fillText(char, x, y); }
           }
         });
         drop.y += drop.speed;
-        if (drop.y * fontSize > h + drop.chars.length * fontSize) {
-          drop.y = -Math.random() * 100;
-        }
+        if (drop.y * fontSize > h + drop.chars.length * fontSize) drop.y = -Math.random() * 100;
       });
       drawExplosions();
       requestAnimationFrame(draw);
@@ -209,7 +233,7 @@
     draw();
   }
 
-  // ===== EXPLOSIVE WIREFRAME (gaming-tech, engine-docs) =====
+  // ===== STARRY WIREFRAME (gaming-tech, engine-docs) =====
   else if (bgType === 'wireframe') {
     let rotX = 0, rotY = 0;
     const points = [];
@@ -218,9 +242,7 @@
     for (let x = -size; x <= size; x++) {
       for (let y = -size; y <= size; y++) {
         for (let z = -size; z <= size; z++) {
-          if (Math.random() > 0.6) {
-            points.push({x: x*spacing, y: y*spacing, z: z*spacing});
-          }
+          if (Math.random() > 0.6) points.push({x: x*spacing, y: y*spacing, z: z*spacing});
         }
       }
     }
@@ -234,9 +256,10 @@
     function draw() {
       ctx.fillStyle = 'rgba(10,10,15,0.1)';
       ctx.fillRect(0,0,w,h);
+      drawFuturisticGrid();
+      drawStars();
       rotY += 0.008;
       rotX += 0.004;
-
       points.forEach(p => {
         let {x, y, z} = p;
         let x1 = x * Math.cos(rotY) - z * Math.sin(rotY);
@@ -263,29 +286,25 @@
     draw();
   }
 
-  // ===== EXPLOSIVE STARFIELD (games) =====
+  // ===== STARRY STARFIELD (games) =====
   else if (bgType === 'starfield') {
-    const stars = Array.from({length: 200}, () => ({
+    const stars2 = Array.from({length: 200}, () => ({
       x: (Math.random()-0.5)*w*3, y: (Math.random()-0.5)*h*3, z: Math.random()*1500, trail: []
     }));
 
     function draw() {
       ctx.fillStyle = 'rgba(10,10,15,0.08)';
       ctx.fillRect(0,0,w,h);
-      stars.forEach(s => {
+      drawFuturisticGrid();
+      drawStars();
+      stars2.forEach(s => {
         s.z -= 4;
-        if (s.z <= 0) {
-          s.z = 1500;
-          s.x = (Math.random()-0.5)*w*3;
-          s.y = (Math.random()-0.5)*h*3;
-          s.trail = [];
-        }
+        if (s.z <= 0) { s.z = 1500; s.x = (Math.random()-0.5)*w*3; s.y = (Math.random()-0.5)*h*3; s.trail = []; }
         const sx = (s.x / s.z) * 400 + w/2;
         const sy = (s.y / s.z) * 400 + h/2;
         const size = Math.max(0, (1500-s.z)/200);
         const d = Math.sqrt((sx-mouse.x)**2 + (sy-mouse.y)**2);
         const glow = d < 120 ? (1 - d/120) * 3 : 0;
-        // Trail
         s.trail.push({x: sx, y: sy});
         if (s.trail.length > 5) s.trail.shift();
         s.trail.forEach((t, i) => {
@@ -305,7 +324,7 @@
     draw();
   }
 
-  // ===== EXPLOSIVE WAVES (philosophy) =====
+  // ===== STARRY WAVES (philosophy) =====
   else if (bgType === 'wave') {
     let time = 0;
     const waves = [
@@ -314,16 +333,13 @@
       { amp: 25, freq: 0.006, speed: 0.05, offset: 160 }
     ];
     const ripples = [];
-
-    window.addEventListener('mousemove', e => {
-      if (Math.random() > 0.92) {
-        ripples.push({ x: e.clientX, y: e.clientY, r: 0, maxR: 150, alpha: 1 });
-      }
-    });
+    window.addEventListener('mousemove', e => { if (Math.random() > 0.92) ripples.push({ x: e.clientX, y: e.clientY, r: 0, maxR: 150, alpha: 1 }); });
 
     function draw() {
       ctx.fillStyle = 'rgba(10,10,15,0.05)';
       ctx.fillRect(0,0,w,h);
+      drawFuturisticGrid();
+      drawStars();
       time += 0.02;
       waves.forEach((wave, wi) => {
         ctx.beginPath();
@@ -331,36 +347,23 @@
           const d = Math.sqrt((x-mouse.x)**2 + (h*0.5+wave.offset-mouse.y)**2);
           const mouseInfluence = d < 250 ? Math.sin(d*0.08 - time*2) * 30 * (1-d/250) : 0;
           const y = h*0.5 + wave.offset + Math.sin(x * wave.freq + time * wave.speed) * wave.amp + mouseInfluence;
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
+          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
         }
         ctx.strokeStyle = `rgba(220,20,60,${0.2 - wi*0.04})`;
         ctx.lineWidth = 3;
         ctx.stroke();
-        // Glow under wave
         ctx.beginPath();
         for (let x = 0; x <= w; x += 3) {
           const d = Math.sqrt((x-mouse.x)**2 + (h*0.5+wave.offset-mouse.y)**2);
           const mouseInfluence = d < 250 ? Math.sin(d*0.08 - time*2) * 30 * (1-d/250) : 0;
           const y = h*0.5 + wave.offset + Math.sin(x * wave.freq + time * wave.speed) * wave.amp + mouseInfluence;
-          if (x === 0) ctx.moveTo(x, y+10);
-          else ctx.lineTo(x, y+10);
+          if (x === 0) ctx.moveTo(x, y+10); else ctx.lineTo(x, y+10);
         }
         ctx.strokeStyle = `rgba(220,20,60,${0.05 - wi*0.01})`;
         ctx.lineWidth = 15;
         ctx.stroke();
       });
-      // Ripples
-      ripples.forEach((r, i) => {
-        r.r += 4;
-        r.alpha -= 0.015;
-        if (r.alpha <= 0) { ripples.splice(i, 1); return; }
-        ctx.beginPath();
-        ctx.arc(r.x, r.y, r.r, 0, Math.PI*2);
-        ctx.strokeStyle = `rgba(220,20,60,${r.alpha})`;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-      });
+      ripples.forEach((r, i) => { r.r += 4; r.alpha -= 0.015; if (r.alpha <= 0) { ripples.splice(i, 1); return; } ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI*2); ctx.strokeStyle = `rgba(220,20,60,${r.alpha})`; ctx.lineWidth = 2; ctx.stroke(); });
       drawExplosions();
       requestAnimationFrame(draw);
     }
