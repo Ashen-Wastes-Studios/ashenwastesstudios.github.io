@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company Philosophy — Ashen Wastes Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0c;
+  --surface: #161616;
+  --surface-2: #1e1e1e;
+  --ink: #e8e6e3;
+  --ink-muted: #8a8580;
+  --accent: #d97757;
+  --accent-dim: #a85a3f;
+  --border: #2a2a2a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Navigation */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(12,12,12,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.nav-links a {
+  color: var(--ink-muted);
+  transition: color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active { color: var(--ink); }
+
+.nav-links a.active { border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+
+/* Header */
+.page-header {
+  padding: 10rem 0 3rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb a { color: var(--accent); }
+
+.page-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 400;
+}
+
+/* Manifesto */
+.manifesto-section {
+  margin-bottom: 3rem;
+  padding-bottom: 3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.manifesto-section:last-child {
+  border-bottom: none;
+}
+
+.manifesto-section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  font-weight: 400;
+}
+
+.manifesto-section p {
+  color: var(--ink-muted);
+  font-size: 1.05rem;
+  max-width: 65ch;
+  margin-bottom: 1.25rem;
+  line-height: 1.8;
+}
+
+.manifesto-section p:last-child {
+  margin-bottom: 0;
+}
+
+.lead {
+  font-size: 1.25rem;
+  color: var(--ink);
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  font-size: 1.15rem;
+  color: var(--ink);
+  font-style: italic;
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nav-links { gap: 1rem; font-size: 0.85rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Ashen Wastes Studios</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="ai.html">AI</a></li>
+      <li><a href="ashen-gpt.html">Ashen AI</a></li>
+      <li><a href="gaming-technology.html">Gaming Technology</a></li>
+      <li><a href="games.html">Games</a></li>
+      <li><a href="philosophy.html" class="active">Philosophy</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="page-header container">
+  <div class="breadcrumb"><a href="index.html">Home</a> / Company Philosophy</div>
+  <h1>Our Philosophy.</h1>
+</header>
+
+<section class="container">
+  <div class="manifesto-section">
+    <h2>Open Source as Accountability</h2>
+    <p class="lead">Transparency isn't a marketing buzzword. It's the only real mechanism for holding power accountable.</p>
+    <p>When code is open, anyone can inspect it. Anyone can audit what it does, what data it collects, how it behaves at the edges. When code is closed, the public must simply trust — and trust without verification is faith, not accountability.</p>
+    <p>We open source our work because we believe the people affected by technology have a right to understand it. A black box that shapes lives is a black box that escapes scrutiny. Sunlight is the only disinfectant that has never been lobbied out of existence.</p>
+  </div>
+
+  <div class="manifesto-section">
+    <h2>Technology Should Not Be a Fiefdom</h2>
+    <p class="lead">The most powerful tools of our era are controlled by a handful of ultra-wealthy individuals who answer to no electorate.</p>
+    <p>When a single person or a small cabal can decide what billions of people see, say, and think — that's not innovation. That's feudalism with better UI. The concentration of technological power into private hands is the defining civil liberties issue of our time.</p>
+    <p>We reject the premise that artificial intelligence, communication infrastructure, and creative tools must be proprietary monopolies run for the enrichment of a few. Technology at scale is a public good, and public goods should be governed in the open.</p>
+  </div>
+
+  <div class="manifesto-section">
+    <h2>Slow is Safe</h2>
+    <p>The AI industry's "move fast and break things" ethos was tolerable when it optimized ad clicks. It is catastrophic when it shapes human reasoning.</p>
+    <p>We take it slow. We train carefully. We refuse capabilities until we understand them. We publish our methods so others can verify our safety claims rather than take our word for it. Alignment cannot be outsourced to a press release.</p>
+    <blockquote>The goal is not to be first. The goal is to be responsible in a way that survives contact with reality.</blockquote>
+  </div>
+
+  <div class="manifesto-section">
+    <h2>Build for the User, Not the Investor</h2>
+    <p>Every architectural decision is a political decision. Who benefits? Who is surveilled? Who has control? We optimize for the person at the keyboard, not the entity on the cap table.</p>
+    <p>Our models run on consumer hardware because intelligence should not require a cloud subscription. Our code is open because understanding should not require an NDA. Our tools are free because access to creation is not a luxury good.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <span>&copy; 2026 Ashen Wastes Studios</span>
+    <span>Built in the open.</span>
+  </div>
+</footer>
+
+</body>
+</html>
