@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wasteland Engine Docs — Ashen Wastes Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a25;
+  --ink: #e0e0e8;
+  --ink-muted: #6a6a80;
+  --accent: #dc143c;
+  --accent-dim: #a01030;
+  --accent-2: #ff6b35;
+  --accent-3: #ff4757;
+  --border: #2a2a40;
+  --code-bg: #0f0f0f;
+  --code-border: #2a2a40;
+  --glow: 0 0 10px rgba(220, 20, 60, 0.3);
+  --glow-strong: 0 0 20px rgba(220, 20, 60, 0.5);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cyberpunk body */
+body {
+  background: var(--bg);
+  background-image:
+    linear-gradient(rgba(220, 20, 60, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220, 20, 60, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  position: relative;
+}
+
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+code, pre {
+  font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+  font-size: 0.9em;
+}
+
+code {
+  background: var(--code-bg);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  border: 1px solid var(--code-border);
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 2px;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  line-height: 1.7;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Navigation */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(10, 10, 15, 0.9);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--accent);
+  box-shadow: 0 0 20px rgba(220, 20, 60, 0.15), 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.6), 0 0 20px rgba(220, 20, 60, 0.3);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.nav-links a {
+  color: var(--ink-muted);
+  transition: color 0.2s;
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 5px var(--accent);
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  width: 100%;
+}
+
+.nav-links a:hover {
+  text-shadow: 0 0 8px rgba(220, 20, 60, 0.6);
+}
+
+.nav-links a.active {
+  color: var(--accent) !important;
+  text-shadow: 0 0 8px rgba(220, 20, 60, 0.5);
+}
+
+/* Page Header */
+.page-header {
+  padding: 10rem 0 4rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4rem;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb a { color: var(--accent); }
+
+.page-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  max-width: 16ch;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  color: var(--ink-muted);
+  max-width: 50ch;
+}
+
+/* TOC */
+.toc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 0.75rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.toc ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+
+.toc a {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  transition: color 0.2s;
+}
+
+.toc a:hover { color: var(--accent); }
+
+/* Docs Section */
+.docs-section {
+  margin-bottom: 4rem;
+  scroll-margin-top: 80px;
+}
+
+.docs-section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  font-weight: 400;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
+}
+
+.docs-section h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.docs-section h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.docs-section p {
+  color: var(--ink-muted);
+  max-width: 70ch;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.docs-section strong { color: var(--ink); }
+
+.docs-section ul, .docs-section ol {
+  color: var(--ink-muted);
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.docs-section li {
+  margin-bottom: 0.5rem;
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+}
+
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--surface);
+  font-size: 0.85rem;
+}
+
+td {
+  color: var(--ink-muted;
+}
+
+td:first-child {
+  color: var(--ink);
+  font-weight: 500;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+
+/* Feature Grid */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1.75rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+.feature-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+/* Glow effects */
+h1, h2, h3 {
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
+}
+
+a:hover {
+  text-shadow: 0 0 8px rgba(220, 20, 60, 0.6);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
+}
+
+/* Selection color */
+::selection {
+  background: rgba(220, 20, 60, 0.3);
+  color: var(--ink);
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nav-links { gap: 1rem; font-size: 0.85rem; }
+  .toc ul { columns: 1; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Ashen Wastes Studios</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="ai.html">AI</a></li>
+      <li><a href="ashen-gpt.html">Ashen AI</a></li>
+      <li><a href="gaming-technology.html">Gaming Technology</a></li>
+      <li><a href="wasteland-engine-docs.html" class="active">Engine Docs</a></li>
+      <li><a href="games.html">Games</a></li>
+      <li><a href="philosophy.html">Philosophy</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="page-header container">
+  <div class="breadcrumb"><a href="index.html">Home</a> / <a href="gaming-technology.html">Gaming Technology</a> / Wasteland Engine Documentation</div>
+  <h1>Wasteland Engine.</h1>
+  <p>A 2D/3D game engine built on OpenGL, DirectX, and Vulkan with AI-powered ray tracing via Nova Renderer.</p>
+</header>
+
+<section class="container">
+  <nav class="toc">
+    <ul>
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#getting-started">Getting Started</a></li>
+      <li><a href="#building">Building</a></li>
+      <li><a href="#editor">DemonCore Editor</a></li>
+      <li><a href="#rendering">Rendering Pipeline</a></li>
+      <li><a href="#physics">Physics</a></li>
+      <li><a href="#scripting">Scripting</a></li>
+      <li><a href="#tools">AI Tools</a></li>
+      <li><a href="#nvrhi">NVRHI Integration</a></li>
+    </ul>
+  </nav>
+
+  <!-- Overview -->
+  <div id="overview" class="docs-section">
+    <h2>Overview</h2>
+    <p>Wasteland Engine is a custom game engine built from scratch by Ashen Wasteland Studios. It supports 2D and 3D rendering with multiple graphics APIs and AI-powered path tracing through Nova Renderer.</p>
+    
+    <h3>Key Features</h3>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>Multi-API Rendering</h3>
+        <p>OpenGL, DirectX 11, DirectX 12, and Vulkan backends via NVRHI.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Nova Renderer</h3>
+        <p>AI-powered ray tracing for denoising, upscaling, and intelligent sampling.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Volumetric Effects</h3>
+        <p>Volumetric fog, raymarched clouds, and dynamic global illumination.</p>
+      </div>
+      <div class="feature-card">
+        <h3>DemonCore Editor</h3>
+        <p>Full editor with scene hierarchy, scripting, and AI chat panel.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Physics</h3>
+        <p>Box2D for 2D, Box3D for 3D physics simulation.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Python Scripting</h3>
+        <p>Full Python integration via pybind11 for game logic and tools.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Architecture -->
+  <div id="architecture" class="docs-section">
+    <h2>Architecture</h2>
+    <p>The engine is built with a layered architecture separating the core systems from the editor and tooling.</p>
+
+    <h3>Project Structure</h3>
+    <pre><code>Wasteland/
+├── Wasteland/                    # Main game engine library
+│   └── vendor/                   # Third-party dependencies (GLFW, ImGui, NVRHI, etc.)
+├── DemonCore-Editor/             # Editor application
+│   └── src/Panels/               # Editor panels (AIChatPanel, SceneHierarchy, etc.)
+├── Sandbox/                      # Test/sandbox application
+├── docs/                         # Documentation (NVRHI setup guide, etc.)
+├── scripts/                      # Build scripts (Win/Mac/Linux)
+├── vendor/bin/premake/           # Premake build system
+└── Wasteland.slnx                # Visual Studio solution</code></pre>
+
+    <h3>Core Systems</h3>
+    <table>
+      <tr><th>System</th><th>Description</th></tr>
+      <tr><td>Renderer</td><td>Multi-backend rendering (OpenGL, D3D11, D3D12, Vulkan)</td></tr>
+      <tr><td>NVRHI</td><td>NVIDIA Rendering Hardware Interface for D3D11/D3D12/Vulkan</td></tr>
+      <tr><td>Nova</td><td>AI-powered ray tracing renderer</td></tr>
+      <tr><td>Physics</td><td>Box2D (2D) and Box3D (3D) physics engines</td></tr>
+      <tr><td>Scripting</td><td>Python via pybind11</td></tr>
+      <tr><td>AI Tools</td><td>ToolServer for AI agent tool execution</td></tr>
+      <tr><td>Editor</td><td>DemonCore-Editor with ImGui interface</td></tr>
+    </table>
+  </div>
+
+  <!-- Getting Started -->
+  <div id="getting-started" class="docs-section">
+    <h2>Getting Started</h2>
+    
+    <h3>Prerequisites</h3>
+    <table>
+      <tr><th>Component</th><th>Windows</th><th>Linux</th><th>macOS</th></tr>
+      <tr><td>Compiler</td><td>Visual Studio 2022+</td><td>GCC/Clang</td><td>Xcode CLI Tools</td></tr>
+      <tr><td>Python</td><td>3.14+</td><td>3.14+</td><td>3.14+</td></tr>
+      <tr><td>CMake</td><td>3.16+ (for NVRHI)</td><td>3.16+</td><td>3.16+</td></tr>
+      <tr><td>Vulkan SDK</td><td>1.3.296.0</td><td>1.3.296.0</td><td>—</td></tr>
+    </table>
+
+    <h3>Clone the Repository</h3>
+    <pre><code>git clone https://github.com/Ashen-Wastes-Studios/Wasteland-Engine.git
+cd Wasteland-Engine</code></pre>
+  </div>
+
+  <!-- Building -->
+  <div id="building" class="docs-section">
+    <h2>Building</h2>
+
+    <h3>Step 1: Generate Project Files</h3>
+    <table>
+      <tr><th>Platform</th><th>Command</th></tr>
+      <tr><td>Windows</td><td><code>.\scripts\Win-GenProjects.bat</code></td></tr>
+      <tr><td>Linux</td><td><code>./scripts/Linux-GenProjects.sh</code></td></tr>
+      <tr><td>macOS</td><td><code>./scripts/Mac-GenProjects.sh</code></td></tr>
+    </table>
+
+    <h3>Step 2: Build NVRHI (Required for D3D11/D3D12/Vulkan)</h3>
+    <pre><code>cd Wasteland\vendor\nvrhi
+mkdir build
+cd build
+cmake .. -G "Visual Studio 17 2022" -A x64
+cmake --build . --config Release
+cmake --build . --config Debug</code></pre>
+
+    <h3>Step 3: Build Wasteland Engine</h3>
+    <pre><code># Windows (MSBuild)
+msbuild Wasteland.slnx -property:Configuration=Release -property:Platform=x64
+
+# Linux & macOS
+make config=release_x64</code></pre>
+
+    <h3>Step 4: Run the Editor</h3>
+    <pre><code># Windows
+.\bin\Release-windows-x86_64\DemonCore-Editor\DemonCore-Editor.exe
+
+# Linux
+./bin/Release-linux-x86_64/DemonCore-Editor/DemonCore-Editor
+
+# macOS
+./bin/Release-macosx-x86_64/DemonCore-Editor/DemonCore-Editor</code></pre>
+  </div>
+
+  <!-- Editor -->
+  <div id="editor" class="docs-section">
+    <h2>DemonCore Editor</h2>
+    <p>The DemonCore Editor is the primary development tool for Wasteland Engine. It provides a full ImGui-based interface for creating and editing projects.</p>
+
+    <h3>Editor Panels</h3>
+    <table>
+      <tr><th>Panel</th><th>Description</th></tr>
+      <tr><td>AIChatPanel</td><td>AI chat interface with tool support and agentic mode</td></tr>
+      <tr><td>SceneHierarchyPanel</td><td>Entity/scene graph management</td></tr>
+      <tr><td>ScriptEditorPanel</td><td>Code editor with syntax highlighting</td></tr>
+      <tr><td>ScriptInspectorPanel</td><td>Script property inspector</td></tr>
+      <tr><td>ContentBrowserPanel</td><td>Asset browser</td></tr>
+      <tr><td>ModelDownloaderPanel</td><td>3D model downloader</td></tr>
+    </table>
+
+    <h3>AI Chat Panel Features</h3>
+    <ul>
+      <li>AI-powered chat with tool execution capabilities</li>
+      <li>Agentic mode for autonomous operations</li>
+      <li>File operation notifications</li>
+      <li>Entity inspection tools</li>
+    </ul>
+  </div>
+
+  <!-- Rendering -->
+  <div id="rendering" class="docs-section">
+    <h2>Rendering Pipeline</h2>
+
+    <h3>Graphics APIs</h3>
+    <p>Engine supports runtime switching between multiple graphics APIs:</p>
+    <table>
+      <tr><th>API</th><th>Backend</th><th>Platform</th></tr>
+      <tr><td>OpenGL</td><td>Native</td><td>Windows, Linux, macOS</td></tr>
+      <tr><td>DirectX 11</td><td>NVRHI</td><td>Windows</td></tr>
+      <tr><td>DirectX 12</td><td>NVRHI</td><td>Windows</td></tr>
+      <tr><td>Vulkan</td><td>NVRHI</td><td>Windows, Linux</td></tr>
+    </table>
+
+    <h3>Nova Rendering Pipeline</h3>
+    <p>Nova is the AI-powered rendering pipeline for 3D ray tracing:</p>
+    <ul>
+      <li>Real-time path tracing with denoising</li>
+      <li>AI-powered upscaling (similar to DLSS)</li>
+      <li>Intelligent sample distribution</li>
+      <li>Volumetric fog and cloud raymarching</li>
+      <li>Dynamic global illumination</li>
+      <li>Render scale options: 0.5, 0.66, 0.8, 1.0</li>
+    </ul>
+  </div>
+
+  <!-- Physics -->
+  <div id="physics" class="docs-section">
+    <h2>Physics</h2>
+    <table>
+      <tr><th>Engine</th><th>Dimension</th><th>Use Case</th></tr>
+      <tr><td>Box2D</td><td>2D</td><td>2D games and physics simulations</td></tr>
+      <tr><td>Box3D</td><td>3D</td><td>3D games and physics simulations</td></tr>
+    </table>
+  </div>
+
+  <!-- Scripting -->
+  <div id="scripting" class="docs-section">
+    <h2>Scripting</h2>
+    <p>Game logic can be written in Python using the pybind11 integration. The scripting engine is currently a work in progress and accepts contributions.</p>
+
+    <h3>Tool Server</h3>
+    <p>The ToolServer class provides AI agents with engine tools:</p>
+    <ul>
+      <li>File operations (read, write, edit)</li>
+      <li>Memory management</li>
+      <li>Entity inspection</li>
+      <li>Scene manipulation</li>
+    </ul>
+  </div>
+
+  <!-- AI Tools -->
+  <div id="tools" class="docs-section">
+    <h2>AI Tools</h2>
+    <p>The engine includes a ToolServer that exposes engine functionality to AI agents. This enables autonomous AI-assisted development within the editor.</p>
+
+    <h3>Available Tools</h3>
+    <table>
+      <tr><th>Tool</th><th>Description</th></tr>
+      <tr><td>read_file</td><td>Read a text file</td></tr>
+      <tr><td>write_file</td><td>Create or overwrite a file</td></tr>
+      <tr><td>edit_file</td><td>Replace text in a file</td></tr>
+      <tr><td>list_dir</td><td>List directory contents</td></tr>
+      <tr><td>inspect_entity</td><td>Get information about a scene entity</td></tr>
+    </table>
+  </div>
+
+  <!-- NVRHI -->
+  <div id="nvrhi" class="docs-section">
+    <h2>NVRHI Integration</h2>
+    <p>NVRHI (NVIDIA Rendering Hardware Interface) provides DirectX 11, DirectX 12, and Vulkan backends. For detailed setup instructions, see <a href="https://github.com/Ashen-Wastes-Studios/Wasteland-Engine/blob/master/docs/NVRHI_SETUP.md" target="_blank" rel="noopener" style="color: var(--accent);">docs/NVRHI_SETUP.md</a> in the repository.</p>
+
+    <h3>Key Points</h3>
+    <ul>
+      <li>Build NVRHI as a static library first</li>
+      <li>Both Debug and Release configs must be built</li>
+      <li>Vulkan SDK 1.3.296.0 is pinned</li>
+      <li>Supports runtime API switching</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <span>&copy; 2026 Ashen Wastes Studios</span>
+    <span><a href="https://github.com/Ashen-Wastes-Studios/Wasteland-Engine" style="color: var(--accent);" target="_blank" rel="noopener">GitHub Repository</a></span>
+  </div>
+</footer>
+
+</body>
+</html>
