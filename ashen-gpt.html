@@ -619,7 +619,71 @@
       background: rgba(220, 20, 60, 0.3);
       color: var(--ink);
     }
-  </style>
+  
+    /* Sidebar Layout */
+    .docs-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1rem;
+    }
+
+    .sidebar h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      margin: 0;
+    }
+
+    .sidebar a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      display: block;
+      padding: 0.35rem 0.5rem;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    .sidebar a:hover {
+      color: var(--accent);
+      background: var(--surface-2);
+      text-shadow: 0 0 5px rgba(220, 20, 60, 0.5);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      background: var(--surface-2);
+      border-left: 2px solid var(--accent);
+    }
+
+    @media (max-width: 768px) {
+      .docs-layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+        margin-bottom: 1rem;
+      }
+    }
+    </style>
 </head>
 
 <body>
@@ -645,8 +709,14 @@
     <h1>Ashen AI — documentation.</h1>
     <p>A safe, open source, self-hosted AI assistant that runs entirely on consumer hardware.</p>
 
-    <nav class="toc">
-      <ul>
+    </header>
+
+  <section class="container">
+<div class="docs-layout">
+<aside class="sidebar">
+  <h3>Contents</h3>
+  <ul>
+
         <li><a href="#architecture">Architecture</a></li>
         <li><a href="#requirements">Requirements</a></li>
         <li><a href="#installation">Install</a></li>
@@ -659,11 +729,10 @@
         <li><a href="#multi-agent">Swarm & Council</a></li>
         <li><a href="#safety">Safety</a></li>
         <li><a href="#license">License</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <section class="container">
+      
+  </ul>
+</aside>
+<div class="docs-content">
     <div class="repo-card">
       <div class="repo-header">
         <div class="repo-icon">
@@ -1295,7 +1364,9 @@ print('All imports OK')"</code></pre>
       <p>Third-party components retain their own licenses: Qwen_Qwen3.5-0.8B/ (upstream) and tools/llama.cpp/
         (upstream).</p>
     </div>
-  </section>
+  </div>
+</div>
+</section>
 
   <footer>
     <div class="container footer-inner">

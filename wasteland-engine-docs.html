@@ -392,7 +392,135 @@
         font-size: 0.85rem;
       }
     }
-  </style>
+  
+    /* Sidebar Layout */
+    .docs-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1rem;
+    }
+
+    .sidebar h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      margin: 0;
+    }
+
+    .sidebar a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      display: block;
+      padding: 0.35rem 0.5rem;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    .sidebar a:hover {
+      color: var(--accent);
+      background: var(--surface-2);
+      text-shadow: 0 0 5px rgba(220, 20, 60, 0.5);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      background: var(--surface-2);
+      border-left: 2px solid var(--accent);
+    }
+
+    @media (max-width: 768px) {
+      .docs-layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+        margin-bottom: 1rem;
+      }
+    }
+    
+    /* Sidebar Layout */
+    .docs-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 80px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1rem;
+    }
+
+    .sidebar h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar li {
+      margin: 0;
+    }
+
+    .sidebar a {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      display: block;
+      padding: 0.35rem 0.5rem;
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
+
+    .sidebar a:hover {
+      color: var(--accent);
+      background: var(--surface-2);
+      text-shadow: 0 0 5px rgba(220, 20, 60, 0.5);
+    }
+
+    .sidebar a.active {
+      color: var(--accent);
+      background: var(--surface-2);
+      border-left: 2px solid var(--accent);
+    }
+
+    @media (max-width: 768px) {
+      .docs-layout {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        position: static;
+        margin-bottom: 1rem;
+      }
+    }
+    </style>
 </head>
 
 <body>
@@ -420,10 +548,11 @@
   </header>
 
   <section class="container">
+<div class="docs-layout">
+<aside class="sidebar">
+  <h3>Contents</h3>
+  <ul>
 
-    <!-- Table of Contents -->
-    <div class="docs-toc">
-      <ul>
         <li><a href="#overview">Overview</a></li>
         <li><a href="#core">Core Systems</a></li>
         <li><a href="#scene">Scene System</a></li>
@@ -436,8 +565,13 @@
         <li><a href="#building">Building</a></li>
         <li><a href="#premake">Build Configuration</a></li>
         <li><a href="#structure">Project Structure</a></li>
-      </ul>
-    </div>
+      
+  </ul>
+</aside>
+<div class="docs-content">
+
+    <!-- Table of Contents -->
+    
 
     <!-- Overview -->
     <div id="overview" class="docs-section">
@@ -1017,7 +1151,9 @@ pybind11, NVRHI, VulkanSDK</code></pre>
 └── Wasteland.slnx                # Visual Studio solution</code></pre>
     </div>
 
-  </section>
+  </div>
+</div>
+</section>
 
   <footer>
     <div class="container footer-inner">
