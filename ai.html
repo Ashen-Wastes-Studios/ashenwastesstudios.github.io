@@ -9,14 +9,18 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #0c0c0c;
-  --surface: #161616;
-  --surface-2: #1e1e1e;
-  --ink: #e8e6e3;
-  --ink-muted: #8a8580;
-  --accent: #d97757;
-  --accent-dim: #a85a3f;
-  --border: #2a2a2a;
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a25;
+  --ink: #e0e0e8;
+  --ink-muted: #6a6a80;
+  --accent: #00fff5;
+  --accent-dim: #00cccc;
+  --accent-2: #ff00ff;
+  --accent-3: #ffe600;
+  --border: #2a2a40;
+  --glow: 0 0 10px rgba(0, 255, 245, 0.3);
+  --glow-strong: 0 0 20px rgba(0, 255, 245, 0.5);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -203,6 +207,103 @@ footer {
 
 @media (max-width: 768px) {
   .nav-links { gap: 1rem; font-size: 0.85rem; }
+}
+
+/* Cyberpunk body */
+body {
+  background: var(--bg);
+  background-image:
+    linear-gradient(rgba(0, 255, 245, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 245, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  position: relative;
+}
+
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Neon glow on headings */
+h1, h2, h3 {
+  text-shadow: 0 0 10px rgba(0, 255, 245, 0.4);
+}
+
+/* Neon border glow on cards */
+.work-card:hover, .research-card:hover, .project-card:hover,
+.game-card:hover, .repo-card:hover, .feature-card:hover {
+  border-color: var(--accent) !important;
+  box-shadow: var(--glow);
+}
+
+/* Buttons glow */
+.btn:hover, .github-btn:hover, .clone-btn:hover {
+  box-shadow: var(--glow);
+}
+
+/* Links glow on hover */
+a:hover {
+  text-shadow: 0 0 8px rgba(0, 255, 245, 0.6);
+}
+
+/* Accent color for breadcrumbs and tags */
+.breadcrumb a, .section-label, .tag, .repo-name .repo-link {
+  color: var(--accent) !important;
+  text-shadow: 0 0 5px rgba(0, 255, 245, 0.5);
+}
+
+/* Status indicator glow */
+.status-dot {
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+}
+
+.status-dot.offline {
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+/* Sharp corners on key elements */
+.btn, .github-btn, .clone-btn, .repo-card, .work-card,
+.research-card, .project-card, .game-card, .feature-card,
+.engine-spec, .toc {
+  border-radius: 2px !important;
+}
+
+/* Navigation border glow */
+nav {
+  border-bottom-color: var(--accent) !important;
+  box-shadow: 0 2px 15px rgba(0, 255, 245, 0.15);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
+}
+
+/* Selection color */
+::selection {
+  background: rgba(0, 255, 245, 0.3);
+  color: var(--ink);
 }
 </style>
 </head>
