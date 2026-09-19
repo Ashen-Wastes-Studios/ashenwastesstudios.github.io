@@ -1,8 +1,8 @@
-// Interactive Visual Images for All Pages
+// EXPLOSIVE Interactive Backgrounds for Ashen Wastes Studios
 (function() {
   const canvas = document.createElement('canvas');
   canvas.id = 'bg-canvas';
-  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.6;';
+  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
   document.body.prepend(canvas);
   const ctx = canvas.getContext('2d');
 
@@ -14,166 +14,211 @@
   resize();
   window.addEventListener('resize', resize);
 
-  const mouse = { x: w/2, y: h/2, active: false };
-  window.addEventListener('mousemove', e => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-    mouse.active = true;
-  });
+  const mouse = { x: w/2, y: h/2, active: false, down: false };
+  window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; });
+  window.addEventListener('mousedown', e => { mouse.down = true; createExplosion(mouse.x, mouse.y); });
+  window.addEventListener('mouseup', () => mouse.down = false);
   window.addEventListener('mouseleave', () => mouse.active = false);
 
   const bgType = document.body.dataset.bg || 'particles';
-  const accent = '#dc143c';
 
-  function getAlpha(base, dist, maxDist) {
-    return Math.max(0, base * (1 - dist / maxDist));
+  // Explosion effects array
+  const explosions = [];
+
+  function createExplosion(x, y) {
+    explosions.push({ x, y, radius: 0, maxRadius: 200, alpha: 1, color: `hsl(${Math.random()*30+350}, 100%, 50%)` });
   }
 
-  function distance(x1, y1, x2, y2) {
-    return Math.sqrt((x1-x2)**2 + (y1-y2)**2);
+  function drawExplosions() {
+    explosions.forEach((e, i) => {
+      e.radius += 8;
+      e.alpha -= 0.02;
+      if (e.alpha <= 0) { explosions.splice(i, 1); return; }
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = e.color;
+      ctx.globalAlpha = e.alpha;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      // Glow
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.radius * 0.7, 0, Math.PI * 2);
+      ctx.fillStyle = e.color;
+      ctx.globalAlpha = e.alpha * 0.3;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
   }
 
-  // ===== INTERACTIVE PARTICLES (index) =====
+  // ===== EXPLOSIVE PARTICLES (index) =====
   if (bgType === 'particles') {
-    const particles = Array.from({ length: 50 }, () => ({
-      x: Math.random() * w, y: Math.random() * h,
-      baseX: 0, baseY: 0,
-      vx: (Math.random()-0.5)*0.5, vy: (Math.random()-0.5)*0.5,
-      r: Math.random()*3+1, color: accent
+    const particles = Array.from({ length: 150 }, () => ({
+      x: Math.random()*w, y: Math.random()*h,
+      vx: (Math.random()-0.5)*1.5, vy: (Math.random()-0.5)*1.5,
+      r: Math.random()*4+1, color: `hsl(${Math.random()*30+350}, 100%, 50%)`
     }));
-    particles.forEach(p => { p.baseX = p.x; p.baseY = p.y; });
 
     function draw() {
-      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = 'rgba(10,10,15,0.1)';
+      ctx.fillRect(0,0,w,h);
       particles.forEach(p => {
-        // React to mouse
-        const d = distance(p.x, p.y, mouse.x, mouse.y);
-        if (d < 200) {
-          const angle = Math.atan2(p.y - mouse.y, p.x - mouse.x);
-          p.vx += Math.cos(angle) * 0.02;
-          p.vy += Math.sin(angle) * 0.02;
+        // Flee from mouse
+        const dx = p.x - mouse.x, dy = p.y - mouse.y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 250) {
+          const force = (250 - d) / 250;
+          p.vx += (dx/d) * force * 0.5;
+          p.vy += (dy/d) * force * 0.5;
         }
         p.x += p.vx; p.y += p.vy;
-        p.vx *= 0.99; p.vy *= 0.99;
+        p.vx *= 0.96; p.vy *= 0.96;
         if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
         if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
 
-        // Draw connections
-        particles.forEach(p2 => {
-          const d2 = distance(p.x, p.y, p2.x, p2.y);
-          if (d2 < 150) {
-            ctx.beginPath();
-            ctx.moveTo(p.x, p.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.strokeStyle = `rgba(220,20,60,${0.1*(1-d2/150)})`;
-            ctx.stroke();
-          }
-        });
-
+        // Glow trail
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r*3, 0, Math.PI*2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = 0.2;
+        ctx.fill();
+        // Core
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        ctx.fillStyle = accent;
+        ctx.fillStyle = '#fff';
+        ctx.globalAlpha = 0.9;
         ctx.fill();
+        ctx.globalAlpha = 1;
       });
-      requestAnimationFrame(draw);
-    }
-    draw();
-  }
-
-  // ===== NEURAL NETWORK (ai, ashen-gpt) =====
-  else if (bgType === 'neural') {
-    const layers = [4, 6, 8, 6, 4];
-    const nodes = [];
-    layers.forEach((count, li) => {
-      for (let i = 0; i < count; i++) {
-        nodes.push({
-          x: (li + 0.5) * (w / layers.length),
-          y: (i + 0.5) * (h / count),
-          r: 4,
-          pulse: Math.random() * Math.PI * 2
-        });
-      }
-    });
-
-    function draw() {
-      ctx.clearRect(0,0,w,h);
-      // Draw connections
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i+1; j < nodes.length; j++) {
-          if (Math.abs(nodes[i].x - nodes[j].x) < w/layers.length + 10) {
-            const d = distance(nodes[i].x, nodes[i].y, mouse.x, mouse.y);
-            const glow = d < 200 ? 0.15 * (1 - d/200) : 0.03;
+      // Connections
+      ctx.globalAlpha = 0.3;
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i+1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 120) {
             ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
-            ctx.strokeStyle = `rgba(220,20,60,${glow})`;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.strokeStyle = `rgba(220,20,60,${0.3*(1-dist/120)})`;
+            ctx.lineWidth = 1;
             ctx.stroke();
           }
         }
       }
-      // Draw nodes
-      nodes.forEach(n => {
-        n.pulse += 0.03;
-        const glow = Math.sin(n.pulse) * 0.5 + 0.5;
-        const d = distance(n.x, n.y, mouse.x, mouse.y);
-        const proximity = d < 150 ? (1 - d/150) * 10 : 0;
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r + proximity + glow, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(220,20,60,${0.3 + glow*0.4})`;
-        ctx.fill();
-      });
+      ctx.globalAlpha = 1;
+      drawExplosions();
       requestAnimationFrame(draw);
     }
     draw();
   }
 
-  // ===== MATRIX RAIN (chat) =====
-  else if (bgType === 'matrix') {
-    const fontSize = 14;
-    const columns = Math.floor(w / fontSize);
-    const drops = Array.from({length: columns}, () => ({
-      y: Math.random() * -100,
-      speed: Math.random() * 2 + 1,
-      chars: Array.from({length: 20}, () => String.fromCharCode(0x30A0 + Math.random() * 96))
+  // ===== EXPLOSIVE NEURAL (ai, ashen-gpt) =====
+  else if (bgType === 'neural') {
+    const nodes = Array.from({ length: 80 }, () => ({
+      x: Math.random()*w, y: Math.random()*h,
+      vx: (Math.random()-0.5)*0.8, vy: (Math.random()-0.5)*0.8,
+      r: Math.random()*5+2, pulse: Math.random()*Math.PI*2
     }));
 
     function draw() {
-      ctx.fillStyle = 'rgba(10,10,15,0.05)';
+      ctx.fillStyle = 'rgba(10,10,15,0.08)';
       ctx.fillRect(0,0,w,h);
-      ctx.font = `${fontSize}px monospace`;
+      nodes.forEach(n => {
+        n.pulse += 0.05;
+        const d = Math.sqrt((n.x-mouse.x)**2 + (n.y-mouse.y)**2);
+        if (d < 200) {
+          n.r = 5 + Math.sin(n.pulse) * 3 + (200-d)/30;
+        } else {
+          n.r = 3 + Math.sin(n.pulse) * 2;
+        }
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < 0 || n.x > w) n.vx *= -1;
+        if (n.y < 0 || n.y > h) n.vy *= -1;
+
+        // Outer glow
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r*3, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba(220,20,60,0.3)';
+        ctx.fill();
+        // Inner core
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+      });
+      // Connections
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i+1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 180) {
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.strokeStyle = `rgba(220,20,60,${0.2*(1-dist/180)})`;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+        }
+      }
+      drawExplosions();
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+
+  // ===== EXPLOSIVE MATRIX (chat) =====
+  else if (bgType === 'matrix') {
+    const fontSize = 16;
+    const columns = Math.floor(w / fontSize);
+    const drops = Array.from({length: columns}, () => ({
+      y: Math.random() * -200,
+      speed: Math.random() * 3 + 2,
+      chars: Array.from({length: 25}, () => String.fromCharCode(0x30A0 + Math.random() * 96))
+    }));
+
+    function draw() {
+      ctx.fillStyle = 'rgba(10,10,15,0.06)';
+      ctx.fillRect(0,0,w,h);
+      ctx.font = `bold ${fontSize}px monospace`;
       drops.forEach((drop, i) => {
         const x = i * fontSize;
         drop.chars.forEach((char, ci) => {
           const y = (drop.y + ci) * fontSize;
           if (y > 0 && y < h) {
-            const alpha = ci === 0 ? 0.4 : 0.1 * (1 - ci/drop.chars.length);
-            const d = distance(x, y, mouse.x, mouse.y);
-            const glow = d < 100 ? 0.3 * (1 - d/100) : 0;
+            const d = Math.sqrt((x-mouse.x)**2 + (y-mouse.y)**2);
+            const glow = d < 120 ? 0.8 * (1 - d/120) : 0;
+            const alpha = ci === 0 ? 1 : 0.2 * (1 - ci/drop.chars.length);
             ctx.fillStyle = `rgba(220,20,60,${alpha + glow})`;
             ctx.fillText(char, x, y);
+            // Bright lead character
+            if (ci === 0) {
+              ctx.fillStyle = '#fff';
+              ctx.fillText(char, x, y);
+            }
           }
         });
         drop.y += drop.speed;
         if (drop.y * fontSize > h + drop.chars.length * fontSize) {
-          drop.y = -Math.random() * 50;
-          drop.chars = Array.from({length: 20}, () => String.fromCharCode(0x30A0 + Math.random() * 96));
+          drop.y = -Math.random() * 100;
         }
       });
+      drawExplosions();
       requestAnimationFrame(draw);
     }
     draw();
   }
 
-  // ===== 3D WIREFRAME (gaming-tech, engine-docs) =====
+  // ===== EXPLOSIVE WIREFRAME (gaming-tech, engine-docs) =====
   else if (bgType === 'wireframe') {
     let rotX = 0, rotY = 0;
     const points = [];
-    const size = 8;
-    const spacing = 40;
+    const size = 10;
+    const spacing = 50;
     for (let x = -size; x <= size; x++) {
       for (let y = -size; y <= size; y++) {
         for (let z = -size; z <= size; z++) {
-          if (Math.random() > 0.7) {
+          if (Math.random() > 0.6) {
             points.push({x: x*spacing, y: y*spacing, z: z*spacing});
           }
         }
@@ -187,90 +232,136 @@
     }
 
     function draw() {
-      ctx.clearRect(0,0,w,h);
-      rotY += 0.005;
-      rotX += 0.002;
+      ctx.fillStyle = 'rgba(10,10,15,0.1)';
+      ctx.fillRect(0,0,w,h);
+      rotY += 0.008;
+      rotX += 0.004;
 
-      const transformed = points.map(p => {
+      points.forEach(p => {
         let {x, y, z} = p;
-        // Rotate Y
         let x1 = x * Math.cos(rotY) - z * Math.sin(rotY);
         let z1 = x * Math.sin(rotY) + z * Math.cos(rotY);
-        // Rotate X
         let y1 = y * Math.cos(rotX) - z1 * Math.sin(rotX);
         let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
-        return { x: x1, y: y1, z: z2 };
-      });
-
-      transformed.forEach(p => {
-        const proj = project(p.x, p.y, p.z);
-        const d = distance(proj.x, proj.y, mouse.x, mouse.y);
-        const glow = d < 150 ? (1 - d/150) * 0.5 : 0;
+        const proj = project(x1, y1, z2);
+        const d = Math.sqrt((proj.x-mouse.x)**2 + (proj.y-mouse.y)**2);
+        const glow = d < 180 ? (1 - d/180) * 2 : 0;
         ctx.beginPath();
-        ctx.arc(proj.x, proj.y, 2 * proj.scale + glow, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(220,20,60,${0.15 * proj.scale + glow})`;
+        ctx.arc(proj.x, proj.y, 3 * proj.scale + glow, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(220,20,60,${0.3 * proj.scale + glow})`;
         ctx.fill();
+        if (glow > 0.5) {
+          ctx.beginPath();
+          ctx.arc(proj.x, proj.y, 6 + glow, 0, Math.PI*2);
+          ctx.fillStyle = `rgba(220,20,60,${glow * 0.5})`;
+          ctx.fill();
+        }
       });
+      drawExplosions();
       requestAnimationFrame(draw);
     }
     draw();
   }
 
-  // ===== STARFIELD (games) =====
+  // ===== EXPLOSIVE STARFIELD (games) =====
   else if (bgType === 'starfield') {
-    const stars = Array.from({length: 100}, () => ({
-      x: (Math.random()-0.5)*w*2, y: (Math.random()-0.5)*h*2, z: Math.random()*1000
+    const stars = Array.from({length: 200}, () => ({
+      x: (Math.random()-0.5)*w*3, y: (Math.random()-0.5)*h*3, z: Math.random()*1500, trail: []
     }));
 
     function draw() {
-      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle = 'rgba(10,10,15,0.08)';
+      ctx.fillRect(0,0,w,h);
       stars.forEach(s => {
-        s.z -= 2;
+        s.z -= 4;
         if (s.z <= 0) {
-          s.z = 1000;
-          s.x = (Math.random()-0.5)*w*2;
-          s.y = (Math.random()-0.5)*h*2;
+          s.z = 1500;
+          s.x = (Math.random()-0.5)*w*3;
+          s.y = (Math.random()-0.5)*h*3;
+          s.trail = [];
         }
-        const sx = (s.x / s.z) * 300 + w/2;
-        const sy = (s.y / s.z) * 300 + h/2;
-        const size = Math.max(0, (1000-s.z)/200);
-        const d = distance(sx, sy, mouse.x, mouse.y);
-        const glow = d < 100 ? (1 - d/100) * 0.5 : 0;
+        const sx = (s.x / s.z) * 400 + w/2;
+        const sy = (s.y / s.z) * 400 + h/2;
+        const size = Math.max(0, (1500-s.z)/200);
+        const d = Math.sqrt((sx-mouse.x)**2 + (sy-mouse.y)**2);
+        const glow = d < 120 ? (1 - d/120) * 3 : 0;
+        // Trail
+        s.trail.push({x: sx, y: sy});
+        if (s.trail.length > 5) s.trail.shift();
+        s.trail.forEach((t, i) => {
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, size * (i/s.trail.length), 0, Math.PI*2);
+          ctx.fillStyle = `rgba(220,20,60,${0.3 * (i/s.trail.length)})`;
+          ctx.fill();
+        });
         ctx.beginPath();
         ctx.arc(sx, sy, size + glow, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(220,20,60,${Math.min(1, (1000-s.z)/500) + glow})`;
+        ctx.fillStyle = '#fff';
         ctx.fill();
       });
+      drawExplosions();
       requestAnimationFrame(draw);
     }
     draw();
   }
 
-  // ===== WAVE FLOW (philosophy) =====
+  // ===== EXPLOSIVE WAVES (philosophy) =====
   else if (bgType === 'wave') {
     let time = 0;
     const waves = [
-      { amp: 30, freq: 0.003, speed: 0.02, offset: 0 },
-      { amp: 20, freq: 0.005, speed: 0.03, offset: 100 },
-      { amp: 15, freq: 0.007, speed: 0.04, offset: 200 }
+      { amp: 50, freq: 0.002, speed: 0.03, offset: 0 },
+      { amp: 35, freq: 0.004, speed: 0.04, offset: 80 },
+      { amp: 25, freq: 0.006, speed: 0.05, offset: 160 }
     ];
+    const ripples = [];
+
+    window.addEventListener('mousemove', e => {
+      if (Math.random() > 0.92) {
+        ripples.push({ x: e.clientX, y: e.clientY, r: 0, maxR: 150, alpha: 1 });
+      }
+    });
 
     function draw() {
-      ctx.clearRect(0,0,w,h);
-      time += 0.01;
+      ctx.fillStyle = 'rgba(10,10,15,0.05)';
+      ctx.fillRect(0,0,w,h);
+      time += 0.02;
       waves.forEach((wave, wi) => {
         ctx.beginPath();
         for (let x = 0; x <= w; x += 3) {
-          const d = distance(x, h*0.5 + wave.offset, mouse.x, mouse.y);
-          const mouseInfluence = d < 200 ? Math.sin(d * 0.05) * 20 * (1 - d/200) : 0;
+          const d = Math.sqrt((x-mouse.x)**2 + (h*0.5+wave.offset-mouse.y)**2);
+          const mouseInfluence = d < 250 ? Math.sin(d*0.08 - time*2) * 30 * (1-d/250) : 0;
           const y = h*0.5 + wave.offset + Math.sin(x * wave.freq + time * wave.speed) * wave.amp + mouseInfluence;
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
-        ctx.strokeStyle = `rgba(220,20,60,${0.15 - wi*0.03})`;
+        ctx.strokeStyle = `rgba(220,20,60,${0.2 - wi*0.04})`;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        // Glow under wave
+        ctx.beginPath();
+        for (let x = 0; x <= w; x += 3) {
+          const d = Math.sqrt((x-mouse.x)**2 + (h*0.5+wave.offset-mouse.y)**2);
+          const mouseInfluence = d < 250 ? Math.sin(d*0.08 - time*2) * 30 * (1-d/250) : 0;
+          const y = h*0.5 + wave.offset + Math.sin(x * wave.freq + time * wave.speed) * wave.amp + mouseInfluence;
+          if (x === 0) ctx.moveTo(x, y+10);
+          else ctx.lineTo(x, y+10);
+        }
+        ctx.strokeStyle = `rgba(220,20,60,${0.05 - wi*0.01})`;
+        ctx.lineWidth = 15;
+        ctx.stroke();
+      });
+      // Ripples
+      ripples.forEach((r, i) => {
+        r.r += 4;
+        r.alpha -= 0.015;
+        if (r.alpha <= 0) { ripples.splice(i, 1); return; }
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, r.r, 0, Math.PI*2);
+        ctx.strokeStyle = `rgba(220,20,60,${r.alpha})`;
         ctx.lineWidth = 2;
         ctx.stroke();
       });
+      drawExplosions();
       requestAnimationFrame(draw);
     }
     draw();
