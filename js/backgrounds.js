@@ -1,5 +1,5 @@
 // GALAXY UNIVERSE — Full Featured Version
-document.addEventListener('DOMContentLoaded', function() {
+function initBackgrounds() {
   const canvas = document.createElement('canvas');
   canvas.id = 'bg-canvas';
   canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
@@ -456,4 +456,4 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   draw();
-});
+}
