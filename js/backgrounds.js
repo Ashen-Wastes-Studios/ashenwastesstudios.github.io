@@ -1,4 +1,4 @@
-// GALAXY UNIVERSE — Scroll Distortion + Interactive
+// GALAXY UNIVERSE — Infinite Tiling + Interactive
 (function() {
   const canvas = document.createElement('canvas');
   canvas.id = 'bg-canvas';
@@ -33,39 +33,79 @@
   const bgType = document.body.dataset.bg || 'particles';
 
   const themes = {
-    particles: { galaxyCount: 50, colors: ['#dc143c', '#ff6b6b', '#ff8e53', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'], spiralArms: [2, 3, 4], neuralNodes: 25, coreColor: '#fff' },
-    neural: { galaxyCount: 35, colors: ['#dc143c', '#ff4757', '#ff6348', '#c44569', '#f8b500'], spiralArms: [3, 4, 5], neuralNodes: 35, coreColor: '#fff' },
-    ashen: { galaxyCount: 40, colors: ['#dc143c', '#ff4757', '#ff6b6b', '#ff8e53', '#feca57', '#48dbfb'], spiralArms: [3, 4], neuralNodes: 40, coreColor: '#fff' },
-    matrix: { galaxyCount: 25, colors: ['#00ff41', '#39ff14', '#00ff00', '#7fff00', '#dc143c'], spiralArms: [2, 3], neuralNodes: 20, coreColor: '#00ff41' },
-    wireframe: { galaxyCount: 40, colors: ['#dc143c', '#ff4757', '#ff6348', '#f8b500', '#48dbfb', '#54a0ff'], spiralArms: [4, 5, 6], neuralNodes: 30, coreColor: '#fff' },
-    starfield: { galaxyCount: 55, colors: ['#dc143c', '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3'], spiralArms: [2, 3, 4, 5], neuralNodes: 35, coreColor: '#fff' },
-    wave: { galaxyCount: 30, colors: ['#dc143c', '#c44569', '#f8b500', '#48dbfb', '#54a0ff', '#5f27cd'], spiralArms: [2, 3], neuralNodes: 20, coreColor: '#fff' }
+    particles: { galaxyCount: 50, colors: ['#dc143c', '#ff6b6b', '#ff8e53', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'], spiralArms: [2, 3, 4], neuralNodes: 25, coreColor: '#fff', gridSpacing: 300 },
+    neural: { galaxyCount: 35, colors: ['#dc143c', '#ff4757', '#ff6348', '#c44569', '#f8b500'], spiralArms: [3, 4, 5], neuralNodes: 35, coreColor: '#fff', gridSpacing: 350 },
+    ashen: { galaxyCount: 40, colors: ['#dc143c', '#ff4757', '#ff6b6b', '#ff8e53', '#feca57', '#48dbfb'], spiralArms: [3, 4], neuralNodes: 40, coreColor: '#fff', gridSpacing: 320 },
+    matrix: { galaxyCount: 25, colors: ['#00ff41', '#39ff14', '#00ff00', '#7fff00', '#dc143c'], spiralArms: [2, 3], neuralNodes: 20, coreColor: '#00ff41', gridSpacing: 400 },
+    wireframe: { galaxyCount: 40, colors: ['#dc143c', '#ff4757', '#ff6348', '#f8b500', '#48dbfb', '#54a0ff'], spiralArms: [4, 5, 6], neuralNodes: 30, coreColor: '#fff', gridSpacing: 350 },
+    starfield: { galaxyCount: 55, colors: ['#dc143c', '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3'], spiralArms: [2, 3, 4, 5], neuralNodes: 35, coreColor: '#fff', gridSpacing: 280 },
+    wave: { galaxyCount: 30, colors: ['#dc143c', '#c44569', '#f8b500', '#48dbfb', '#54a0ff', '#5f27cd'], spiralArms: [2, 3], neuralNodes: 20, coreColor: '#fff', gridSpacing: 380 }
   };
 
   const theme = themes[bgType] || themes.particles;
 
-  // Create galaxies with proper spiral structure
-  const galaxies = Array.from({ length: theme.galaxyCount }, () => ({
-    x: Math.random() * w,
-    y: Math.random() * h,
-    r: Math.random() * 40 + 15,
-    color: theme.colors[Math.floor(Math.random() * theme.colors.length)],
-    rotation: Math.random() * Math.PI * 2,
-    rotSpeed: (Math.random() - 0.5) * 0.003 + 0.001,
-    spiralArms: theme.spiralArms[Math.floor(Math.random() * theme.spiralArms.length)],
-    pulsePhase: Math.random() * Math.PI * 2,
-    tilt: Math.random() * 0.5 + 0.3, // 3D tilt for elliptical appearance
-    stars: Array.from({ length: 30 }, () => {
-      const arm = Math.floor(Math.random() * theme.spiralArms[0]);
-      const dist = Math.random() * 0.8 + 0.1;
-      const angle = (arm / theme.spiralArms[0]) * Math.PI * 2 + dist * 3;
-      return { dist, angle, size: Math.random() * 2 + 0.5, brightness: Math.random() };
-    })
-  }));
+  // Create a seeded random number generator for consistent galaxy generation
+  function seededRandom(seed) {
+    const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+    return x - Math.floor(x);
+  }
+
+  // Generate a galaxy at a specific grid position (gx, gy)
+  function getGalaxyAt(gx, gy) {
+    const seed = gx * 1000 + gy;
+    const rng = (offset) => seededRandom(seed + offset);
+    
+    return {
+      gx: gx,
+      gy: gy,
+      x: gx * theme.gridSpacing + rng(1) * theme.gridSpacing * 0.5,
+      y: gy * theme.gridSpacing + rng(2) * theme.gridSpacing * 0.5,
+      r: rng(3) * 40 + 15,
+      color: theme.colors[Math.floor(rng(4) * theme.colors.length)],
+      rotation: rng(5) * Math.PI * 2,
+      rotSpeed: (rng(6) - 0.5) * 0.003 + 0.001,
+      spiralArms: theme.spiralArms[Math.floor(rng(7) * theme.spiralArms.length)],
+      pulsePhase: rng(8) * Math.PI * 2,
+      tilt: rng(9) * 0.5 + 0.3,
+      stars: Array.from({ length: 30 }, (_, i) => ({
+        dist: rng(10 + i * 3) * 0.8 + 0.1,
+        angle: (Math.floor(rng(11 + i * 3) * theme.spiralArms[0]) / theme.spiralArms[0]) * Math.PI * 2 + rng(12 + i * 3) * 3,
+        size: rng(13 + i * 3) * 2 + 0.5,
+        brightness: rng(14 + i * 3)
+      }))
+    };
+  }
+
+  // Cache for generated galaxies
+  const galaxyCache = new Map();
+
+  function getGalaxy(gx, gy) {
+    const key = `${gx},${gy}`;
+    if (!galaxyCache.has(key)) {
+      galaxyCache.set(key, getGalaxyAt(gx, gy));
+    }
+    return galaxyCache.get(key);
+  }
+
+  // Get visible galaxies based on scroll position
+  function getVisibleGalaxies() {
+    const result = [];
+    const viewMargin = 400;
+    const minGX = Math.floor((scrollY * 0.2 - viewMargin) / theme.gridSpacing) - 1;
+    const maxGX = Math.floor((w + scrollY * 0.2 + viewMargin) / theme.gridSpacing) + 1;
+    const minGY = Math.floor((-viewMargin) / theme.gridSpacing) - 1;
+    const maxGY = Math.floor((h + viewMargin) / theme.gridSpacing) + 1;
+    
+    for (let gx = minGX; gx <= maxGX; gx++) {
+      for (let gy = minGY; gy <= maxGY; gy++) {
+        result.push(getGalaxy(gx, gy));
+      }
+    }
+    return result;
+  }
 
   const bgStars = Array.from({ length: 400 }, () => ({ x: Math.random()*w, y: Math.random()*h, r: Math.random()*1.5+0.3, twinkle: Math.random()*Math.PI*2, speed: Math.random()*0.02+0.005 }));
   const nebulae = Array.from({ length: 10 }, () => ({ x: Math.random()*w, y: Math.random()*h, rx: Math.random()*250+100, ry: Math.random()*180+80, rotation: Math.random()*Math.PI, color: `hsla(${Math.random()*60+320},80%,30%,0.04)` }));
-  const neuralNodes = galaxies.slice(0, theme.neuralNodes);
 
   const explosions = [];
   const particles = Array.from({ length: 100 }, () => ({ x: Math.random()*w, y: Math.random()*h, vx: (Math.random()-0.5)*2, vy: (Math.random()-0.5)*2, r: Math.random()*3+1, life: 1, decay: Math.random()*0.01+0.005, color: theme.colors[Math.floor(Math.random()*theme.colors.length)] }));
@@ -167,7 +207,9 @@
       ctx.fillStyle=`rgba(255,255,255,${a})`;
       ctx.fill();
     });
-    for (let i=0;i<neuralNodes.length;i++) for (let j=i+1;j<neuralNodes.length;j++) { const a=neuralNodes[i],b=neuralNodes[j],dist=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2); if(dist<400) { const al=0.08*(1-dist/400),d1=Math.sqrt((a.x-mouse.x)**2+(a.y-mouse.y)**2),d2=Math.sqrt((b.x-mouse.x)**2+(b.y-mouse.y)**2),mp=Math.max(0,1-Math.min(d1,d2)/200); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.strokeStyle=`rgba(220,20,60,${al+mp*0.3})`; ctx.lineWidth=mp>0.3?1.5:0.5; ctx.stroke(); if(mp>0.3) { const pp=(Date.now()*0.001+i*0.3)%1,px=a.x+(b.x-a.x)*pp,py=a.y+(b.y-a.y)*pp; ctx.beginPath(); ctx.arc(px,py,2,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); } } }
+    const visibleGalaxies = getVisibleGalaxies();
+const neuralNodes = visibleGalaxies.slice(0, theme.neuralNodes);
+for (let i=0;i<neuralNodes.length;i++) for (let j=i+1;j<neuralNodes.length;j++) { const a=neuralNodes[i],b=neuralNodes[j],dist=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2); if(dist<400) { const al=0.08*(1-dist/400),d1=Math.sqrt((a.x-mouse.x)**2+(a.y-mouse.y)**2),d2=Math.sqrt((b.x-mouse.x)**2+(b.y-mouse.y)**2),mp=Math.max(0,1-Math.min(d1,d2)/200); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.strokeStyle=`rgba(220,20,60,${al+mp*0.3})`; ctx.lineWidth=mp>0.3?1.5:0.5; ctx.stroke(); if(mp>0.3) { const pp=(Date.now()*0.001+i*0.3)%1,px=a.x+(b.x-a.x)*pp,py=a.y+(b.y-a.y)*pp; ctx.beginPath(); ctx.arc(px,py,2,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); } } }
   }
 
   function drawExplosions() {
@@ -313,7 +355,8 @@
 
   function draw() {
     drawBase();
-    galaxies.forEach(g => drawGalaxy(g));
+    const visibleGalaxies = getVisibleGalaxies();
+    visibleGalaxies.forEach(g => drawGalaxy(g));
     draw3DShapes();
     drawWaves();
     drawExplosions();
