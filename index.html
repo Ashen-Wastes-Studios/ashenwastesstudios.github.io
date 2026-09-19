@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ashen Wastes Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0c;
+  --surface: #161616;
+  --surface-2: #1e1e1e;
+  --ink: #e8e6e3;
+  --ink-muted: #8a8580;
+  --accent: #d97757;
+  --accent-dim: #a85a3f;
+  --border: #2a2a2a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Navigation */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(12,12,12,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.nav-links a {
+  color: var(--ink-muted);
+  transition: color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active { color: var(--ink); }
+
+.nav-links a.active { border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 64px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -20%;
+  width: 140%; height: 200%;
+  background: radial-gradient(ellipse at 70% 40%, rgba(217,119,87,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3rem, 8vw, 6.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  max-width: 14ch;
+  margin-bottom: 2rem;
+  font-weight: 400;
+}
+
+.hero p {
+  font-size: 1.15rem;
+  color: var(--ink-muted);
+  max-width: 52ch;
+  margin-bottom: 3rem;
+}
+
+.hero-cta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent-dim); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--ink-muted); }
+
+/* Section */
+section {
+  padding: 6rem 0;
+}
+
+.section-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 400;
+  margin-bottom: 1.5rem;
+  max-width: 22ch;
+}
+
+/* What We Do Grid */
+.work-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.work-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2.5rem;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.work-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.work-card h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 400;
+}
+
+.work-card p {
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+}
+
+.work-card a {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nav-links { gap: 1rem; font-size: 0.85rem; }
+  .hero-cta { flex-direction: column; }
+  .btn { justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Ashen Wastes Studios</div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="ai.html">AI</a></li>
+      <li><a href="ashen-gpt.html">Ashen AI</a></li>
+      <li><a href="ashen-gpt-chat.html">Chat</a></li>
+      <li><a href="gaming-technology.html">Gaming Technology</a></li>
+      <li><a href="games.html">Games</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="hero container">
+  <h1>We build games. We forge intelligence.</h1>
+  <p>Ashen Wastes Studios is a game development studio and technology research company. We create original interactive experiences and push the boundaries of real-time AI systems.</p>
+  <div class="hero-cta">
+    <a href="games.html" class="btn btn-primary">Explore our work</a>
+    <a href="ai.html" class="btn btn-ghost">Research &rarr;</a>
+  </div>
+</header>
+
+<section>
+  <div class="container">
+    <div class="section-label">What we do</div>
+    <h2>Two disciplines, one obsession: building worlds worth being in.</h2>
+    <div class="work-grid">
+      <div class="work-card">
+        <h3>Games</h3>
+        <p>Original titles built on our own engine technology. From rendering to narrative systems, we craft every layer in-house.</p>
+        <a href="games.html">See our games &rarr;</a>
+      </div>
+      <div class="work-card">
+        <h3>AI Research</h3>
+        <p>Applied machine learning for interactive systems — real-time inference, NPC intelligence, procedural generation, and creative tools.</p>
+        <a href="ai.html">Research overview &rarr;</a>
+      </div>
+      <div class="work-card">
+        <h3>Gaming Technology</h3>
+        <p>Wasteland Engine and Nova Renderer — Vulkan-first, AI-powered ray tracing, cross-platform. The foundation beneath every title we ship.</p>
+        <a href="gaming-technology.html">Engine &amp; renderer &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <span>&copy; 2026 Ashen Wastes Studios</span>
+    <span>Game Development &amp; AI Research</span>
+  </div>
+</footer>
+
+</body>
+</html>

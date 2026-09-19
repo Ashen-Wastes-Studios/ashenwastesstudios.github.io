@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gaming Technology — Ashen Wastes Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0c;
+  --surface: #161616;
+  --surface-2: #1e1e1e;
+  --ink: #e8e6e3;
+  --ink-muted: #8a8580;
+  --accent: #d97757;
+  --accent-dim: #a85a3f;
+  --border: #2a2a2a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Navigation */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(12,12,12,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.nav-links a {
+  color: var(--ink-muted);
+  transition: color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active { color: var(--ink); }
+
+.nav-links a.active { border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+
+/* Page Header */
+.page-header {
+  padding: 10rem 0 4rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4rem;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb a { color: var(--accent); }
+
+.page-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  max-width: 16ch;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  color: var(--ink-muted);
+  max-width: 50ch;
+}
+
+/* Section */
+.section-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Engine Spec */
+.engine-spec {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.spec-item h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+  margin-bottom: 0.5rem;
+}
+
+.spec-item p {
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+/* Project Card */
+.project-card {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2rem;
+  padding: 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  align-items: center;
+  transition: border-color 0.2s;
+}
+
+.project-card:hover { border-color: var(--accent); }
+
+.project-thumb {
+  width: 100%;
+  aspect-ratio: 16/10;
+  background: var(--surface-2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+}
+
+.project-info h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  font-weight: 400;
+}
+
+.project-info .status {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+}
+
+.project-info p {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Tech Feature */
+.tech-feature {
+  margin-bottom: 4rem;
+}
+
+.tech-feature h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  font-weight: 400;
+}
+
+.tech-feature p {
+  color: var(--ink-muted);
+  max-width: 60ch;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nav-links { gap: 1rem; font-size: 0.85rem; }
+  .project-card { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Ashen Wastes Studios</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="ai.html">AI</a></li>
+      <li><a href="ashen-gpt.html">Ashen AI</a></li>
+      <li><a href="ashen-gpt-chat.html">Chat</a></li>
+      <li><a href="gaming-technology.html" class="active">Gaming Technology</a></li>
+      <li><a href="games.html">Games</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="page-header container">
+  <div class="breadcrumb"><a href="index.html">Home</a> / Gaming Technology</div>
+  <h1>Built from the silicon up.</h1>
+  <p>Our engine and rendering technology — designed in-house for visual fidelity, performance, and creative freedom across Windows and Linux.</p>
+</header>
+
+<section class="container">
+  <div class="tech-feature">
+    <div class="section-label">Engine</div>
+    <h2>Wasteland Engine — Vulkan-first rendering.</h2>
+    <p>Our engine is built on Vulkan for maximum GPU control across Windows and Linux. Volumetric fog, raymarched clouds, dynamic global illumination, and GPU-driven rendering pipelines.</p>
+    <div class="engine-spec">
+      <div class="spec-item"><h4>Graphics API</h4><p>Vulkan / D3D12 / D3D11 / OpenGL</p></div>
+      <div class="spec-item"><h4>Renderer</h4><p>Nova — AI ray tracing</p></div>
+      <div class="spec-item"><h4>Lighting</h4><p>Volumetric GI</p></div>
+      <div class="spec-item"><h4>Physics</h4><p>Custom solver</p></div>
+    </div>
+  </div>
+
+  <div class="tech-feature">
+    <div class="section-label">Projects</div>
+    <h2>Core technology powering our games.</h2>
+
+    <div class="project-card">
+      <div class="project-thumb">[Art]</div>
+      <div class="project-info">
+        <h3>Wasteland Engine</h3>
+        <div class="status">Active Development — includes Nova Renderer</div>
+        <p>Full game engine stack: rendering, physics, audio, AI integration, and tooling. Ships with <strong>Nova Renderer</strong> — our AI-powered 3D ray tracing renderer for denoising, upscaling, and intelligent sample distribution. Vulkan-first with fallback support for D3D12, D3D11, and OpenGL. Built for original titles.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <span>&copy; 2026 Ashen Wastes Studios</span>
+    <span>Gaming Technology &amp; Game Development</span>
+  </div>
+</footer>
+
+</body>
+</html>

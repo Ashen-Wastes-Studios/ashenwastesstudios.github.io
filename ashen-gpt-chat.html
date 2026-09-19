@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ashen GPT Chat — Ashen Wastes Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0c;
+  --surface: #161616;
+  --surface-2: #1e1e1e;
+  --ink: #e8e6e3;
+  --ink-muted: #8a8580;
+  --accent: #d97757;
+  --accent-dim: #a85a3f;
+  --border: #2a2a2a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* Navigation */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(12,12,12,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.nav-links a {
+  color: var(--ink-muted);
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--ink); }
+
+/* Chat Container */
+.chat-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding-top: 64px;
+}
+
+.chat-header {
+  padding: 1rem 2rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.chat-header .status {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.clone-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--ink);
+  padding: 0.4rem 0.9rem;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.clone-btn:hover {
+  border-color: var(--accent);
+  background: var(--surface-2);
+}
+
+.clone-btn.copied {
+  border-color: #4ade80;
+  color: #4ade80;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.offline {
+  background: #ef4444;
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.chat-frame-container {
+  flex: 1;
+  position: relative;
+}
+
+iframe#ashen-chat {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: var(--bg);
+}
+
+/* Offline Fallback */
+.offline-fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  background: var(--bg);
+}
+
+.offline-fallback.active {
+  display: flex;
+}
+
+.offline-fallback h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  font-weight: 400;
+}
+
+.offline-fallback p {
+  color: var(--ink-muted);
+  max-width: 40ch;
+  margin-bottom: 1.5rem;
+}
+
+.offline-fallback code {
+  background: var(--surface);
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-family: monospace;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* Back link */
+.back-link {
+  font-size: 0.9rem;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 768px) {
+  .nav-links { gap: 1rem; font-size: 0.85rem; }
+  .chat-header { padding: 1rem; }
+  .chat-header h1 { font-size: 1.2rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Ashen Wastes Studios</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="ai.html">AI</a></li>
+      <li><a href="ashen-gpt.html">Ashen AI</a></li>
+      <li><a href="gaming-technology.html">Gaming Technology</a></li>
+      <li><a href="games.html">Games</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="chat-wrapper">
+  <div class="chat-header">
+    <h1>Ashen GPT</h1>
+    <div class="status">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">Connecting...</span>
+      <button class="clone-btn" id="clone-btn" title="Clone repo to clipboard">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Clone
+      </button>
+    </div>
+  </div>
+  <div class="chat-frame-container">
+    <iframe id="ashen-chat" src="http://localhost:5000" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+    <div class="offline-fallback" id="offline-fallback">
+      <h2>Ashen AI is offline</h2>
+      <p>The local chatbot server isn't running. Start it from the Ashen AI Base directory:</p>
+      <code>cd C:\dev\Ashen AI Base</code>
+      <code>cuda\Scripts\python.exe web_chatbot.py</code>
+      <p style="margin-top: 1rem;"><a href="ashen-gpt.html" class="back-link">← Back to documentation</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const iframe = document.getElementById('ashen-chat');
+const fallback = document.getElementById('offline-fallback');
+const statusDot = document.getElementById('status-dot');
+const statusText = document.getElementById('status-text');
+const cloneBtn = document.getElementById('clone-btn');
+
+// Clone button
+const cloneCmd = 'git clone https://github.com/Ashen-Wastes-Studios/Ashen-GPT.git';
+
+if (cloneBtn) {
+  cloneBtn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(cloneCmd);
+      cloneBtn.classList.add('copied');
+      cloneBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+      setTimeout(() => {
+        cloneBtn.classList.remove('copied');
+        cloneBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Clone';
+      }, 2000);
+    } catch (e) {
+      // Fallback for older browsers
+      cloneBtn.textContent = 'Copy: ' + cloneCmd;
+    }
+  });
+}
+
+// Check if the chatbot is reachable
+function checkServer() {
+  return fetch('http://localhost:5000', { method: 'HEAD', mode: 'no-cors' })
+    .then(() => true)
+    .catch(() => false);
+}
+
+// Poll for server status
+async function updateStatus() {
+  const online = await checkServer();
+  if (online) {
+    statusDot.classList.remove('offline');
+    statusText.textContent = 'Online — localhost:5000';
+    fallback.classList.remove('active');
+  } else {
+    statusDot.classList.add('offline');
+    statusText.textContent = 'Offline';
+    fallback.classList.add('active');
+  }
+}
+
+// Initial check + poll every 5 seconds
+updateStatus();
+setInterval(updateStatus, 5000);
+
+// Handle iframe load errors
+iframe.addEventListener('error', () => {
+  fallback.classList.add('active');
+});
+
+</script>
+
+</body>
+</html>

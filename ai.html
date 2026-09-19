@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Research — Ashen Wastes Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0c0c0c;
+  --surface: #161616;
+  --surface-2: #1e1e1e;
+  --ink: #e8e6e3;
+  --ink-muted: #8a8580;
+  --accent: #d97757;
+  --accent-dim: #a85a3f;
+  --border: #2a2a2a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Navigation */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(12,12,12,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.nav-links a {
+  color: var(--ink-muted);
+  transition: color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active { color: var(--ink); }
+
+.nav-links a.active { border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+
+/* Page Header */
+.page-header {
+  padding: 10rem 0 4rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4rem;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb a { color: var(--accent); }
+
+.page-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  max-width: 16ch;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  color: var(--ink-muted);
+  max-width: 50ch;
+}
+
+/* Section */
+.section-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Research Grid */
+.research-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.research-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  transition: border-color 0.2s;
+}
+
+.research-card:hover { border-color: var(--accent); }
+
+.research-card .tag {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.research-card h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.35rem;
+  margin-bottom: 0.75rem;
+  font-weight: 400;
+}
+
+.research-card p {
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+/* Content block */
+.content-block {
+  margin-bottom: 4rem;
+}
+
+.content-block h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  font-weight: 400;
+  max-width: 24ch;
+}
+
+.content-block p {
+  color: var(--ink-muted);
+  max-width: 60ch;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nav-links { gap: 1rem; font-size: 0.85rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Ashen Wastes Studios</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="ai.html" class="active">AI</a></li>
+      <li><a href="ashen-gpt.html">Ashen AI</a></li>
+      <li><a href="ashen-gpt-chat.html">Chat</a></li>
+      <li><a href="gaming-technology.html">Gaming Technology</a></li>
+      <li><a href="games.html">Games</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="page-header container">
+  <div class="breadcrumb"><a href="index.html">Home</a> / AI Research</div>
+  <h1>Intelligence that inhabits worlds.</h1>
+  <p>We build AI systems designed for interactive environments — real-time, embedded, and responsive to player agency.</p>
+</header>
+
+<section class="container">
+  <div class="content-block">
+    <div class="section-label">Research Areas</div>
+    <h2>From model to moment — AI that acts inside games.</h2>
+    <div class="research-grid">
+      <div class="research-card">
+        <div class="tag">Real-Time Inference</div>
+        <h3>On-device, on-budget</h3>
+        <p>Running language models on consumer hardware with strict latency budgets. Quantization, context management, and streaming that doesn't stall the frame loop.</p>
+      </div>
+      <div class="research-card">
+        <div class="tag">NPC Intelligence</div>
+        <h3>Agent architectures</h3>
+        <p>Behavior systems that blend scripted reliability with generative flexibility. Characters that remember, react, and reason — not just recite.</p>
+      </div>
+      <div class="research-card">
+        <div class="tag">Procedural Systems</div>
+        <h3>Generative worlds</h3>
+        <p>ML-assisted content generation: dialogue, quest structure, terrain, and narrative scaffolding. Tools that amplify designers, not replace them.</p>
+      </div>
+      <div class="research-card">
+        <div class="tag">Creative Tools</div>
+        <h3>AI-augmented pipelines</h3>
+        <p>Integrating large models into art and writing workflows. Fine-tuned on studio voice, deployed locally, controlled by creators.</p>
+      </div>
+      <div class="research-card">
+        <div class="tag">Safety & Alignment</div>
+        <h3>Runtime guardrails</h3>
+        <p>Refusal filters, content policies, and behavioral constraints that operate at inference time — keeping generated content within design intent.</p>
+      </div>
+      <div class="research-card">
+        <div class="tag">Simulation</div>
+        <h3>World models</h3>
+        <p>Predictive models of game state for testing, balancing, and emergent scenario generation. Faster iteration through simulated play.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-block">
+    <div class="section-label">Open Source</div>
+    <h2>Ashen AI — our open source project.</h2>
+    <p>We believe in building AI transparently. Ashen AI is an open source project focused on safe, local AI systems that researchers can contribute to and build upon. Licensed under the BigScience Open RAIL-M License.</p>
+    <p><a href="ashen-gpt.html" style="color: var(--accent); font-weight: 500;">Learn more about Ashen AI &rarr;</a></p>
+  </div>
+
+  <div class="content-block">
+    <div class="section-label">Approach</div>
+    <h2>Embedded, not external.</h2>
+    <p>Most AI research treats the model as the product. We treat it as a component — one that has to coexist with rendering, physics, audio, and input at 60 frames per second. That constraint shapes everything we build.</p>
+    <p>Our systems run locally on player hardware. No cloud dependency, no latency spikes, no per-token cost. Just intelligence that lives inside the game.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <span>&copy; 2026 Ashen Wastes Studios</span>
+    <span>AI Research &amp; Game Development</span>
+  </div>
+</footer>
+
+</body>
+</html>
