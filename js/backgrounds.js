@@ -90,8 +90,12 @@
     const baseAlpha = 0.4 + Math.sin(g.pulsePhase) * 0.15;
     const alpha = Math.min(1, baseAlpha + proximity * 0.6);
 
+    // Scroll-based position offset (parallax-like movement)
+    const scrollOffsetX = Math.sin(g.pulsePhase * 0.5) * scrollY * 0.3;
+    const scrollOffsetY = Math.cos(g.pulsePhase * 0.3) * scrollY * 0.2;
+
     ctx.save();
-    ctx.translate(g.x, g.y);
+    ctx.translate(g.x + scrollOffsetX, g.y + scrollOffsetY);
     // More tilt distortion when scrolled
     ctx.scale(1 + distortion * 0.3, g.tilt - distortion * 0.2);
 
@@ -137,8 +141,32 @@
   function drawBase() {
     ctx.fillStyle = '#030308';
     ctx.fillRect(0, 0, w, h);
-    nebulae.forEach(n => { ctx.save(); ctx.translate(n.x, n.y); ctx.rotate(n.rotation); const g = ctx.createRadialGradient(0,0,0,0,0,n.rx); g.addColorStop(0,n.color); g.addColorStop(1,'transparent'); ctx.fillStyle=g; ctx.scale(1,n.ry/n.rx); ctx.beginPath(); ctx.arc(0,0,n.rx,0,Math.PI*2); ctx.fill(); ctx.restore(); });
-    bgStars.forEach(s => { s.twinkle+=s.speed; const a=0.15+Math.sin(s.twinkle)*0.25; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fillStyle=`rgba(255,255,255,${a})`; ctx.fill(); });
+    // Nebulae shift with scroll
+    nebulae.forEach(n => {
+      ctx.save();
+      ctx.translate(n.x + scrollY * 0.1, n.y + scrollY * 0.05);
+      ctx.rotate(n.rotation + scrollY * 0.0001);
+      const g = ctx.createRadialGradient(0,0,0,0,0,n.rx);
+      g.addColorStop(0,n.color);
+      g.addColorStop(1,'transparent');
+      ctx.fillStyle=g;
+      ctx.scale(1,n.ry/n.rx);
+      ctx.beginPath();
+      ctx.arc(0,0,n.rx,0,Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+    });
+    // Stars parallax (slower than foreground)
+    bgStars.forEach(s => {
+      s.twinkle+=s.speed;
+      const a=0.15+Math.sin(s.twinkle)*0.25;
+      const sx = (s.x + scrollY * 0.05) % w;
+      const sy = (s.y + scrollY * 0.03) % h;
+      ctx.beginPath();
+      ctx.arc(sx, sy, s.r, 0, Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${a})`;
+      ctx.fill();
+    });
     for (let i=0;i<neuralNodes.length;i++) for (let j=i+1;j<neuralNodes.length;j++) { const a=neuralNodes[i],b=neuralNodes[j],dist=Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2); if(dist<400) { const al=0.08*(1-dist/400),d1=Math.sqrt((a.x-mouse.x)**2+(a.y-mouse.y)**2),d2=Math.sqrt((b.x-mouse.x)**2+(b.y-mouse.y)**2),mp=Math.max(0,1-Math.min(d1,d2)/200); ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.strokeStyle=`rgba(220,20,60,${al+mp*0.3})`; ctx.lineWidth=mp>0.3?1.5:0.5; ctx.stroke(); if(mp>0.3) { const pp=(Date.now()*0.001+i*0.3)%1,px=a.x+(b.x-a.x)*pp,py=a.y+(b.y-a.y)*pp; ctx.beginPath(); ctx.arc(px,py,2,0,Math.PI*2); ctx.fillStyle='#fff'; ctx.fill(); } } }
   }
 
@@ -189,6 +217,10 @@
       shape.rotZ += shape.rz * (1 + distortion * 4);
       shape.z += 0.8 * (1 + distortion * 2);
       if (shape.z > 400) shape.z = -400;
+
+      // Scroll-based position movement
+      shape.x += Math.sin(scrollY * 0.002 + shape.rotX) * 0.5;
+      shape.y += Math.cos(scrollY * 0.002 + shape.rotY) * 0.5;
 
       let verts = [];
       if (shape.type === 0) {
@@ -245,7 +277,7 @@
       const amp = 35 + layer * 12 + distortion * 20;
       const freq = 0.002 + layer * 0.0004;
       const speed = 0.008 + layer * 0.003 + distortion * 0.01;
-      const offset = layer * 45;
+      const offset = layer * 45 + scrollY * 0.1; // Waves shift down as you scroll
       const color = theme.colors[layer % theme.colors.length];
 
       ctx.beginPath();
