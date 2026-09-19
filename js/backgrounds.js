@@ -1,4 +1,4 @@
-// STARRY FUTURISTIC Interactive Backgrounds for Ashen Wastes Studios
+// GALAXY UNIVERSE Neural Network Visualization
 (function() {
   const canvas = document.createElement('canvas');
   canvas.id = 'bg-canvas';
@@ -14,360 +14,183 @@
   resize();
   window.addEventListener('resize', resize);
 
-  const mouse = { x: w/2, y: h/2, active: false, down: false };
+  const mouse = { x: w/2, y: h/2, active: false };
   window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; });
-  window.addEventListener('mousedown', e => { mouse.down = true; createExplosion(mouse.x, mouse.y); });
-  window.addEventListener('mouseup', () => mouse.down = false);
   window.addEventListener('mouseleave', () => mouse.active = false);
 
   const bgType = document.body.dataset.bg || 'particles';
 
-  // Star field (shared across all pages)
-  const stars = Array.from({ length: 100 }, () => ({
-    x: Math.random() * w, y: Math.random() * h,
-    r: Math.random() * 1.5 + 0.5,
-    twinkle: Math.random() * Math.PI * 2,
-    speed: Math.random() * 0.02 + 0.01
+  // Galaxy colors
+  const galaxyColors = [
+    'rgba(220, 20, 60, 0.8)',    // Blood red
+    'rgba(255, 100, 100, 0.6)',  // Light red
+    'rgba(200, 50, 100, 0.5)',   // Pink
+    'rgba(150, 50, 200, 0.4)',   // Purple
+    'rgba(100, 100, 255, 0.3)',  // Blue
+    'rgba(255, 255, 255, 0.9)',  // White hot
+  ];
+
+  // Create galaxy clusters (stars/galaxies)
+  const galaxyCount = 60;
+  const galaxies = Array.from({ length: galaxyCount }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    z: Math.random() * 1000 + 200, // Depth for parallax
+    r: Math.random() * 30 + 10,
+    color: galaxyColors[Math.floor(Math.random() * galaxyColors.length)],
+    rotation: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.002,
+    spiralArms: Math.floor(Math.random() * 3) + 2,
+    pulsePhase: Math.random() * Math.PI * 2,
+    connections: [],
+    active: false
   }));
 
-  // Explosion effects array
-  const explosions = [];
+  // Create background stars
+  const bgStars = Array.from({ length: 300 }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    r: Math.random() * 1.5 + 0.5,
+    twinkle: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.02 + 0.005
+  }));
 
-  function createExplosion(x, y) {
-    explosions.push({ x, y, radius: 0, maxRadius: 200, alpha: 1, color: `hsl(${Math.random()*30+350}, 100%, 50%)` });
+  // Create nebula clouds
+  const nebulae = Array.from({ length: 8 }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    rx: Math.random() * 200 + 100,
+    ry: Math.random() * 150 + 80,
+    rotation: Math.random() * Math.PI,
+    color: `hsla(${Math.random() * 60 + 320}, 80%, 30%, 0.05)`
+  }));
+
+  // Neural network nodes (subset of galaxies)
+  const neuralNodes = galaxies.slice(0, 25);
+
+  function drawNebulae() {
+    nebulae.forEach(n => {
+      ctx.save();
+      ctx.translate(n.x, n.y);
+      ctx.rotate(n.rotation);
+      const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, n.rx);
+      gradient.addColorStop(0, n.color);
+      gradient.addColorStop(1, 'transparent');
+      ctx.fillStyle = gradient;
+      ctx.scale(1, n.ry / n.rx);
+      ctx.beginPath();
+      ctx.arc(0, 0, n.rx, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    });
   }
 
-  function drawStars() {
-    stars.forEach(s => {
+  function drawBackgroundStars() {
+    bgStars.forEach(s => {
       s.twinkle += s.speed;
-      const alpha = 0.3 + Math.sin(s.twinkle) * 0.3;
+      const alpha = 0.2 + Math.sin(s.twinkle) * 0.3;
       ctx.beginPath();
       ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
       ctx.fill();
     });
   }
 
-  function drawExplosions() {
-    explosions.forEach((e, i) => {
-      e.radius += 8;
-      e.alpha -= 0.02;
-      if (e.alpha <= 0) { explosions.splice(i, 1); return; }
-      ctx.beginPath();
-      ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
-      ctx.strokeStyle = e.color;
-      ctx.globalAlpha = e.alpha;
-      ctx.lineWidth = 3;
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(e.x, e.y, e.radius * 0.7, 0, Math.PI * 2);
-      ctx.fillStyle = e.color;
-      ctx.globalAlpha = e.alpha * 0.3;
-      ctx.fill();
-      ctx.globalAlpha = 1;
-    });
-  }
+  function drawGalaxy(g) {
+    const d = Math.sqrt((g.x - mouse.x) ** 2 + (g.y - mouse.y) ** 2);
+    const proximity = d < 300 ? Math.max(0, 1 - d / 300) : 0;
+    g.pulsePhase += 0.02;
+    g.rotation += g.rotSpeed;
 
-  function drawFuturisticGrid() {
-    ctx.strokeStyle = 'rgba(220,20,60,0.03)';
-    ctx.lineWidth = 1;
-    const gridSize = 80;
-    for (let x = 0; x < w; x += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, h);
-      ctx.stroke();
-    }
-    for (let y = 0; y < h; y += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
-      ctx.stroke();
-    }
-  }
+    const baseAlpha = 0.3 + Math.sin(g.pulsePhase) * 0.1;
+    const alpha = Math.min(1, baseAlpha + proximity * 0.7);
 
-  // ===== STARRY PARTICLES (index) =====
-  if (bgType === 'particles') {
-    const particles = Array.from({ length: 200 }, () => ({
-      x: Math.random()*w, y: Math.random()*h,
-      vx: (Math.random()-0.5)*1.5, vy: (Math.random()-0.5)*1.5,
-      r: Math.random()*4+1, color: `hsl(${Math.random()*30+350}, 100%, 50%)`
-    }));
+    // Outer glow
+    const glowSize = g.r * (2 + proximity * 1.5);
+    const gradient = ctx.createRadialGradient(g.x, g.y, 0, g.x, g.y, glowSize);
+    gradient.addColorStop(0, `rgba(220, 20, 60, ${alpha * 0.8})`);
+    gradient.addColorStop(0.3, `rgba(200, 50, 100, ${alpha * 0.4})`);
+    gradient.addColorStop(0.6, `rgba(150, 50, 200, ${alpha * 0.2})`);
+    gradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(g.x, g.y, glowSize, 0, Math.PI * 2);
+    ctx.fill();
 
-    function draw() {
-      ctx.fillStyle = 'rgba(10,10,15,0.1)';
-      ctx.fillRect(0,0,w,h);
-      drawFuturisticGrid();
-      drawStars();
-      particles.forEach(p => {
-        const dx = p.x - mouse.x, dy = p.y - mouse.y;
-        const d = Math.sqrt(dx*dx + dy*dy);
-        if (d < 250) {
-          const force = (250 - d) / 250;
-          p.vx += (dx/d) * force * 0.5;
-          p.vy += (dy/d) * force * 0.5;
-        }
-        p.x += p.vx; p.y += p.vy;
-        p.vx *= 0.96; p.vy *= 0.96;
-        if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
-        if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+    // Spiral arms
+    ctx.save();
+    ctx.translate(g.x, g.y);
+    ctx.rotate(g.rotation);
+    for (let arm = 0; arm < g.spiralArms; arm++) {
+      const armAngle = (arm / g.spiralArms) * Math.PI * 2;
+      for (let i = 0; i < 15; i++) {
+        const dist = i * (g.r / 8);
+        const angle = armAngle + i * 0.3;
+        const sx = Math.cos(angle) * dist;
+        const sy = Math.sin(angle) * dist;
+        const size = Math.max(1, (15 - i) * 0.5 * (1 + proximity));
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r*3, 0, Math.PI*2);
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = 0.2;
+        ctx.arc(sx, sy, size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha * (1 - i / 15)})`;
         ctx.fill();
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-        ctx.fillStyle = '#fff';
-        ctx.globalAlpha = 0.9;
-        ctx.fill();
-        ctx.globalAlpha = 1;
-      });
-      ctx.globalAlpha = 0.3;
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i+1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          if (dist < 120) {
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(220,20,60,${0.3*(1-dist/120)})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
-        }
-      }
-      ctx.globalAlpha = 1;
-      drawExplosions();
-      requestAnimationFrame(draw);
-    }
-    draw();
-  }
-
-  // ===== STARRY NEURAL (ai, ashen-gpt) =====
-  else if (bgType === 'neural') {
-    const nodes = Array.from({ length: 100 }, () => ({
-      x: Math.random()*w, y: Math.random()*h,
-      vx: (Math.random()-0.5)*0.8, vy: (Math.random()-0.5)*0.8,
-      r: Math.random()*5+2, pulse: Math.random()*Math.PI*2
-    }));
-
-    function draw() {
-      ctx.fillStyle = 'rgba(10,10,15,0.08)';
-      ctx.fillRect(0,0,w,h);
-      drawFuturisticGrid();
-      drawStars();
-      nodes.forEach(n => {
-        n.pulse += 0.05;
-        const d = Math.sqrt((n.x-mouse.x)**2 + (n.y-mouse.y)**2);
-        if (d < 200) n.r = 5 + Math.sin(n.pulse) * 3 + (200-d)/30;
-        else n.r = 3 + Math.sin(n.pulse) * 2;
-        n.x += n.vx; n.y += n.vy;
-        if (n.x < 0 || n.x > w) n.vx *= -1;
-        if (n.y < 0 || n.y > h) n.vy *= -1;
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r*3, 0, Math.PI*2);
-        ctx.fillStyle = 'rgba(220,20,60,0.3)';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r, 0, Math.PI*2);
-        ctx.fillStyle = '#fff';
-        ctx.fill();
-      });
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i+1; j < nodes.length; j++) {
-          const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
-          const dist = Math.sqrt(dx*dx + dy*dy);
-          if (dist < 180) {
-            ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
-            ctx.strokeStyle = `rgba(220,20,60,${0.2*(1-dist/180)})`;
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-          }
-        }
-      }
-      drawExplosions();
-      requestAnimationFrame(draw);
-    }
-    draw();
-  }
-
-  // ===== STARRY MATRIX (chat) =====
-  else if (bgType === 'matrix') {
-    const fontSize = 16;
-    const columns = Math.floor(w / fontSize);
-    const drops = Array.from({length: columns}, () => ({
-      y: Math.random() * -200,
-      speed: Math.random() * 3 + 2,
-      chars: Array.from({length: 25}, () => String.fromCharCode(0x30A0 + Math.random() * 96))
-    }));
-
-    function draw() {
-      ctx.fillStyle = 'rgba(10,10,15,0.06)';
-      ctx.fillRect(0,0,w,h);
-      drawFuturisticGrid();
-      drawStars();
-      ctx.font = `bold ${fontSize}px monospace`;
-      drops.forEach((drop, i) => {
-        const x = i * fontSize;
-        drop.chars.forEach((char, ci) => {
-          const y = (drop.y + ci) * fontSize;
-          if (y > 0 && y < h) {
-            const d = Math.sqrt((x-mouse.x)**2 + (y-mouse.y)**2);
-            const glow = d < 120 ? 0.8 * (1 - d/120) : 0;
-            const alpha = ci === 0 ? 1 : 0.2 * (1 - ci/drop.chars.length);
-            ctx.fillStyle = `rgba(220,20,60,${alpha + glow})`;
-            ctx.fillText(char, x, y);
-            if (ci === 0) { ctx.fillStyle = '#fff'; ctx.fillText(char, x, y); }
-          }
-        });
-        drop.y += drop.speed;
-        if (drop.y * fontSize > h + drop.chars.length * fontSize) drop.y = -Math.random() * 100;
-      });
-      drawExplosions();
-      requestAnimationFrame(draw);
-    }
-    draw();
-  }
-
-  // ===== STARRY WIREFRAME (gaming-tech, engine-docs) =====
-  else if (bgType === 'wireframe') {
-    let rotX = 0, rotY = 0;
-    const points = [];
-    const size = 10;
-    const spacing = 50;
-    for (let x = -size; x <= size; x++) {
-      for (let y = -size; y <= size; y++) {
-        for (let z = -size; z <= size; z++) {
-          if (Math.random() > 0.6) points.push({x: x*spacing, y: y*spacing, z: z*spacing});
-        }
       }
     }
+    ctx.restore();
 
-    function project(x, y, z) {
-      const fov = 400;
-      const scale = fov / (fov + z + 300);
-      return { x: w/2 + x * scale, y: h/2 + y * scale, scale };
-    }
+    // Core
+    ctx.beginPath();
+    ctx.arc(g.x, g.y, g.r * (1 + proximity * 0.5), 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+    ctx.fill();
+  }
 
-    function draw() {
-      ctx.fillStyle = 'rgba(10,10,15,0.1)';
-      ctx.fillRect(0,0,w,h);
-      drawFuturisticGrid();
-      drawStars();
-      rotY += 0.008;
-      rotX += 0.004;
-      points.forEach(p => {
-        let {x, y, z} = p;
-        let x1 = x * Math.cos(rotY) - z * Math.sin(rotY);
-        let z1 = x * Math.sin(rotY) + z * Math.cos(rotY);
-        let y1 = y * Math.cos(rotX) - z1 * Math.sin(rotX);
-        let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
-        const proj = project(x1, y1, z2);
-        const d = Math.sqrt((proj.x-mouse.x)**2 + (proj.y-mouse.y)**2);
-        const glow = d < 180 ? (1 - d/180) * 2 : 0;
-        ctx.beginPath();
-        ctx.arc(proj.x, proj.y, 3 * proj.scale + glow, 0, Math.PI*2);
-        ctx.fillStyle = `rgba(220,20,60,${0.3 * proj.scale + glow})`;
-        ctx.fill();
-        if (glow > 0.5) {
+  function drawNeuralConnections() {
+    for (let i = 0; i < neuralNodes.length; i++) {
+      for (let j = i + 1; j < neuralNodes.length; j++) {
+        const a = neuralNodes[i];
+        const b = neuralNodes[j];
+        const dist = Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+        if (dist < 400) {
+          const alpha = 0.1 * (1 - dist / 400);
+          const d1 = Math.sqrt((a.x - mouse.x) ** 2 + (a.y - mouse.y) ** 2);
+          const d2 = Math.sqrt((b.x - mouse.x) ** 2 + (b.y - mouse.y) ** 2);
+          const mouseProximity = Math.max(0, 1 - Math.min(d1, d2) / 200);
+
           ctx.beginPath();
-          ctx.arc(proj.x, proj.y, 6 + glow, 0, Math.PI*2);
-          ctx.fillStyle = `rgba(220,20,60,${glow * 0.5})`;
-          ctx.fill();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.strokeStyle = `rgba(220, 20, 60, ${alpha + mouseProximity * 0.4})`;
+          ctx.lineWidth = mouseProximity > 0.3 ? 2 : 0.5;
+          ctx.stroke();
+
+          // Pulse traveling along connection
+          if (mouseProximity > 0.3) {
+            const pulsePos = (Date.now() * 0.001 + i * 0.3) % 1;
+            const px = a.x + (b.x - a.x) * pulsePos;
+            const py = a.y + (b.y - a.y) * pulsePos;
+            ctx.beginPath();
+            ctx.arc(px, py, 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+          }
         }
-      });
-      drawExplosions();
-      requestAnimationFrame(draw);
+      }
     }
-    draw();
   }
 
-  // ===== STARRY STARFIELD (games) =====
-  else if (bgType === 'starfield') {
-    const stars2 = Array.from({length: 200}, () => ({
-      x: (Math.random()-0.5)*w*3, y: (Math.random()-0.5)*h*3, z: Math.random()*1500, trail: []
-    }));
+  function draw() {
+    // Deep space background
+    ctx.fillStyle = '#050508';
+    ctx.fillRect(0, 0, w, h);
 
-    function draw() {
-      ctx.fillStyle = 'rgba(10,10,15,0.08)';
-      ctx.fillRect(0,0,w,h);
-      drawFuturisticGrid();
-      drawStars();
-      stars2.forEach(s => {
-        s.z -= 4;
-        if (s.z <= 0) { s.z = 1500; s.x = (Math.random()-0.5)*w*3; s.y = (Math.random()-0.5)*h*3; s.trail = []; }
-        const sx = (s.x / s.z) * 400 + w/2;
-        const sy = (s.y / s.z) * 400 + h/2;
-        const size = Math.max(0, (1500-s.z)/200);
-        const d = Math.sqrt((sx-mouse.x)**2 + (sy-mouse.y)**2);
-        const glow = d < 120 ? (1 - d/120) * 3 : 0;
-        s.trail.push({x: sx, y: sy});
-        if (s.trail.length > 5) s.trail.shift();
-        s.trail.forEach((t, i) => {
-          ctx.beginPath();
-          ctx.arc(t.x, t.y, size * (i/s.trail.length), 0, Math.PI*2);
-          ctx.fillStyle = `rgba(220,20,60,${0.3 * (i/s.trail.length)})`;
-          ctx.fill();
-        });
-        ctx.beginPath();
-        ctx.arc(sx, sy, size + glow, 0, Math.PI*2);
-        ctx.fillStyle = '#fff';
-        ctx.fill();
-      });
-      drawExplosions();
-      requestAnimationFrame(draw);
-    }
-    draw();
+    drawNebulae();
+    drawBackgroundStars();
+    drawNeuralConnections();
+    galaxies.forEach(g => drawGalaxy(g));
+
+    requestAnimationFrame(draw);
   }
 
-  // ===== STARRY WAVES (philosophy) =====
-  else if (bgType === 'wave') {
-    let time = 0;
-    const waves = [
-      { amp: 50, freq: 0.002, speed: 0.03, offset: 0 },
-      { amp: 35, freq: 0.004, speed: 0.04, offset: 80 },
-      { amp: 25, freq: 0.006, speed: 0.05, offset: 160 }
-    ];
-    const ripples = [];
-    window.addEventListener('mousemove', e => { if (Math.random() > 0.92) ripples.push({ x: e.clientX, y: e.clientY, r: 0, maxR: 150, alpha: 1 }); });
-
-    function draw() {
-      ctx.fillStyle = 'rgba(10,10,15,0.05)';
-      ctx.fillRect(0,0,w,h);
-      drawFuturisticGrid();
-      drawStars();
-      time += 0.02;
-      waves.forEach((wave, wi) => {
-        ctx.beginPath();
-        for (let x = 0; x <= w; x += 3) {
-          const d = Math.sqrt((x-mouse.x)**2 + (h*0.5+wave.offset-mouse.y)**2);
-          const mouseInfluence = d < 250 ? Math.sin(d*0.08 - time*2) * 30 * (1-d/250) : 0;
-          const y = h*0.5 + wave.offset + Math.sin(x * wave.freq + time * wave.speed) * wave.amp + mouseInfluence;
-          if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-        }
-        ctx.strokeStyle = `rgba(220,20,60,${0.2 - wi*0.04})`;
-        ctx.lineWidth = 3;
-        ctx.stroke();
-        ctx.beginPath();
-        for (let x = 0; x <= w; x += 3) {
-          const d = Math.sqrt((x-mouse.x)**2 + (h*0.5+wave.offset-mouse.y)**2);
-          const mouseInfluence = d < 250 ? Math.sin(d*0.08 - time*2) * 30 * (1-d/250) : 0;
-          const y = h*0.5 + wave.offset + Math.sin(x * wave.freq + time * wave.speed) * wave.amp + mouseInfluence;
-          if (x === 0) ctx.moveTo(x, y+10); else ctx.lineTo(x, y+10);
-        }
-        ctx.strokeStyle = `rgba(220,20,60,${0.05 - wi*0.01})`;
-        ctx.lineWidth = 15;
-        ctx.stroke();
-      });
-      ripples.forEach((r, i) => { r.r += 4; r.alpha -= 0.015; if (r.alpha <= 0) { ripples.splice(i, 1); return; } ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI*2); ctx.strokeStyle = `rgba(220,20,60,${r.alpha})`; ctx.lineWidth = 2; ctx.stroke(); });
-      drawExplosions();
-      requestAnimationFrame(draw);
-    }
-    draw();
-  }
+  draw();
 
 })();
