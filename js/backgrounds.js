@@ -1,4 +1,4 @@
-// GALAXY UNIVERSE Neural Network Visualization
+// GALAXY UNIVERSE + EXPLOSIVE Interactive Backgrounds
 (function() {
   const canvas = document.createElement('canvas');
   canvas.id = 'bg-canvas';
@@ -14,28 +14,30 @@
   resize();
   window.addEventListener('resize', resize);
 
-  const mouse = { x: w/2, y: h/2, active: false };
+  const mouse = { x: w/2, y: h/2, active: false, down: false };
   window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; });
+  window.addEventListener('mousedown', e => { mouse.down = true; createExplosion(mouse.x, mouse.y); });
+  window.addEventListener('mouseup', () => mouse.down = false);
   window.addEventListener('mouseleave', () => mouse.active = false);
 
   const bgType = document.body.dataset.bg || 'particles';
 
   // Galaxy colors
   const galaxyColors = [
-    'rgba(220, 20, 60, 0.8)',    // Blood red
-    'rgba(255, 100, 100, 0.6)',  // Light red
-    'rgba(200, 50, 100, 0.5)',   // Pink
-    'rgba(150, 50, 200, 0.4)',   // Purple
-    'rgba(100, 100, 255, 0.3)',  // Blue
-    'rgba(255, 255, 255, 0.9)',  // White hot
+    'rgba(220, 20, 60, 0.8)',
+    'rgba(255, 100, 100, 0.6)',
+    'rgba(200, 50, 100, 0.5)',
+    'rgba(150, 50, 200, 0.4)',
+    'rgba(100, 100, 255, 0.3)',
+    'rgba(255, 255, 255, 0.9)',
   ];
 
-  // Create galaxy clusters (stars/galaxies)
+  // Create galaxy clusters
   const galaxyCount = 60;
   const galaxies = Array.from({ length: galaxyCount }, () => ({
     x: Math.random() * w,
     y: Math.random() * h,
-    z: Math.random() * 1000 + 200, // Depth for parallax
+    z: Math.random() * 1000 + 200,
     r: Math.random() * 30 + 10,
     color: galaxyColors[Math.floor(Math.random() * galaxyColors.length)],
     rotation: Math.random() * Math.PI * 2,
@@ -46,7 +48,7 @@
     active: false
   }));
 
-  // Create background stars
+  // Background stars
   const bgStars = Array.from({ length: 300 }, () => ({
     x: Math.random() * w,
     y: Math.random() * h,
@@ -55,7 +57,7 @@
     speed: Math.random() * 0.02 + 0.005
   }));
 
-  // Create nebula clouds
+  // Nebula clouds
   const nebulae = Array.from({ length: 8 }, () => ({
     x: Math.random() * w,
     y: Math.random() * h,
@@ -67,6 +69,75 @@
 
   // Neural network nodes (subset of galaxies)
   const neuralNodes = galaxies.slice(0, 25);
+
+  // EXPLOSIVE effects arrays
+  const explosions = [];
+  const particles = Array.from({ length: 150 }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    vx: (Math.random() - 0.5) * 2,
+    vy: (Math.random() - 0.5) * 2,
+    r: Math.random() * 3 + 1,
+    life: 1,
+    decay: Math.random() * 0.01 + 0.005,
+    color: `hsl(${Math.random() * 60 + 340}, 100%, 50%)`
+  }));
+
+  function createExplosion(x, y) {
+    explosions.push({ x, y, radius: 0, maxRadius: 200, alpha: 1, color: `hsl(${Math.random()*30+350}, 100%, 50%)` });
+    // Spawn particles
+    for (let i = 0; i < 20; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 5 + 2;
+      particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        r: Math.random() * 4 + 2,
+        life: 1,
+        decay: Math.random() * 0.02 + 0.01,
+        color: `hsl(${Math.random() * 60 + 340}, 100%, 60%)`
+      });
+    }
+  }
+
+  function drawExplosions() {
+    explosions.forEach((e, i) => {
+      e.radius += 8;
+      e.alpha -= 0.02;
+      if (e.alpha <= 0) { explosions.splice(i, 1); return; }
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2);
+      ctx.strokeStyle = e.color;
+      ctx.globalAlpha = e.alpha;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, e.radius * 0.7, 0, Math.PI * 2);
+      ctx.fillStyle = e.color;
+      ctx.globalAlpha = e.alpha * 0.3;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  function drawParticles() {
+    particles.forEach((p, i) => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vx *= 0.98;
+      p.vy *= 0.98;
+      p.life -= p.decay;
+      if (p.life <= 0) { particles.splice(i, 1); return; }
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * p.life, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = p.life * 0.8;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    });
+  }
 
   function drawNebulae() {
     nebulae.forEach(n => {
@@ -187,6 +258,10 @@
     drawBackgroundStars();
     drawNeuralConnections();
     galaxies.forEach(g => drawGalaxy(g));
+
+    // EXPLOSIVE effects on top
+    drawParticles();
+    drawExplosions();
 
     requestAnimationFrame(draw);
   }
