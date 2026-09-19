@@ -1,4 +1,4 @@
-// GALAXY UNIVERSE — Polished & Fixed
+// GALAXY UNIVERSE — Scroll Distortion + Interactive
 (function() {
   const canvas = document.createElement('canvas');
   canvas.id = 'bg-canvas';
@@ -10,6 +10,19 @@
   function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
   resize();
   window.addEventListener('resize', resize);
+
+  // Scroll-based distortion (0 = top, increases as you scroll down)
+  let scrollY = 0;
+  window.addEventListener('scroll', () => {
+    scrollY = window.scrollY;
+  });
+
+  // Distortion factor based on scroll (0 at top, max at bottom of page)
+  function getScrollDistortion() {
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (docHeight <= 0) return 0;
+    return Math.min(1, scrollY / docHeight);
+  }
 
   const mouse = { x: w/2, y: h/2, active: false, down: false };
   window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; });
@@ -68,18 +81,22 @@
   function drawGalaxy(g) {
     const d = Math.sqrt((g.x - mouse.x) ** 2 + (g.y - mouse.y) ** 2);
     const proximity = d < 300 ? Math.max(0, 1 - d / 300) : 0;
-    g.rotation += g.rotSpeed;
-    g.pulsePhase += 0.015;
+    
+    // Scroll distortion: stars orbit faster and more chaotically as you scroll
+    const distortion = getScrollDistortion();
+    g.rotation += g.rotSpeed * (1 + distortion * 3);
+    g.pulsePhase += 0.015 * (1 + distortion * 2);
 
     const baseAlpha = 0.4 + Math.sin(g.pulsePhase) * 0.15;
     const alpha = Math.min(1, baseAlpha + proximity * 0.6);
 
     ctx.save();
     ctx.translate(g.x, g.y);
-    ctx.scale(1, g.tilt); // 3D tilt effect
+    // More tilt distortion when scrolled
+    ctx.scale(1 + distortion * 0.3, g.tilt - distortion * 0.2);
 
     // Outer glow
-    const glowSize = g.r * (2.5 + proximity);
+    const glowSize = g.r * (2.5 + proximity) * (1 + distortion * 0.5);
     const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, glowSize);
     gradient.addColorStop(0, `rgba(220, 20, 60, ${alpha * 0.6})`);
     gradient.addColorStop(0.2, `rgba(200, 50, 100, ${alpha * 0.3})`);
@@ -93,8 +110,9 @@
     // Spiral arms
     g.stars.forEach(star => {
       const armAngle = (star.angle + g.rotation * 50) % (Math.PI * 2);
-      const x = Math.cos(armAngle) * star.dist * g.r;
-      const y = Math.sin(armAngle) * star.dist * g.r;
+      const dist = star.dist * (1 + distortion * Math.sin(g.pulsePhase + star.angle) * 0.3);
+      const x = Math.cos(armAngle) * dist * g.r;
+      const y = Math.sin(armAngle) * dist * g.r;
       const twinkle = Math.sin(g.pulsePhase + star.brightness * 10) * 0.3 + 0.7;
 
       ctx.beginPath();
@@ -161,11 +179,15 @@
 
   function draw3DShapes() {
     if (bgType !== 'wireframe' && bgType !== 'starfield') return;
-    rotX += 0.002; rotY += 0.003;
+    const distortion = getScrollDistortion();
+    rotX += 0.002 * (1 + distortion * 3);
+    rotY += 0.003 * (1 + distortion * 3);
 
     shapes3D.forEach(shape => {
-      shape.rotX += shape.rx; shape.rotY += shape.ry; shape.rotZ += shape.rz;
-      shape.z += 0.8;
+      shape.rotX += shape.rx * (1 + distortion * 4);
+      shape.rotY += shape.ry * (1 + distortion * 4);
+      shape.rotZ += shape.rz * (1 + distortion * 4);
+      shape.z += 0.8 * (1 + distortion * 2);
       if (shape.z > 400) shape.z = -400;
 
       let verts = [];
@@ -216,12 +238,13 @@
 
   function drawWaves() {
     if (bgType !== 'wave') return;
-    waveTime += 0.008;
+    const distortion = getScrollDistortion();
+    waveTime += 0.008 * (1 + distortion * 2);
 
     for (let layer = 0; layer < 6; layer++) {
-      const amp = 35 + layer * 12;
+      const amp = 35 + layer * 12 + distortion * 20;
       const freq = 0.002 + layer * 0.0004;
-      const speed = 0.008 + layer * 0.003;
+      const speed = 0.008 + layer * 0.003 + distortion * 0.01;
       const offset = layer * 45;
       const color = theme.colors[layer % theme.colors.length];
 
@@ -229,12 +252,13 @@
       for (let x = 0; x <= w; x += 4) {
         const d = Math.sqrt((x-mouse.x)**2 + (h*0.5+offset-mouse.y)**2);
         const mi = d < 280 ? Math.sin(d*0.06 - waveTime*2.5) * 35 * (1-d/280) : 0;
-        const y = h*0.5 + offset + Math.sin(x*freq + waveTime*speed) * amp + mi;
+        const scrollWave = distortion * 30 * Math.sin(x*0.01 + waveTime*2);
+        const y = h*0.5 + offset + Math.sin(x*freq + waveTime*speed) * amp + mi + scrollWave;
         if (x === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
       }
       ctx.strokeStyle = color;
       ctx.lineWidth = 2;
-      ctx.globalAlpha = 0.12;
+      ctx.globalAlpha = 0.12 + distortion * 0.08;
       ctx.stroke();
 
       // Glow
@@ -242,11 +266,12 @@
       for (let x = 0; x <= w; x += 4) {
         const d = Math.sqrt((x-mouse.x)**2 + (h*0.5+offset-mouse.y)**2);
         const mi = d < 280 ? Math.sin(d*0.06 - waveTime*2.5) * 35 * (1-d/280) : 0;
-        const y = h*0.5 + offset + Math.sin(x*freq + waveTime*speed) * amp + mi + 12;
+        const scrollWave = distortion * 30 * Math.sin(x*0.01 + waveTime*2);
+        const y = h*0.5 + offset + Math.sin(x*freq + waveTime*speed) * amp + mi + scrollWave + 12;
         if (x === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
       }
       ctx.lineWidth = 18;
-      ctx.globalAlpha = 0.025;
+      ctx.globalAlpha = 0.025 + distortion * 0.015;
       ctx.stroke();
     }
     ctx.globalAlpha = 1;
