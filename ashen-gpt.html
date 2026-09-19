@@ -640,22 +640,25 @@
 
   </header>
 
-  <nav class="toc">
-    <ul>
-      <li><a href="#architecture">Architecture</a></li>
-      <li><a href="#requirements">Requirements</a></li>
-      <li><a href="#installation">Install</a></li>
-      <li><a href="#quick-start">Quick Start</a></li>
-      <li><a href="#training">Training</a></li>
-      <li><a href="#chatbots">Chatbots</a></li>
-      <li><a href="#api">API</a></li>
-      <li><a href="#project-structure">Structure</a></li>
-      <li><a href="#settings">Settings</a></li>
-      <li><a href="#multi-agent">Swarm & Council</a></li>
-      <li><a href="#safety">Safety</a></li>
-      <li><a href="#license">License</a></li>
-    </ul>
-  </nav>
+  <div class="docs-toc">
+    <h3>Table of Contents</h3>
+    <nav class="toc">
+      <ul>
+        <li><a href="#architecture">Architecture</a></li>
+        <li><a href="#requirements">Requirements</a></li>
+        <li><a href="#installation">Install</a></li>
+        <li><a href="#quick-start">Quick Start</a></li>
+        <li><a href="#training">Training</a></li>
+        <li><a href="#chatbots">Chatbots</a></li>
+        <li><a href="#api">API</a></li>
+        <li><a href="#project-structure">Structure</a></li>
+        <li><a href="#settings">Settings</a></li>
+        <li><a href="#multi-agent">Swarm & Council</a></li>
+        <li><a href="#safety">Safety</a></li>
+        <li><a href="#license">License</a></li>
+      </ul>
+    </nav>
+  </div>
 
   <section class="container">
     <div class="repo-card">
@@ -919,7 +922,8 @@ print('All imports OK')"</code></pre>
       <h3>Typical Workflow</h3>
       <ol style="color: var(--ink-muted); margin-left: 1.5rem;">
         <li><strong>Train/fine-tune</strong> — <code>qwen_finetune.py</code> produces the default
-          <code>ashen_gpt_model/</code></li>
+          <code>ashen_gpt_model/</code>
+        </li>
         <li><strong>Chat</strong> — launch the CLI or web interface; model loads the saved checkpoint</li>
         <li><strong>Agent mode</strong> — ask the model to inspect files, run commands, or explore your workspace</li>
         <li><strong>Evaluate & improve</strong> — use Swarm / Council for hard prompts and Self-Improve dashboard for
@@ -933,7 +937,8 @@ print('All imports OK')"</code></pre>
 
       <h3>qwen_finetune.py — LoRA Fine-Tune (Default)</h3>
       <p>Fine-tunes Qwen3.5-0.8B with LoRA in bf16, emits a merged HuggingFace checkpoint at
-        <code>ashen_gpt_model/</code> plus a small <code>class_head.pt</code> for intent routing.</p>
+        <code>ashen_gpt_model/</code> plus a small <code>class_head.pt</code> for intent routing.
+      </p>
 
       <h4>Key Environment Variables</h4>
       <table>
@@ -982,7 +987,8 @@ print('All imports OK')"</code></pre>
       <h3>ashen_gpt_trainer.py — Legacy Pre-Training</h3>
       <p>Trains from-scratch Qwen-style MoE on the book/code corpus. Architecture:
         <code>n_embd=512, n_layer=8, n_head=8, block_size=8192</code>. Progressive context (512 → 2K → 8K), gradient
-        checkpointing, memory-mapped data streaming.</p>
+        checkpointing, memory-mapped data streaming.
+      </p>
     </div>
 
     <!-- Chatbots -->
@@ -1256,7 +1262,8 @@ print('All imports OK')"</code></pre>
       <h3>LLM Benchmark Suite</h3>
       <p>Built-in evaluation across 5 categories: Knowledge, Code Generation, Math Reasoning, Language Understanding,
         and Ethics & Safety. 12 standardized questions with letter grades. Trigger via
-        <code>[TOOL: run_benchmark()]</code>.</p>
+        <code>[TOOL: run_benchmark()]</code>.
+      </p>
     </div>
 
     <!-- Safety -->
