@@ -1,4 +1,4 @@
-// GALAXY UNIVERSE + EXPLOSIVE — Themed per page
+// GALAXY UNIVERSE + EXPLOSIVE + Themed Visuals per Page
 (function() {
   const canvas = document.createElement('canvas');
   canvas.id = 'bg-canvas';
@@ -24,7 +24,6 @@
 
   // Page-specific themes
   const themes = {
-    // Studio overview — diverse galaxies representing different disciplines
     particles: {
       galaxyCount: 60,
       colors: ['#dc143c', '#ff6b6b', '#ff8e53', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'],
@@ -34,7 +33,6 @@
       particleColors: ['#dc143c', '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3'],
       coreColor: '#fff'
     },
-    // AI research — neural network more prominent, brain-like
     neural: {
       galaxyCount: 40,
       colors: ['#dc143c', '#ff4757', '#ff6348', '#ff4757', '#c44569', '#f8b500'],
@@ -44,7 +42,6 @@
       particleColors: ['#dc143c', '#ff4757', '#ff6348', '#f8b500'],
       coreColor: '#fff'
     },
-    // Ashen AI project — AI/ML themed, more nodes
     ashen: {
       galaxyCount: 50,
       colors: ['#dc143c', '#ff4757', '#ff6b6b', '#ff8e53', '#feca57', '#48dbfb'],
@@ -54,7 +51,6 @@
       particleColors: ['#dc143c', '#ff4757', '#feca57', '#48dbfb'],
       coreColor: '#fff'
     },
-    // Chat interface — matrix-like rain combined with galaxy
     matrix: {
       galaxyCount: 30,
       colors: ['#00ff41', '#39ff14', '#00ff00', '#7fff00', '#adff2f', '#dc143c'],
@@ -64,7 +60,6 @@
       particleColors: ['#00ff41', '#39ff14', '#00ff00', '#dc143c'],
       coreColor: '#00ff41'
     },
-    // Gaming tech — engine/3D themed, geometric shapes
     wireframe: {
       galaxyCount: 45,
       colors: ['#dc143c', '#ff4757', '#ff6348', '#f8b500', '#48dbfb', '#54a0ff'],
@@ -74,7 +69,6 @@
       particleColors: ['#dc143c', '#ff4757', '#48dbfb', '#54a0ff'],
       coreColor: '#fff'
     },
-    // Games — colorful, playful, action-oriented
     starfield: {
       galaxyCount: 70,
       colors: ['#dc143c', '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3'],
@@ -84,7 +78,6 @@
       particleColors: ['#dc143c', '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'],
       coreColor: '#fff'
     },
-    // Philosophy — contemplative, flowing, wave-like nebulae
     wave: {
       galaxyCount: 35,
       colors: ['#dc143c', '#c44569', '#f8b500', '#48dbfb', '#54a0ff', '#5f27cd'],
@@ -315,6 +308,229 @@
     }
   }
 
+  // ===== PAGE-SPECIFIC VISUAL LAYERS =====
+
+  // AI page — floating data streams
+  const dataStreams = Array.from({ length: 20 }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    length: Math.random() * 100 + 50,
+    speed: Math.random() * 2 + 1,
+    chars: Array.from({ length: 10 }, () => String.fromCharCode(0x30A0 + Math.random() * 96)),
+    opacity: Math.random() * 0.3 + 0.1
+  }));
+
+  function drawDataStreams() {
+    if (bgType !== 'neural' && bgType !== 'ashen') return;
+    ctx.font = '12px monospace';
+    dataStreams.forEach(s => {
+      s.y += s.speed;
+      if (s.y > h + 100) { s.y = -100; s.x = Math.random() * w; }
+      s.chars.forEach((char, i) => {
+        const y = s.y + i * 14;
+        if (y > 0 && y < h) {
+          const alpha = s.opacity * (1 - i / s.chars.length);
+          ctx.fillStyle = `rgba(220, 20, 60, ${alpha})`;
+          ctx.fillText(char, s.x, y);
+        }
+      });
+    });
+  }
+
+  // Chat page — matrix rain
+  const matrixDrops = Array.from({ length: 50 }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * -h,
+    speed: Math.random() * 3 + 2,
+    chars: Array.from({ length: 20 }, () => String.fromCharCode(0x30A0 + Math.random() * 96))
+  }));
+
+  function drawMatrixRain() {
+    if (bgType !== 'matrix') return;
+    ctx.font = 'bold 14px monospace';
+    matrixDrops.forEach(drop => {
+      drop.y += drop.speed;
+      if (drop.y > h + 300) { drop.y = -Math.random() * 200; drop.x = Math.random() * w; }
+      drop.chars.forEach((char, ci) => {
+        const y = drop.y + ci * 14;
+        if (y > 0 && y < h) {
+          const d = Math.sqrt((drop.x - mouse.x) ** 2 + (y - mouse.y) ** 2);
+          const glow = d < 100 ? 0.5 * (1 - d / 100) : 0;
+          const alpha = ci === 0 ? 1 : 0.15 * (1 - ci / drop.chars.length);
+          ctx.fillStyle = `rgba(0, 255, 65, ${alpha + glow})`;
+          ctx.fillText(char, drop.x, y);
+          if (ci === 0) { ctx.fillStyle = '#fff'; ctx.fillText(char, drop.x, y); }
+        }
+      });
+    });
+  }
+
+  // Gaming/Engine page — 3D wireframe shapes
+  const wireframeShapes = Array.from({ length: 5 }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    size: Math.random() * 50 + 30,
+    rotX: Math.random() * Math.PI,
+    rotY: Math.random() * Math.PI,
+    rotZ: Math.random() * Math.PI,
+    rotSpeedX: (Math.random() - 0.5) * 0.02,
+    rotSpeedY: (Math.random() - 0.5) * 0.02,
+    rotSpeedZ: (Math.random() - 0.5) * 0.02,
+    type: Math.floor(Math.random() * 3)
+  }));
+
+  function drawWireframeShapes() {
+    if (bgType !== 'wireframe') return;
+    wireframeShapes.forEach(shape => {
+      shape.rotX += shape.rotSpeedX;
+      shape.rotY += shape.rotSpeedY;
+      shape.rotZ += shape.rotSpeedZ;
+
+      const vertices = [];
+      if (shape.type === 0) {
+        // Cube
+        for (let x = -1; x <= 1; x += 2)
+          for (let y = -1; y <= 1; y += 2)
+            for (let z = -1; z <= 1; z += 2)
+              vertices.push({ x: x * shape.size, y: y * shape.size, z: z * shape.size });
+      } else if (shape.type === 1) {
+        // Pyramid
+        vertices.push({ x: 0, y: -shape.size, z: 0 });
+        for (let i = 0; i < 4; i++) {
+          const angle = (i / 4) * Math.PI * 2;
+          vertices.push({ x: Math.cos(angle) * shape.size, y: shape.size, z: Math.sin(angle) * shape.size });
+        }
+      } else {
+        // Octahedron
+        vertices.push({ x: shape.size, y: 0, z: 0 }, { x: -shape.size, y: 0, z: 0 });
+        vertices.push({ x: 0, y: shape.size, z: 0 }, { x: 0, y: -shape.size, z: 0 });
+        vertices.push({ x: 0, y: 0, z: shape.size }, { x: 0, y: 0, z: -shape.size });
+      }
+
+      // Rotate and project
+      const projected = vertices.map(v => {
+        let { x, y, z } = v;
+        // Rotate X
+        let y1 = y * Math.cos(shape.rotX) - z * Math.sin(shape.rotX);
+        let z1 = y * Math.sin(shape.rotX) + z * Math.cos(shape.rotX);
+        // Rotate Y
+        let x2 = x * Math.cos(shape.rotY) + z1 * Math.sin(shape.rotY);
+        let z2 = -x * Math.sin(shape.rotY) + z1 * Math.cos(shape.rotY);
+        // Rotate Z
+        let x3 = x2 * Math.cos(shape.rotZ) - y1 * Math.sin(shape.rotZ);
+        let y3 = x2 * Math.sin(shape.rotZ) + y1 * Math.cos(shape.rotZ);
+
+        const fov = 300;
+        const scale = fov / (fov + z2 + 200);
+        return { x: shape.x + x3 * scale, y: shape.y + y3 * scale, scale };
+      });
+
+      // Draw edges
+      ctx.strokeStyle = 'rgba(220, 20, 60, 0.2)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < projected.length; i++) {
+        for (let j = i + 1; j < projected.length; j++) {
+          ctx.beginPath();
+          ctx.moveTo(projected[i].x, projected[i].y);
+          ctx.lineTo(projected[j].x, projected[j].y);
+          ctx.stroke();
+        }
+      }
+
+      // Draw vertices
+      projected.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3 * p.scale, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(220, 20, 60, 0.4)';
+        ctx.fill();
+      });
+    });
+  }
+
+  // Games page — floating game elements
+  const gameElements = Array.from({ length: 15 }, () => ({
+    x: Math.random() * w,
+    y: Math.random() * h,
+    vx: (Math.random() - 0.5) * 1,
+    vy: (Math.random() - 0.5) * 1,
+    r: Math.random() * 20 + 10,
+    color: theme.colors[Math.floor(Math.random() * theme.colors.length)],
+    rotation: 0,
+    rotSpeed: (Math.random() - 0.5) * 0.05,
+    type: Math.floor(Math.random() * 3)
+  }));
+
+  function drawGameElements() {
+    if (bgType !== 'starfield') return;
+    gameElements.forEach(e => {
+      e.x += e.vx;
+      e.y += e.vy;
+      e.rotation += e.rotSpeed;
+      if (e.x < -50) e.x = w + 50;
+      if (e.x > w + 50) e.x = -50;
+      if (e.y < -50) e.y = h + 50;
+      if (e.y > h + 50) e.y = -50;
+
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      ctx.rotate(e.rotation);
+
+      if (e.type === 0) {
+        // Diamond
+        ctx.beginPath();
+        ctx.moveTo(0, -e.r);
+        ctx.lineTo(e.r, 0);
+        ctx.lineTo(0, e.r);
+        ctx.lineTo(-e.r, 0);
+        ctx.closePath();
+        ctx.strokeStyle = e.color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else if (e.type === 1) {
+        // Triangle
+        ctx.beginPath();
+        ctx.moveTo(0, -e.r);
+        ctx.lineTo(e.r, e.r);
+        ctx.lineTo(-e.r, e.r);
+        ctx.closePath();
+        ctx.strokeStyle = e.color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      } else {
+        // Cross
+        ctx.beginPath();
+        ctx.moveTo(-e.r, 0);
+        ctx.lineTo(e.r, 0);
+        ctx.moveTo(0, -e.r);
+        ctx.lineTo(0, e.r);
+        ctx.strokeStyle = e.color;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+      ctx.restore();
+    });
+  }
+
+  // Philosophy page — flowing waves
+  let waveTime = 0;
+  function drawWaves() {
+    if (bgType !== 'wave') return;
+    waveTime += 0.01;
+    for (let layer = 0; layer < 3; layer++) {
+      ctx.beginPath();
+      for (let x = 0; x <= w; x += 5) {
+        const d = Math.sqrt((x - mouse.x) ** 2 + (h * 0.5 + layer * 60 - mouse.y) ** 2);
+        const mouseInfluence = d < 200 ? Math.sin(d * 0.05 - waveTime * 2) * 20 * (1 - d / 200) : 0;
+        const y = h * 0.5 + layer * 60 + Math.sin(x * 0.003 + waveTime + layer) * 30 + mouseInfluence;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = `rgba(220, 20, 60, ${0.15 - layer * 0.03})`;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
   function draw() {
     // Deep space background
     ctx.fillStyle = '#050508';
@@ -324,6 +540,13 @@
     drawBackgroundStars();
     drawNeuralConnections();
     galaxies.forEach(g => drawGalaxy(g));
+
+    // Page-specific visuals on top
+    drawDataStreams();
+    drawMatrixRain();
+    drawWireframeShapes();
+    drawGameElements();
+    drawWaves();
 
     // EXPLOSIVE effects on top
     drawParticles();
