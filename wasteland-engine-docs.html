@@ -35,11 +35,6 @@ body {
   color: var(--ink);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-}
-
-/* Cyberpunk body */
-body {
-  background: var(--bg);
   background-image:
     linear-gradient(rgba(220, 20, 60, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(220, 20, 60, 0.03) 1px, transparent 1px);
@@ -47,7 +42,6 @@ body {
   position: relative;
 }
 
-/* Scanline overlay */
 body::before {
   content: '';
   position: fixed;
@@ -87,19 +81,10 @@ pre {
   line-height: 1.7;
 }
 
-pre code {
-  background: none;
-  border: none;
-  padding: 0;
-}
+pre code { background: none; border: none; padding: 0; }
 
-.container {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
+.container { max-width: 1000px; margin: 0 auto; padding: 0 2rem; }
 
-/* Navigation */
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -127,13 +112,7 @@ nav {
   text-shadow: 0 0 10px rgba(220, 20, 60, 0.6), 0 0 20px rgba(220, 20, 60, 0.3);
 }
 
-.nav-links {
-  display: flex;
-  gap: 2rem;
-  list-style: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
+.nav-links { display: flex; gap: 2rem; list-style: none; font-size: 0.9rem; font-weight: 500; }
 
 .nav-links a {
   color: var(--ink-muted);
@@ -155,32 +134,18 @@ nav {
 }
 
 .nav-links a:hover::after,
-.nav-links a.active::after {
-  width: 100%;
-}
+.nav-links a.active::after { width: 100%; }
 
-.nav-links a:hover {
-  text-shadow: 0 0 8px rgba(220, 20, 60, 0.6);
-}
+.nav-links a:hover { text-shadow: 0 0 8px rgba(220, 20, 60, 0.6); }
+.nav-links a.active { color: var(--accent) !important; text-shadow: 0 0 8px rgba(220, 20, 60, 0.5); }
 
-.nav-links a.active {
-  color: var(--accent) !important;
-  text-shadow: 0 0 8px rgba(220, 20, 60, 0.5);
-}
-
-/* Page Header */
 .page-header {
   padding: 10rem 0 4rem;
   border-bottom: 1px solid var(--border);
   margin-bottom: 4rem;
 }
 
-.breadcrumb {
-  font-size: 0.85rem;
-  color: var(--ink-muted);
-  margin-bottom: 1.5rem;
-}
-
+.breadcrumb { font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 1.5rem; }
 .breadcrumb a { color: var(--accent); }
 
 .page-header h1 {
@@ -188,43 +153,22 @@ nav {
   font-size: clamp(2.5rem, 6vw, 4.5rem);
   line-height: 1.1;
   letter-spacing: -0.03em;
-  max-width: 16ch;
-  margin-bottom: 1.5rem;
   font-weight: 400;
   text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
 }
 
-.page-header p {
-  font-size: 1.1rem;
-  color: var(--ink-muted);
-  max-width: 50ch;
-}
+.page-header p { font-size: 1.1rem; color: var(--ink-muted); max-width: 50ch; }
 
-/* TOC */
-.toc {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  padding: 0.75rem 1.5rem;
-  margin-bottom: 2rem;
-}
+h1, h2, h3 { text-shadow: 0 0 10px rgba(220, 20, 60, 0.4); }
+a:hover { text-shadow: 0 0 8px rgba(220, 20, 60, 0.6); }
 
-.toc ul {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
 
-.toc a {
-  font-size: 0.85rem;
-  color: var(--ink-muted);
-  transition: color 0.2s;
-}
+::selection { background: rgba(220, 20, 60, 0.3); color: var(--ink); }
 
-.toc a:hover { color: var(--accent); }
-
-/* Docs Section */
 .docs-section {
   margin-bottom: 4rem;
   scroll-margin-top: 80px;
@@ -238,7 +182,6 @@ nav {
   font-weight: 400;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);
-  text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
 }
 
 .docs-section h3 {
@@ -273,11 +216,8 @@ nav {
   margin-bottom: 1rem;
 }
 
-.docs-section li {
-  margin-bottom: 0.5rem;
-}
+.docs-section li { margin-bottom: 0.5rem; }
 
-/* Table */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -291,88 +231,10 @@ th, td {
   border-bottom: 1px solid var(--border);
 }
 
-th {
-  font-weight: 600;
-  color: var(--ink);
-  background: var(--surface);
-  font-size: 0.85rem;
-}
+th { font-weight: 600; color: var(--ink); background: var(--surface); font-size: 0.85rem; }
+td { color: var(--ink-muted); }
+td:first-child { color: var(--ink); font-weight: 500; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
 
-td {
-  color: var(--ink-muted;
-}
-
-td:first-child {
-  color: var(--ink);
-  font-weight: 500;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-}
-
-/* Feature Grid */
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.25rem;
-  margin-top: 2rem;
-}
-
-.feature-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  padding: 1.75rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.feature-card:hover {
-  border-color: var(--accent);
-  box-shadow: var(--glow);
-}
-
-.feature-card h3 {
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.feature-card p {
-  color: var(--ink-muted);
-  font-size: 0.85rem;
-  line-height: 1.6;
-}
-
-/* Glow effects */
-h1, h2, h3 {
-  text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
-}
-
-a:hover {
-  text-shadow: 0 0 8px rgba(220, 20, 60, 0.6);
-}
-
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 0;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: var(--accent-dim);
-}
-
-/* Selection color */
-::selection {
-  background: rgba(220, 20, 60, 0.3);
-  color: var(--ink);
-}
-
-/* Footer */
 footer {
   border-top: 1px solid var(--border);
   padding: 3rem 0;
@@ -380,16 +242,10 @@ footer {
   color: var(--ink-muted);
 }
 
-.footer-inner {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
+.footer-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
 
 @media (max-width: 768px) {
   .nav-links { gap: 1rem; font-size: 0.85rem; }
-  .toc ul { columns: 1; }
 }
 </style>
 </head>
@@ -413,250 +269,381 @@ footer {
 <header class="page-header container">
   <div class="breadcrumb"><a href="index.html">Home</a> / <a href="gaming-technology.html">Gaming Technology</a> / Wasteland Engine Documentation</div>
   <h1>Wasteland Engine.</h1>
-  <p>A 2D/3D game engine built on OpenGL, DirectX, and Vulkan with AI-powered ray tracing via Nova Renderer.</p>
+  <p>Complete engine documentation — architecture, systems, and APIs.</p>
 </header>
 
 <section class="container">
-  <nav class="toc">
-    <ul>
-      <li><a href="#overview">Overview</a></li>
-      <li><a href="#architecture">Architecture</a></li>
-      <li><a href="#getting-started">Getting Started</a></li>
-      <li><a href="#building">Building</a></li>
-      <li><a href="#editor">DemonCore Editor</a></li>
-      <li><a href="#rendering">Rendering Pipeline</a></li>
-      <li><a href="#physics">Physics</a></li>
-      <li><a href="#scripting">Scripting</a></li>
-      <li><a href="#tools">AI Tools</a></li>
-      <li><a href="#nvrhi">NVRHI Integration</a></li>
-    </ul>
-  </nav>
 
-  <!-- Overview -->
-  <div id="overview" class="docs-section">
-    <h2>Overview</h2>
-    <p>Wasteland Engine is a custom game engine built from scratch by Ashen Wasteland Studios. It supports 2D and 3D rendering with multiple graphics APIs and AI-powered path tracing through Nova Renderer.</p>
-    
-    <h3>Key Features</h3>
-    <div class="feature-grid">
-      <div class="feature-card">
-        <h3>Multi-API Rendering</h3>
-        <p>OpenGL, DirectX 11, DirectX 12, and Vulkan backends via NVRHI.</p>
-      </div>
-      <div class="feature-card">
-        <h3>Nova Renderer</h3>
-        <p>AI-powered ray tracing for denoising, upscaling, and intelligent sampling.</p>
-      </div>
-      <div class="feature-card">
-        <h3>Volumetric Effects</h3>
-        <p>Volumetric fog, raymarched clouds, and dynamic global illumination.</p>
-      </div>
-      <div class="feature-card">
-        <h3>DemonCore Editor</h3>
-        <p>Full editor with scene hierarchy, scripting, and AI chat panel.</p>
-      </div>
-      <div class="feature-card">
-        <h3>Physics</h3>
-        <p>Box2D for 2D, Box3D for 3D physics simulation.</p>
-      </div>
-      <div class="feature-card">
-        <h3>Python Scripting</h3>
-        <p>Full Python integration via pybind11 for game logic and tools.</p>
-      </div>
-    </div>
-  </div>
+<!-- Overview -->
+<div id="overview" class="docs-section">
+<h2>Overview</h2>
+<p>Wasteland Engine is a 2D/3D game engine built from scratch in C++17. It uses a layered architecture with an Application core, a Scene/Entity system built on EnTT, multiple rendering backends (OpenGL, DirectX 11/12, Vulkan via NVRHI), AI-powered ray tracing (Nova), and a full editor (DemonCore-Editor).</p>
 
-  <!-- Architecture -->
-  <div id="architecture" class="docs-section">
-    <h2>Architecture</h2>
-    <p>The engine is built with a layered architecture separating the core systems from the editor and tooling.</p>
+<h3>Key Facts</h3>
+<table>
+<tr><th>Property</th><th>Value</th></tr>
+<tr><td>Language</td><td>C++17</td></tr>
+<tr><td>Build System</td><td>Premake5</td></tr>
+<tr><td>Entity System</td><td>EnTT (ECS)</td></tr>
+<tr><td>Rendering</td><td>OpenGL, D3D11, D3D12, Vulkan</td></tr>
+<tr><td>Physics</td><td>Box2D (2D), Box3D (3D)</td></tr>
+<tr><td>Scripting</td><td>Python (pybind11)</td></tr>
+<tr><td>Editor</td><td>DemonCore-Editor (ImGui)</td></tr>
+<tr><td>Platform</td><td>Windows, Linux, macOS</td></tr>
+</table>
+</div>
 
-    <h3>Project Structure</h3>
-    <pre><code>Wasteland/
-├── Wasteland/                    # Main game engine library
-│   └── vendor/                   # Third-party dependencies (GLFW, ImGui, NVRHI, etc.)
-├── DemonCore-Editor/             # Editor application
-│   └── src/Panels/               # Editor panels (AIChatPanel, SceneHierarchy, etc.)
-├── Sandbox/                      # Test/sandbox application
-├── docs/                         # Documentation (NVRHI setup guide, etc.)
-├── scripts/                      # Build scripts (Win/Mac/Linux)
-├── vendor/bin/premake/           # Premake build system
-└── Wasteland.slnx                # Visual Studio solution</code></pre>
+<!-- Core Systems -->
+<div id="core" class="docs-section">
+<h2>Core Systems</h2>
 
-    <h3>Core Systems</h3>
-    <table>
-      <tr><th>System</th><th>Description</th></tr>
-      <tr><td>Renderer</td><td>Multi-backend rendering (OpenGL, D3D11, D3D12, Vulkan)</td></tr>
-      <tr><td>NVRHI</td><td>NVIDIA Rendering Hardware Interface for D3D11/D3D12/Vulkan</td></tr>
-      <tr><td>Nova</td><td>AI-powered ray tracing renderer</td></tr>
-      <tr><td>Physics</td><td>Box2D (2D) and Box3D (3D) physics engines</td></tr>
-      <tr><td>Scripting</td><td>Python via pybind11</td></tr>
-      <tr><td>AI Tools</td><td>ToolServer for AI agent tool execution</td></tr>
-      <tr><td>Editor</td><td>DemonCore-Editor with ImGui interface</td></tr>
-    </table>
-  </div>
+<h3>Application (<code>Wasteland/Core/Application.h</code>)</h3>
+<p>The <code>Application</code> class is the entry point for all Wasteland programs. It owns the window, runs the main loop, and manages the layer stack.</p>
+<pre><code>class Application {
+public:
+    Application(const std::string& name = "Wasteland App");
+    void Run();
+    void PushLayer(Layer* layer);
+    void PushOverlay(Layer* layer);
+    void Close();
+    static Application& Get();
+};</code></pre>
+<p>The main loop calls <code>OnUpdate()</code> on every layer, renders ImGui overlays, and swaps the window buffer. The static <code>Get()</code> singleton allows global access.</p>
 
-  <!-- Getting Started -->
-  <div id="getting-started" class="docs-section">
-    <h2>Getting Started</h2>
-    
-    <h3>Prerequisites</h3>
-    <table>
-      <tr><th>Component</th><th>Windows</th><th>Linux</th><th>macOS</th></tr>
-      <tr><td>Compiler</td><td>Visual Studio 2022+</td><td>GCC/Clang</td><td>Xcode CLI Tools</td></tr>
-      <tr><td>Python</td><td>3.14+</td><td>3.14+</td><td>3.14+</td></tr>
-      <tr><td>CMake</td><td>3.16+ (for NVRHI)</td><td>3.16+</td><td>3.16+</td></tr>
-      <tr><td>Vulkan SDK</td><td>1.3.296.0</td><td>1.3.296.0</td><td>—</td></tr>
-    </table>
+<h3>Layer (<code>Wasteland/Core/Layer.h</code>)</h3>
+<p>Layers are the primary unit of engine functionality. Both the editor and game systems are implemented as layers.</p>
+<pre><code>class Layer {
+public:
+    virtual void OnAttach() {}
+    virtual void OnDetach() {}
+    virtual void OnUpdate(Timestep ts) {}
+    virtual void OnImGuiRender() {}
+    virtual void OnEvent(Event& event) {}
+};</code></pre>
+<p>The <code>EditorLayer</code> (in DemonCore-Editor) and <code>Sandbox2D</code> are the two main layer implementations.</p>
 
-    <h3>Clone the Repository</h3>
-    <pre><code>git clone https://github.com/Ashen-Wastes-Studios/Wasteland-Engine.git
+<h3>Timestep (<code>Wasteland/Core/Timestep.h</code>)</h3>
+<p>A simple wrapper around a float representing seconds since last frame. Provides <code>GetSeconds()</code> and <code>GetMilliseconds()</code>.</p>
+
+<h3>Window (<code>Wasteland/Core/Window.h</code>)</h3>
+<p>Abstracts platform-specific window creation (GLFW-backed). Handles input callbacks, vsync, and resize events.</p>
+
+<h3>Events (<code>Wasteland/Events/Event.h</code>)</h3>
+<p>Blocking event system. Event types include:</p>
+<ul>
+<li><code>WindowClose</code>, <code>WindowResize</code>, <code>WindowFocus</code></li>
+<li><code>KeyPressed</code>, <code>KeyReleased</code>, <code>KeyTyped</code></li>
+<li><code>MouseButtonPressed</code>, <code>MouseButtonReleased</code>, <code>MouseMoved</code>, <code>MouseScrolled</code></li>
+</ul>
+<p>Events are dispatched immediately via <code>EventDispatcher</code> which routes to handler functions.</p>
+
+<h3>Log (<code>Wasteland/Core/Log.h</code>)</h3>
+<p>Static logger using spdlog. <code>WL_CORE_INFO()</code>, <code>WL_CORE_ERROR()</code>, etc. for engine-side logging.</p>
+</div>
+
+<!-- Scene System -->
+<div id="scene" class="docs-section">
+<h2>Scene System</h2>
+
+<h3>Scene (<code>Wasteland/Scene/Scene.h</code>)</h3>
+<p>The <code>Scene</code> owns an <code>entt::registry</code> and manages entity lifetime. It handles three update paths:</p>
+<ul>
+<li><code>OnUpdateEditor()</code> — Editor preview with <code>EditorCamera</code></li>
+<li><code>OnUpdateRuntime()</code> — Play mode</li>
+<li><code>OnUpdateSimulation()</code> — Physics-only simulation</li>
+</ul>
+<p>The scene also manages volumetric volumes (fog, clouds), water surfaces, and light submission to the renderer.</p>
+
+<h3>Entity (<code>Wasteland/Scene/Entity.h</code>)</h3>
+<p>An Entity is a lightweight handle wrapping an <code>entt::entity</code> and its parent <code>Scene</code>. It provides a templated component API:</p>
+<pre><code>Entity entity = scene.CreateEntity("Player");
+entity.AddComponent&lt;TransformComponent&gt;();
+auto& transform = entity.GetComponent&lt;TransformComponent&gt;();
+bool has = entity.HasComponent&lt;SpriteRendererComponent&gt;();</code></pre>
+
+<h3>Components (<code>Wasteland/Scene/Components.h</code>)</h3>
+<p>All ECS components are plain structs:</p>
+<table>
+<tr><th>Component</th><th>Purpose</th></tr>
+<tr><td>IDComponent</td><td>UUID identifier</td></tr>
+<tr><td>TagComponent</td><td>Human-readable name</td></tr>
+<tr><td>TransformComponent</td><td>Translation, rotation, scale (cached matrix)</td></tr>
+<tr><td>SpriteRendererComponent</td><td>Color + texture + tiling for 2D</td></tr>
+<tr><td>CircleRendererComponent</td><td>Circle primitive for 2D</td></tr>
+<tr><td>CameraComponent</td><td>SceneCamera reference</td></tr>
+<tr><td>ScriptComponent</td><td>Python script instance</td></tr>
+<tr><td>Rigidbody2DComponent</td><td>Box2D body definition</td></tr>
+<tr><td>BoxCollider2DComponent</td><td>Box2D box shape</td></tr>
+<tr><td>Rigidbody3DComponent</td><td>Box3D body definition</td></tr>
+<tr><td>BoxCollider3DComponent</td><td>Box3D box shape</td></tr>
+<tr><td>DirectionalLightComponent</td><td>Sun/main directional light</td></tr>
+<tr><td>PointLightComponent</td><td>Omnidirectional point light</td></tr>
+<tr><td>SpotLightComponent</td><td>Cone spotlight</td></tr>
+<tr><td>MaterialComponent</td><td>PBR material (albedo, roughness, metallic)</td></tr>
+<tr><td>VolumetricFogComponent</td><td>Volumetric fog volume</td></tr>
+<tr><td>VolumetricCloudsComponent</td><td>Raymarched cloud volume</td></tr>
+<tr><td>WaterComponent</td><td>Gerstner-wave water surface</td></tr>
+<tr><td>MeshComponent</td><td>3D mesh + submeshes</td></tr>
+<tr><td>AnimationComponent</td><td>Skeletal animation state</td></tr>
+</table>
+</div>
+
+<!-- Rendering -->
+<div id="rendering" class="docs-section">
+<h2>Rendering</h2>
+
+<h3>Renderer (<code>Wasteland/Renderer/Renderer.h</code>)</h3>
+<p>The static <code>Renderer</code> class initializes the active API and provides <code>BeginScene()</code>/<code>EndScene()</code>/<code>Submit()</code> for the 2D pipeline.</p>
+
+<h3>Renderer2D (<code>Wasteland/Renderer/Renderer2D.h</code>)</h3>
+<p>Batch-renderer for 2D primitives. Draws quads, rotated quads, circles, and lines. All 2D draws are batched into a single vertex buffer per flush.</p>
+<pre><code>Renderer2D::BeginScene(camera);
+Renderer2D::DrawQuad(position, size, color);
+Renderer2D::DrawRotatedQuad(pos, size, rotation, texture);
+Renderer2D::EndScene();</code></pre>
+
+<h3>Renderer3D (<code>Wasteland/Renderer/Renderer3D.h</code>)</h3>
+<p>Full 3D renderer with PBR materials, ray tracing support, volumetric effects, and water rendering. Key features:</p>
+<ul>
+<li><code>QualityPreset</code>: Low, Medium, High, Ultra</li>
+<li>Dynamic resolution scaling (0.5–1.0) with target FPS</li>
+<li>Ray tracing accumulation for progressive refinement</li>
+<li>Render scale adjustable at runtime</li>
+</ul>
+
+<h3>NVRHI (<code>Wasteland/vendor/nvrhi</code>)</h3>
+<p>NVIDIA Rendering Hardware Interface provides DirectX 11, DirectX 12, and Vulkan backends. The engine can switch APIs at runtime — all GPU resources are rebuilt via <code>RecreateResources()</code>.</p>
+
+<h3>Nova Renderer</h3>
+<p>Nova is the AI-powered rendering pipeline. It sits on top of Renderer3D and provides:</p>
+<ul>
+<li>AI denoising for ray-traced frames</li>
+<li>AI upscaling (DLSS-like) for performance</li>
+<li>Intelligent sample distribution to reduce noise</li>
+<li>Volumetric fog and cloud raymarching</li>
+<li>Gerstner wave simulation for water</li>
+</ul>
+</div>
+
+<!-- Rendering Resources -->
+<div id="resources" class="docs-section">
+<h2>Rendering Resources</h2>
+
+<h3>Shader (<code>Wasteland/Renderer/Shader.h</code>)</h3>
+<p>Abstract shader API. Supports uniform setting for int, float, vec2/3/4, and mat4. A <code>ShaderLibrary</code> manages loaded shaders.</p>
+<pre><code>Ref&lt;Shader&gt; shader = Shader::Create("assets/shaders/PBR.glsl");
+shader->Bind();
+shader->SetFloat3("u_Color", color);
+shader->SetMat4("u_ViewProjection", vp);</code></pre>
+
+<h3>Buffer (<code>Wasteland/Renderer/Buffer.h</code>)</h3>
+<p>Vertex and index buffers. <code>BufferElement</code> describes vertex attributes (Float, Float2, Float3, Mat4, Int, etc.). The layout is auto-calculated with offsets and strides.</p>
+
+<h3>VertexArray (<code>Wasteland/Renderer/VertexArray.h</code>)</h3>
+<p>VAO wrapper. Binds vertex buffers and an index buffer together for draw calls.</p>
+
+<h3>Texture (<code>Wasteland/Renderer/Texture.h</code>)</p>
+<p>Abstract texture with <code>Texture2D</code> subclass. Created from file path or dimensions. Under NVRHI, <code>GetNativeSRV()</code> returns a D3D shader resource view for ImGui rendering.</p>
+
+<h3>Framebuffer (<code>Wasteland/Renderer/Framebuffer.h</code>)</h3>
+<p>Render target supporting multiple color attachments and depth/stencil. Used for the editor viewport, post-processing, and ray tracing targets. Format options: RGBA8, RED_INTEGER (for picking), DEPTH24STENCIL8.</p>
+
+<h3>Camera (<code>Wasteland/Renderer/Camera.h</code>)</h3>
+<p>Abstract base camera. Provides view and projection matrices.</p>
+
+<h3>SceneCamera (<code>Wasteland/Scene/SceneCamera.h</code>)</h3>
+<p>Supports perspective and orthographic projection. Configurable FOV, near/far clips, and aspect ratio. Automatically recalculates projection on change.</p>
+
+<h3>EditorCamera (<code>Wasteland/Renderer/EditorCamera.h</code>)</h3>
+<p>Fly-style camera for the editor. Pan, zoom, rotate. Orthographic mode for 2D editing.</p>
+
+<h3>OrthographicCameraController (<code>Wasteland/Renderer/OrthographicCameraController.h</code>)</h3>
+<p>2D camera with zoom and pan. Used in the editor viewport for 2D scenes.</p>
+</div>
+
+<!-- Physics -->
+<div id="physics" class="docs-section">
+<h2>Physics</h2>
+
+<h3>Box2D (<code>Wasteland/vendor/Box2D</code>)</h3>
+<p>2D physics engine. Bodies and colliders are created via <code>Rigidbody2DComponent</code> and <code>BoxCollider2DComponent</code>. The scene calls <code>OnPhysics2DStart()</code>/<code>OnPhysics2DStop()</code> to manage the physics world lifecycle.</p>
+
+<h3>Box3D (<code>Wasteland/vendor/Box3D</code>)</h3>
+<p>3D physics engine (fork of Box3D). Managed by <code>Rigidbody3DComponent</code> and <code>BoxCollider3DComponent</code>. Provides 3D collision detection and rigid body dynamics.</p>
+</div>
+
+<!-- Scripting -->
+<div id="scripting" class="docs-section">
+<h2>Scripting</h2>
+
+<h3>Python Integration (<code>Wasteland/vendor/pybind11</code>)</h3>
+<p>Python 3.14+ is embedded via pybind11. Game scripts inherit from <code>ScriptableEntity</code> and can override <code>OnCreate()</code>, <code>OnUpdate()</code>, and <code>OnDestroy()</code>.</p>
+<pre><code>class PlayerController(script.ScriptableEntity):
+    def OnCreate(self):
+        print("Player spawned")
+    def OnUpdate(self, ts):
+        transform = self.GetComponent(TransformComponent)
+        transform.Translation.x += 1.0 * ts</code></pre>
+
+<h3>ScriptableEntity (<code>Wasteland/Scene/ScriptableEntity.h</code>)</h3>
+<p>Base class for all script components. Wraps an <code>Entity</code> and provides component access methods that delegate to the entity.</p>
+
+<h3>ScriptComponent (<code>Components.h</code>)</h3>
+<p>Stores a <code>ScriptableEntity*</code> instance. Created when a Python script file is attached to an entity in the editor.</p>
+</div>
+
+<!-- Editor -->
+<div id="editor" class="docs-section">
+<h2>DemonCore Editor</h2>
+
+<h3>EditorLayer (<code>DemonCore-Editor/src/EditorLayer.h</code>)</h3>
+<p>The main editor layer. Owns the active scene, viewport framebuffer, gizmo state, and all editor panels. Handles scene serialization (YAML), play/stop/simulation modes, and toolbar rendering.</p>
+
+<h3>Editor Panels</h3>
+<table>
+<tr><th>Panel</th><th>File</th><th>Purpose</th></tr>
+<tr><td>AIChatPanel</td><td>AIChatPanel.h</td><td>AI chat with tool execution and agentic mode</td></tr>
+<tr><td>SceneHierarchyPanel</td><td>SceneHierarchyPanel.h</td><td>Entity tree view + creation/deletion</td></tr>
+<tr><td>ScriptEditorPanel</td><td>ScriptEditorPanel.h</td><td>Code editor with syntax highlighting</td></tr>
+<tr><td>ScriptInspectorPanel</td><td>ScriptInspectorPanel.h</td><td>Script property inspector</td></tr>
+<tr><td>ContentBrowserPanel</td><td>ContentBrowserPanel.h</td><td>Asset file browser</td></tr>
+<tr><td>ModelDownloaderPanel</td><td>ModelDownloaderPanel.h</td><td>3D model download utility</td></tr>
+</table>
+
+<h3>AIChatPanel (<code>DemonCore-Editor/src/Panels/AIChatPanel.h</code>)</h3>
+<p>Connects to any OpenAI-compatible API endpoint. Features:</p>
+<ul>
+<li>Chat history with user/assistant/tool roles</li>
+<li>Agentic mode: AI can call tools (file ops, entity inspection) and loop until done</li>
+<li>Engine context injection — loads <code>assets/ai/engine_reference.md</code> into system prompt</li>
+<li>Settings: API key, base URL, model, temperature, system prompt</li>
+</ul>
+
+<h3>ToolServer (<code>DemonCore-Editor/src/Panels/ToolServer.h</code>)</h3>
+<p>Singleton that exposes engine tools to AI agents. Tools available:</p>
+<table>
+<tr><th>Tool</th><th>Description</th></tr>
+<tr><td>read_file</td><td>Read a text file</td></tr>
+<tr><td>write_file</td><td>Create/overwrite a file</td></tr>
+<tr><td>edit_file</td><td>Replace text in a file</td></tr>
+<tr><td>list_files</td><td>List directory contents</td></tr>
+<tr><td>memory_read</td><td>Read persistent memory</td></tr>
+<tr><td>memory_append</td><td>Append to persistent memory</td></tr>
+<tr><td>list_entities</td><td>List all scene entities</td></tr>
+<tr><td>get_entity_info</td><td>Get entity transform + components</td></tr>
+<tr><td>get_entity_script_state</td><td>Get script instance variables</td></tr>
+<tr><td>get_component_info</td><td>Inspect a specific component</td></tr>
+</table>
+</div>
+
+<!-- Volumetrics & Water -->
+<div id="volumetrics" class="docs-section">
+<h2>Volumetrics &amp; Water</h2>
+
+<h3>Volumetric Fog (<code>VolumetricFogComponent</code>)</h3>
+<p>Screen-space raymarched fog. Submitted via <code>SubmitVolumetricVolumes()</code> between BeginScene/EndScene. Supports density, scattering, and absorption parameters.</p>
+
+<h3>Volumetric Clouds (<code>VolumetricCloudsComponent</code>)</h3>
+<p>Raymarched volumetric clouds with noise-based density. Rendered as a post-process pass with lighting integration.</p>
+
+<h3>Water System (<code>WaterComponent</code>)</h3>
+<p>Gerstner wave simulation for water surfaces. Features:</p>
+<ul>
+<li>Configurable wave parameters (amplitude, length, speed, choppiness)</li>
+<li>Phase wrapping (mod 2π) to prevent floating-point drift</li>
+<li>Distance LOD to reduce aliasing at distance</li>
+<li>Buoyancy queries: <code>GetWaterHeightAt()</code> returns still level + wave height</li>
+<li>Flow vectors for river currents</li>
+<li>Underwater detection: <code>IsUnderwater()</code></li>
+</ul>
+</div>
+
+<!-- Building -->
+<div id="building" class="docs-section">
+<h2>Building</h2>
+
+<h3>Prerequisites</h3>
+<table>
+<tr><th>Component</th><th>Windows</th><th>Linux</th><th>macOS</th></tr>
+<tr><td>Compiler</td><td>Visual Studio 2022+</td><td>GCC/Clang</td><td>Xcode CLI Tools</td></tr>
+<tr><td>Python</td><td>3.14+</td><td>3.14+</td><td>3.14+</td></tr>
+<tr><td>CMake</td><td>3.16+ (for NVRHI)</td><td>3.16+</td><td>3.16+</td></tr>
+<tr><td>Vulkan SDK</td><td>1.3.296.0</td><td>1.3.296.0</td><td>—</td></tr>
+</table>
+
+<h3>Step 1: Clone</h3>
+<pre><code>git clone https://github.com/Ashen-Wastes-Studios/Wasteland-Engine.git
 cd Wasteland-Engine</code></pre>
-  </div>
 
-  <!-- Building -->
-  <div id="building" class="docs-section">
-    <h2>Building</h2>
+<h3>Step 2: Generate Projects</h3>
+<pre><code># Windows
+.\scripts\Win-GenProjects.bat
 
-    <h3>Step 1: Generate Project Files</h3>
-    <table>
-      <tr><th>Platform</th><th>Command</th></tr>
-      <tr><td>Windows</td><td><code>.\scripts\Win-GenProjects.bat</code></td></tr>
-      <tr><td>Linux</td><td><code>./scripts/Linux-GenProjects.sh</code></td></tr>
-      <tr><td>macOS</td><td><code>./scripts/Mac-GenProjects.sh</code></td></tr>
-    </table>
+# Linux
+./scripts/Linux-GenProjects.sh
 
-    <h3>Step 2: Build NVRHI (Required for D3D11/D3D12/Vulkan)</h3>
-    <pre><code>cd Wasteland\vendor\nvrhi
-mkdir build
-cd build
+# macOS
+./scripts/Mac-GenProjects.sh</code></pre>
+
+<h3>Step 3: Build NVRHI</h3>
+<pre><code>cd Wasteland\vendor\nvrhi
+mkdir build && cd build
 cmake .. -G "Visual Studio 17 2022" -A x64
 cmake --build . --config Release
 cmake --build . --config Debug</code></pre>
 
-    <h3>Step 3: Build Wasteland Engine</h3>
-    <pre><code># Windows (MSBuild)
+<h3>Step 4: Build Engine</h3>
+<pre><code># Windows
 msbuild Wasteland.slnx -property:Configuration=Release -property:Platform=x64
 
 # Linux & macOS
 make config=release_x64</code></pre>
 
-    <h3>Step 4: Run the Editor</h3>
-    <pre><code># Windows
-.\bin\Release-windows-x86_64\DemonCore-Editor\DemonCore-Editor.exe
+<h3>Step 5: Run</h3>
+<pre><code>.\bin\Release-windows-x86_64\DemonCore-Editor\DemonCore-Editor.exe</code></pre>
+</div>
 
-# Linux
-./bin/Release-linux-x86_64/DemonCore-Editor/DemonCore-Editor
+<!-- premake5.lua -->
+<div id="premake" class="docs-section">
+<h2>Build Configuration (premake5.lua)</h2>
+<p>The workspace defines three configurations:</p>
+<ul>
+<li><strong>Debug</strong> — No optimizations, debug symbols, validation layers enabled</li>
+<li><strong>Release</strong> — Optimized, some validation</li>
+<li><strong>Dist</strong> — Fully optimized, no validation, distribution build</li>
+</ul>
+<p>Output directory: <code>bin/{cfg}-{system}-{arch}/</code></p>
+<p>Dependencies included:</p>
+<pre><code>GLFW, Glad, ImGui, glm, stb_image, entt,
+yaml-cpp, ImGuizmo, Box2D, Box3D,
+pybind11, NVRHI, VulkanSDK</code></pre>
+</div>
 
-# macOS
-./bin/Release-macosx-x86_64/DemonCore-Editor/DemonCore-Editor</code></pre>
-  </div>
+<!-- Project Structure -->
+<div id="structure" class="docs-section">
+<h2>Project Structure</h2>
+<pre><code>Wasteland/
+├── Wasteland/                    # Static library (engine core)
+│   └── src/
+│       ├── Wasteland/Core/       # Application, Layer, Timestep, Log, Input, Window
+│       ├── Wasteland/Events/     # Event types and dispatcher
+│       ├── Wasteland/Renderer/   # Renderer2D, Renderer3D, Nova, Shaders, Buffers
+│       ├── Wasteland/Scene/      # Scene, Entity, Components, Camera
+│       ├── Wasteland/ImGui/      # ImGuiLayer, ImGui build
+│       ├── Wasteland/Scripting/  # Python/scripting utilities
+│       └── Wasteland/vendor/     # All third-party dependencies
+├── DemonCore-Editor/             # Editor executable
+│   └── src/
+│       ├── EditorLayer.h/cpp     # Main editor layer
+│       └── Panels/               # All editor panels
+├── Sandbox/                      # Test application
+├── docs/                         # NVRHI_SETUP.md
+├── scripts/                      # Win/Mac/Linux build scripts
+├── vendor/bin/premake/           # Premake binary
+├── premake5.lua                  # Build configuration
+└── Wasteland.slnx                # Visual Studio solution</code></pre>
+</div>
 
-  <!-- Editor -->
-  <div id="editor" class="docs-section">
-    <h2>DemonCore Editor</h2>
-    <p>The DemonCore Editor is the primary development tool for Wasteland Engine. It provides a full ImGui-based interface for creating and editing projects.</p>
-
-    <h3>Editor Panels</h3>
-    <table>
-      <tr><th>Panel</th><th>Description</th></tr>
-      <tr><td>AIChatPanel</td><td>AI chat interface with tool support and agentic mode</td></tr>
-      <tr><td>SceneHierarchyPanel</td><td>Entity/scene graph management</td></tr>
-      <tr><td>ScriptEditorPanel</td><td>Code editor with syntax highlighting</td></tr>
-      <tr><td>ScriptInspectorPanel</td><td>Script property inspector</td></tr>
-      <tr><td>ContentBrowserPanel</td><td>Asset browser</td></tr>
-      <tr><td>ModelDownloaderPanel</td><td>3D model downloader</td></tr>
-    </table>
-
-    <h3>AI Chat Panel Features</h3>
-    <ul>
-      <li>AI-powered chat with tool execution capabilities</li>
-      <li>Agentic mode for autonomous operations</li>
-      <li>File operation notifications</li>
-      <li>Entity inspection tools</li>
-    </ul>
-  </div>
-
-  <!-- Rendering -->
-  <div id="rendering" class="docs-section">
-    <h2>Rendering Pipeline</h2>
-
-    <h3>Graphics APIs</h3>
-    <p>Engine supports runtime switching between multiple graphics APIs:</p>
-    <table>
-      <tr><th>API</th><th>Backend</th><th>Platform</th></tr>
-      <tr><td>OpenGL</td><td>Native</td><td>Windows, Linux, macOS</td></tr>
-      <tr><td>DirectX 11</td><td>NVRHI</td><td>Windows</td></tr>
-      <tr><td>DirectX 12</td><td>NVRHI</td><td>Windows</td></tr>
-      <tr><td>Vulkan</td><td>NVRHI</td><td>Windows, Linux</td></tr>
-    </table>
-
-    <h3>Nova Rendering Pipeline</h3>
-    <p>Nova is the AI-powered rendering pipeline for 3D ray tracing:</p>
-    <ul>
-      <li>Real-time path tracing with denoising</li>
-      <li>AI-powered upscaling (similar to DLSS)</li>
-      <li>Intelligent sample distribution</li>
-      <li>Volumetric fog and cloud raymarching</li>
-      <li>Dynamic global illumination</li>
-      <li>Render scale options: 0.5, 0.66, 0.8, 1.0</li>
-    </ul>
-  </div>
-
-  <!-- Physics -->
-  <div id="physics" class="docs-section">
-    <h2>Physics</h2>
-    <table>
-      <tr><th>Engine</th><th>Dimension</th><th>Use Case</th></tr>
-      <tr><td>Box2D</td><td>2D</td><td>2D games and physics simulations</td></tr>
-      <tr><td>Box3D</td><td>3D</td><td>3D games and physics simulations</td></tr>
-    </table>
-  </div>
-
-  <!-- Scripting -->
-  <div id="scripting" class="docs-section">
-    <h2>Scripting</h2>
-    <p>Game logic can be written in Python using the pybind11 integration. The scripting engine is currently a work in progress and accepts contributions.</p>
-
-    <h3>Tool Server</h3>
-    <p>The ToolServer class provides AI agents with engine tools:</p>
-    <ul>
-      <li>File operations (read, write, edit)</li>
-      <li>Memory management</li>
-      <li>Entity inspection</li>
-      <li>Scene manipulation</li>
-    </ul>
-  </div>
-
-  <!-- AI Tools -->
-  <div id="tools" class="docs-section">
-    <h2>AI Tools</h2>
-    <p>The engine includes a ToolServer that exposes engine functionality to AI agents. This enables autonomous AI-assisted development within the editor.</p>
-
-    <h3>Available Tools</h3>
-    <table>
-      <tr><th>Tool</th><th>Description</th></tr>
-      <tr><td>read_file</td><td>Read a text file</td></tr>
-      <tr><td>write_file</td><td>Create or overwrite a file</td></tr>
-      <tr><td>edit_file</td><td>Replace text in a file</td></tr>
-      <tr><td>list_dir</td><td>List directory contents</td></tr>
-      <tr><td>inspect_entity</td><td>Get information about a scene entity</td></tr>
-    </table>
-  </div>
-
-  <!-- NVRHI -->
-  <div id="nvrhi" class="docs-section">
-    <h2>NVRHI Integration</h2>
-    <p>NVRHI (NVIDIA Rendering Hardware Interface) provides DirectX 11, DirectX 12, and Vulkan backends. For detailed setup instructions, see <a href="https://github.com/Ashen-Wastes-Studios/Wasteland-Engine/blob/master/docs/NVRHI_SETUP.md" target="_blank" rel="noopener" style="color: var(--accent);">docs/NVRHI_SETUP.md</a> in the repository.</p>
-
-    <h3>Key Points</h3>
-    <ul>
-      <li>Build NVRHI as a static library first</li>
-      <li>Both Debug and Release configs must be built</li>
-      <li>Vulkan SDK 1.3.296.0 is pinned</li>
-      <li>Supports runtime API switching</li>
-    </ul>
-  </div>
 </section>
 
 <footer>
