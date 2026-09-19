@@ -1,4 +1,5 @@
-// GALAXY UNIVERSE — Infinite Tiling + Neural Connections + Page-Specific Visuals
+// GALAXY UNIVERSE — Infinite Tiling + Neural Connections + Explosive
+// With error handling for debugging
 (function() {
   const canvas = document.createElement('canvas');
   canvas.id = 'bg-canvas';
@@ -278,6 +279,23 @@
     color: theme.colors[Math.floor(Math.random() * theme.colors.length)], type: Math.floor(Math.random() * 4)
   }));
 
+  function project3D(v, shape) {
+    let {x, y, z} = v;
+    let y1 = y * Math.cos(shape.rotX) - z * Math.sin(shape.rotX);
+    let z1 = y * Math.sin(shape.rotX) + z * Math.cos(shape.rotX);
+    let x2 = x * Math.cos(shape.rotY) + z1 * Math.sin(shape.rotY);
+    let z2 = -x * Math.sin(shape.rotY) + z1 * Math.cos(shape.rotY);
+    let x3 = x2 * Math.cos(shape.rotZ) - y1 * Math.sin(shape.rotZ);
+    let y3 = x2 * Math.sin(shape.rotZ) + y1 * Math.cos(shape.rotZ);
+    let x4 = x3 * Math.cos(rotY) - z2 * Math.sin(rotY);
+    let z4 = x3 * Math.sin(rotY) + z2 * Math.cos(rotY);
+    let y4 = y3 * Math.cos(rotX) - z4 * Math.sin(rotX);
+    let z5 = y3 * Math.sin(rotX) + z4 * Math.cos(rotX);
+    const fov = 400;
+    const scale = fov / (fov + z5 + 250);
+    return { x: shape.x + x4 * scale, y: shape.y + y4 * scale, scale };
+  }
+
   function draw3DShapes() {
     if (bgType !== 'wireframe' && bgType !== 'starfield') return;
     const distortion = getScrollDistortion();
@@ -305,22 +323,7 @@
         for (let i = 0; i < 8; i++) { const a = (i/8)*Math.PI*2; verts.push({x: Math.cos(a)*shape.size, y: Math.sin(a)*shape.size*0.6, z: (i%3-1)*shape.size*0.5}); }
       }
 
-      const projected = verts.map(v => {
-        let {x, y, z} = v;
-        let y1 = y * Math.cos(shape.rotX) - z * Math.sin(shape.rotX);
-        let z1 = y * Math.sin(shape.rotX) + z * Math.cos(shape.rotX);
-        let x2 = x * Math.cos(shape.rotY) + z1 * Math.sin(shape.rotY);
-        let z2 = -x * Math.sin(shape.rotY) + z1 * Math.cos(shape.rotY);
-        let x3 = x2 * Math.cos(shape.rotZ) - y1 * Math.sin(shape.rotZ);
-        let y3 = x2 * Math.sin(shape.rotZ) + y1 * Math.cos(shape.rotZ);
-        let x4 = x3 * Math.cos(rotY) - z2 * Math.sin(rotY);
-        let z4 = x3 * Math.sin(rotY) + z2 * Math.cos(rotY);
-        let y4 = y3 * Math.cos(rotX) - z4 * Math.sin(rotX);
-        let z5 = y3 * Math.sin(rotX) + z4 * Math.cos(rotX);
-        const fov = 400;
-        const scale = fov / (fov + z5 + 250);
-        return { x: shape.x + x4 * scale, y: shape.y + y4 * scale, scale };
-      });
+      const projected = verts.map(v => project3D(v, shape));
 
       ctx.strokeStyle = shape.color;
       ctx.lineWidth = 1;
@@ -392,15 +395,19 @@
   }
 
   function draw() {
-    drawBase();
-    const visibleGalaxies = getVisibleGalaxies();
-    drawNeuralConnections(visibleGalaxies);
-    visibleGalaxies.forEach(g => drawGalaxy(g));
-    drawDataStreams();
-    drawMatrixRain();
-    draw3DShapes();
-    drawWaves();
-    drawExplosions();
+    try {
+      drawBase();
+      const visibleGalaxies = getVisibleGalaxies();
+      drawNeuralConnections(visibleGalaxies);
+      visibleGalaxies.forEach(g => drawGalaxy(g));
+      drawDataStreams();
+      drawMatrixRain();
+      draw3DShapes();
+      drawWaves();
+      drawExplosions();
+    } catch(e) {
+      console.error('Background render error:', e);
+    }
     requestAnimationFrame(draw);
   }
 
