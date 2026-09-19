@@ -1,4 +1,4 @@
-// GALAXY UNIVERSE + EXPLOSIVE Interactive Backgrounds
+// GALAXY UNIVERSE + EXPLOSIVE — Themed per page
 (function() {
   const canvas = document.createElement('canvas');
   canvas.id = 'bg-canvas';
@@ -22,27 +22,92 @@
 
   const bgType = document.body.dataset.bg || 'particles';
 
-  // Galaxy colors
-  const galaxyColors = [
-    'rgba(220, 20, 60, 0.8)',
-    'rgba(255, 100, 100, 0.6)',
-    'rgba(200, 50, 100, 0.5)',
-    'rgba(150, 50, 200, 0.4)',
-    'rgba(100, 100, 255, 0.3)',
-    'rgba(255, 255, 255, 0.9)',
-  ];
+  // Page-specific themes
+  const themes = {
+    // Studio overview — diverse galaxies representing different disciplines
+    particles: {
+      galaxyCount: 60,
+      colors: ['#dc143c', '#ff6b6b', '#ff8e53', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'],
+      spiralArms: [2, 3, 4],
+      nebulaColors: ['rgba(220,20,60,0.05)', 'rgba(255,107,107,0.04)', 'rgba(72,219,251,0.03)'],
+      neuralNodes: 25,
+      particleColors: ['#dc143c', '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3'],
+      coreColor: '#fff'
+    },
+    // AI research — neural network more prominent, brain-like
+    neural: {
+      galaxyCount: 40,
+      colors: ['#dc143c', '#ff4757', '#ff6348', '#ff4757', '#c44569', '#f8b500'],
+      spiralArms: [3, 4, 5],
+      nebulaColors: ['rgba(220,20,60,0.06)', 'rgba(255,71,87,0.05)', 'rgba(196,69,105,0.04)'],
+      neuralNodes: 35,
+      particleColors: ['#dc143c', '#ff4757', '#ff6348', '#f8b500'],
+      coreColor: '#fff'
+    },
+    // Ashen AI project — AI/ML themed, more nodes
+    ashen: {
+      galaxyCount: 50,
+      colors: ['#dc143c', '#ff4757', '#ff6b6b', '#ff8e53', '#feca57', '#48dbfb'],
+      spiralArms: [3, 4],
+      nebulaColors: ['rgba(220,20,60,0.05)', 'rgba(255,107,107,0.04)', 'rgba(254,202,87,0.03)'],
+      neuralNodes: 40,
+      particleColors: ['#dc143c', '#ff4757', '#feca57', '#48dbfb'],
+      coreColor: '#fff'
+    },
+    // Chat interface — matrix-like rain combined with galaxy
+    matrix: {
+      galaxyCount: 30,
+      colors: ['#00ff41', '#39ff14', '#00ff00', '#7fff00', '#adff2f', '#dc143c'],
+      spiralArms: [2, 3],
+      nebulaColors: ['rgba(0,255,65,0.04)', 'rgba(57,255,20,0.03)', 'rgba(220,20,60,0.03)'],
+      neuralNodes: 20,
+      particleColors: ['#00ff41', '#39ff14', '#00ff00', '#dc143c'],
+      coreColor: '#00ff41'
+    },
+    // Gaming tech — engine/3D themed, geometric shapes
+    wireframe: {
+      galaxyCount: 45,
+      colors: ['#dc143c', '#ff4757', '#ff6348', '#f8b500', '#48dbfb', '#54a0ff'],
+      spiralArms: [4, 5, 6],
+      nebulaColors: ['rgba(220,20,60,0.05)', 'rgba(72,219,251,0.04)', 'rgba(84,160,255,0.03)'],
+      neuralNodes: 30,
+      particleColors: ['#dc143c', '#ff4757', '#48dbfb', '#54a0ff'],
+      coreColor: '#fff'
+    },
+    // Games — colorful, playful, action-oriented
+    starfield: {
+      galaxyCount: 70,
+      colors: ['#dc143c', '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3'],
+      spiralArms: [2, 3, 4, 5],
+      nebulaColors: ['rgba(220,20,60,0.05)', 'rgba(255,159,243,0.04)', 'rgba(95,39,205,0.03)', 'rgba(0,210,211,0.03)'],
+      neuralNodes: 35,
+      particleColors: ['#dc143c', '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'],
+      coreColor: '#fff'
+    },
+    // Philosophy — contemplative, flowing, wave-like nebulae
+    wave: {
+      galaxyCount: 35,
+      colors: ['#dc143c', '#c44569', '#f8b500', '#48dbfb', '#54a0ff', '#5f27cd'],
+      spiralArms: [2, 3],
+      nebulaColors: ['rgba(220,20,60,0.06)', 'rgba(196,69,105,0.05)', 'rgba(84,160,255,0.04)', 'rgba(95,39,205,0.03)'],
+      neuralNodes: 20,
+      particleColors: ['#dc143c', '#c44569', '#f8b500', '#48dbfb'],
+      coreColor: '#fff'
+    }
+  };
+
+  const theme = themes[bgType] || themes.particles;
 
   // Create galaxy clusters
-  const galaxyCount = 60;
-  const galaxies = Array.from({ length: galaxyCount }, () => ({
+  const galaxies = Array.from({ length: theme.galaxyCount }, () => ({
     x: Math.random() * w,
     y: Math.random() * h,
     z: Math.random() * 1000 + 200,
     r: Math.random() * 30 + 10,
-    color: galaxyColors[Math.floor(Math.random() * galaxyColors.length)],
+    color: theme.colors[Math.floor(Math.random() * theme.colors.length)],
     rotation: Math.random() * Math.PI * 2,
     rotSpeed: (Math.random() - 0.5) * 0.002,
-    spiralArms: Math.floor(Math.random() * 3) + 2,
+    spiralArms: theme.spiralArms[Math.floor(Math.random() * theme.spiralArms.length)],
     pulsePhase: Math.random() * Math.PI * 2,
     connections: [],
     active: false
@@ -64,11 +129,11 @@
     rx: Math.random() * 200 + 100,
     ry: Math.random() * 150 + 80,
     rotation: Math.random() * Math.PI,
-    color: `hsla(${Math.random() * 60 + 320}, 80%, 30%, 0.05)`
+    color: theme.nebulaColors[Math.floor(Math.random() * theme.nebulaColors.length)]
   }));
 
   // Neural network nodes (subset of galaxies)
-  const neuralNodes = galaxies.slice(0, 25);
+  const neuralNodes = galaxies.slice(0, theme.neuralNodes);
 
   // EXPLOSIVE effects arrays
   const explosions = [];
@@ -80,12 +145,11 @@
     r: Math.random() * 3 + 1,
     life: 1,
     decay: Math.random() * 0.01 + 0.005,
-    color: `hsl(${Math.random() * 60 + 340}, 100%, 50%)`
+    color: theme.particleColors[Math.floor(Math.random() * theme.particleColors.length)]
   }));
 
   function createExplosion(x, y) {
-    explosions.push({ x, y, radius: 0, maxRadius: 200, alpha: 1, color: `hsl(${Math.random()*30+350}, 100%, 50%)` });
-    // Spawn particles
+    explosions.push({ x, y, radius: 0, maxRadius: 200, alpha: 1, color: theme.particleColors[Math.floor(Math.random() * theme.particleColors.length)] });
     for (let i = 0; i < 20; i++) {
       const angle = Math.random() * Math.PI * 2;
       const speed = Math.random() * 5 + 2;
@@ -97,7 +161,7 @@
         r: Math.random() * 4 + 2,
         life: 1,
         decay: Math.random() * 0.02 + 0.01,
-        color: `hsl(${Math.random() * 60 + 340}, 100%, 60%)`
+        color: theme.particleColors[Math.floor(Math.random() * theme.particleColors.length)]
       });
     }
   }
@@ -179,9 +243,9 @@
     // Outer glow
     const glowSize = g.r * (2 + proximity * 1.5);
     const gradient = ctx.createRadialGradient(g.x, g.y, 0, g.x, g.y, glowSize);
-    gradient.addColorStop(0, `rgba(220, 20, 60, ${alpha * 0.8})`);
-    gradient.addColorStop(0.3, `rgba(200, 50, 100, ${alpha * 0.4})`);
-    gradient.addColorStop(0.6, `rgba(150, 50, 200, ${alpha * 0.2})`);
+    gradient.addColorStop(0, g.color);
+    gradient.addColorStop(0.3, g.color.replace('0.8', '0.4').replace('0.6', '0.3').replace('0.5', '0.25').replace('0.4', '0.2').replace('0.3', '0.15'));
+    gradient.addColorStop(0.6, 'rgba(150, 50, 200, 0.1)');
     gradient.addColorStop(1, 'transparent');
     ctx.fillStyle = gradient;
     ctx.beginPath();
@@ -211,8 +275,10 @@
     // Core
     ctx.beginPath();
     ctx.arc(g.x, g.y, g.r * (1 + proximity * 0.5), 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+    ctx.fillStyle = theme.coreColor;
+    ctx.globalAlpha = alpha;
     ctx.fill();
+    ctx.globalAlpha = 1;
   }
 
   function drawNeuralConnections() {
