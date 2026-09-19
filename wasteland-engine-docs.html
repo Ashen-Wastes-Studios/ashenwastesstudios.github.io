@@ -1,366 +1,500 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wasteland Engine Docs — Ashen Wastes Studios</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0a0a0f;
-  --surface: #12121a;
-  --surface-2: #1a1a25;
-  --ink: #e0e0e8;
-  --ink-muted: #6a6a80;
-  --accent: #dc143c;
-  --accent-dim: #a01030;
-  --accent-2: #ff6b35;
-  --accent-3: #ff4757;
-  --border: #2a2a40;
-  --code-bg: #0f0f0f;
-  --code-border: #2a2a40;
-  --glow: 0 0 10px rgba(220, 20, 60, 0.3);
-  --glow-strong: 0 0 20px rgba(220, 20, 60, 0.5);
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wasteland Engine Docs — Ashen Wastes Studios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --surface-2: #1a1a25;
+      --ink: #e0e0e8;
+      --ink-muted: #6a6a80;
+      --accent: #dc143c;
+      --accent-dim: #a01030;
+      --accent-2: #ff6b35;
+      --accent-3: #ff4757;
+      --border: #2a2a40;
+      --code-bg: #0f0f0f;
+      --code-border: #2a2a40;
+      --glow: 0 0 10px rgba(220, 20, 60, 0.3);
+      --glow-strong: 0 0 20px rgba(220, 20, 60, 0.5);
+    }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-html { scroll-behavior: smooth; }
+    html {
+      scroll-behavior: smooth;
+    }
 
-body {
-  font-family: 'Inter', -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--ink);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  background-image:
-    linear-gradient(rgba(220, 20, 60, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(220, 20, 60, 0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-  position: relative;
-}
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      background-image:
+        linear-gradient(rgba(220, 20, 60, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(220, 20, 60, 0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      position: relative;
+    }
 
-body::before {
-  content: '';
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.1) 2px,
-    rgba(0, 0, 0, 0.1) 4px
-  );
-  pointer-events: none;
-  z-index: 9999;
-}
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(0deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.1) 2px,
+          rgba(0, 0, 0, 0.1) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
 
-a { color: inherit; text-decoration: none; }
-img { max-width: 100%; display: block; }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-code, pre {
-  font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
-  font-size: 0.9em;
-}
+    img {
+      max-width: 100%;
+      display: block;
+    }
 
-code {
-  background: var(--code-bg);
-  padding: 0.15rem 0.4rem;
-  border-radius: 2px;
-  border: 1px solid var(--code-border);
-}
+    code,
+    pre {
+      font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+      font-size: 0.9em;
+    }
 
-pre {
-  background: var(--code-bg);
-  border: 1px solid var(--code-border);
-  border-radius: 2px;
-  padding: 1rem 1.25rem;
-  overflow-x: auto;
-  line-height: 1.7;
-}
+    code {
+      background: var(--code-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 2px;
+      border: 1px solid var(--code-border);
+    }
 
-pre code { background: none; border: none; padding: 0; }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 2px;
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      line-height: 1.7;
+    }
 
-.container { max-width: 1000px; margin: 0 auto; padding: 0 2rem; }
+    pre code {
+      background: none;
+      border: none;
+      padding: 0;
+    }
 
-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  background: rgba(10, 10, 15, 0.9);
-  backdrop-filter: blur(15px);
-  border-bottom: 1px solid var(--accent);
-  box-shadow: 0 0 20px rgba(220, 20, 60, 0.15), 0 2px 10px rgba(0, 0, 0, 0.5);
-}
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
 
-.nav-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: rgba(10, 10, 15, 0.9);
+      backdrop-filter: blur(15px);
+      border-bottom: 1px solid var(--accent);
+      box-shadow: 0 0 20px rgba(220, 20, 60, 0.15), 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
 
-.logo {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.25rem;
-  letter-spacing: -0.02em;
-  text-shadow: 0 0 10px rgba(220, 20, 60, 0.6), 0 0 20px rgba(220, 20, 60, 0.3);
-}
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
 
-.nav-links { display: flex; gap: 2rem; list-style: none; font-size: 0.9rem; font-weight: 500; }
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      text-shadow: 0 0 10px rgba(220, 20, 60, 0.6), 0 0 20px rgba(220, 20, 60, 0.3);
+    }
 
-.nav-links a {
-  color: var(--ink-muted);
-  transition: color 0.2s;
-  position: relative;
-  padding: 0.25rem 0;
-}
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
 
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: var(--accent);
-  box-shadow: 0 0 5px var(--accent);
-  transition: width 0.3s ease;
-}
+    .nav-links a {
+      color: var(--ink-muted);
+      transition: color 0.2s;
+      position: relative;
+      padding: 0.25rem 0;
+    }
 
-.nav-links a:hover::after,
-.nav-links a.active::after { width: 100%; }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--accent);
+      box-shadow: 0 0 5px var(--accent);
+      transition: width 0.3s ease;
+    }
 
-.nav-links a:hover { text-shadow: 0 0 8px rgba(220, 20, 60, 0.6); }
-.nav-links a.active { color: var(--accent) !important; text-shadow: 0 0 8px rgba(220, 20, 60, 0.5); }
+    .nav-links a:hover::after,
+    .nav-links a.active::after {
+      width: 100%;
+    }
 
-.page-header {
-  padding: 10rem 0 4rem;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 4rem;
-}
+    .nav-links a:hover {
+      text-shadow: 0 0 8px rgba(220, 20, 60, 0.6);
+    }
 
-.breadcrumb { font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 1.5rem; }
-.breadcrumb a { color: var(--accent); }
+    .nav-links a.active {
+      color: var(--accent) !important;
+      text-shadow: 0 0 8px rgba(220, 20, 60, 0.5);
+    }
 
-.page-header h1 {
-  font-family: 'DM Serif Display', serif;
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-  font-weight: 400;
-  text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
-}
+    .page-header {
+      padding: 10rem 0 4rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4rem;
+    }
 
-.page-header p { font-size: 1.1rem; color: var(--ink-muted); max-width: 50ch; }
+    .breadcrumb {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      margin-bottom: 1.5rem;
+    }
 
-h1, h2, h3 { text-shadow: 0 0 10px rgba(220, 20, 60, 0.4); }
-a:hover { text-shadow: 0 0 8px rgba(220, 20, 60, 0.6); }
+    .breadcrumb a {
+      color: var(--accent);
+    }
 
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 0; }
-::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+    .page-header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      font-weight: 400;
+      text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
+    }
 
-::selection { background: rgba(220, 20, 60, 0.3); color: var(--ink); }
+    .page-header p {
+      font-size: 1.1rem;
+      color: var(--ink-muted);
+      max-width: 50ch;
+    }
 
-.docs-section {
-  margin-bottom: 4rem;
-  scroll-margin-top: 80px;
-}
+    h1,
+    h2,
+    h3 {
+      text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
+    }
 
-.docs-section h2 {
-  font-family: 'DM Serif Display', serif;
-  font-size: clamp(1.75rem, 3vw, 2.25rem);
-  letter-spacing: -0.02em;
-  margin-bottom: 1rem;
-  font-weight: 400;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--border);
-}
+    a:hover {
+      text-shadow: 0 0 8px rgba(220, 20, 60, 0.6);
+    }
 
-.docs-section h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
-}
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
 
-.docs-section h4 {
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
 
-.docs-section p {
-  color: var(--ink-muted);
-  max-width: 70ch;
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 0;
+    }
 
-.docs-section strong { color: var(--ink); }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-dim);
+    }
 
-.docs-section ul, .docs-section ol {
-  color: var(--ink-muted);
-  margin-left: 1.5rem;
-  margin-bottom: 1rem;
-}
+    ::selection {
+      background: rgba(220, 20, 60, 0.3);
+      color: var(--ink);
+    }
 
-.docs-section li { margin-bottom: 0.5rem; }
+    .docs-section {
+      margin-bottom: 4rem;
+      scroll-margin-top: 80px;
+    }
 
-/* Table of Contents */
-.docs-toc {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 2px;
-  padding: 1.5rem 2rem;
-  margin-bottom: 3rem;
-}
+    .docs-section h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.75rem, 3vw, 2.25rem);
+      letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+      font-weight: 400;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
 
-.docs-toc h3 {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.25rem;
-  margin-bottom: 1rem;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
+    .docs-section h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+    }
 
-.docs-toc ul {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 0.5rem 1.5rem;
-}
+    .docs-section h4 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
 
-.docs-toc li {
-  margin: 0;
-}
+    .docs-section p {
+      color: var(--ink-muted);
+      max-width: 70ch;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
 
-.docs-toc a {
-  font-size: 0.9rem;
-  color: var(--ink-muted);
-  transition: color 0.2s;
-  display: block;
-  padding: 0.25rem 0;
-}
+    .docs-section strong {
+      color: var(--ink);
+    }
 
-.docs-toc a:hover {
-  color: var(--accent);
-  text-shadow: 0 0 5px rgba(220, 20, 60, 0.5);
-}
+    .docs-section ul,
+    .docs-section ol {
+      color: var(--ink-muted);
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1.5rem 0;
-  font-size: 0.9rem;
-}
+    .docs-section li {
+      margin-bottom: 0.5rem;
+    }
 
-th, td {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
-}
+    /* Table of Contents */
+    .docs-toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 3rem;
+    }
 
-th { font-weight: 600; color: var(--ink); background: var(--surface); font-size: 0.85rem; }
-td { color: var(--ink-muted); }
-td:first-child { color: var(--ink); font-weight: 500; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+    .docs-toc h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
 
-footer {
-  border-top: 1px solid var(--border);
-  padding: 3rem 0;
-  font-size: 0.85rem;
-  color: var(--ink-muted);
-}
+    .docs-toc ul {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.5rem 1.5rem;
+    }
 
-.footer-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    .docs-toc li {
+      margin: 0;
+    }
 
-@media (max-width: 768px) {
-  .nav-links { gap: 1rem; font-size: 0.85rem; }
-}
-</style>
+    .docs-toc a {
+      font-size: 0.9rem;
+      color: var(--ink-muted);
+      transition: color 0.2s;
+      display: block;
+      padding: 0.25rem 0;
+    }
+
+    .docs-toc a:hover {
+      color: var(--accent);
+      text-shadow: 0 0 5px rgba(220, 20, 60, 0.5);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.9rem;
+    }
+
+    th,
+    td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-weight: 600;
+      color: var(--ink);
+      background: var(--surface);
+      font-size: 0.85rem;
+    }
+
+    td {
+      color: var(--ink-muted);
+    }
+
+    td:first-child {
+      color: var(--ink);
+      font-weight: 500;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 3rem 0;
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        gap: 1rem;
+        font-size: 0.85rem;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<nav>
-  <div class="nav-inner">
-    <div class="logo">Ashen Wastes Studios</div>
-    <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="ai.html">AI</a></li>
-      <li><a href="ashen-gpt.html">Ashen AI</a></li>
-      <li><a href="gaming-technology.html">Gaming Technology</a></li>
-      <li><a href="wasteland-engine-docs.html" class="active">Engine Docs</a></li>
-      <li><a href="games.html">Games</a></li>
-      <li><a href="philosophy.html">Philosophy</a></li>
-    </ul>
-  </div>
-</nav>
+  <nav>
+    <div class="nav-inner">
+      <div class="logo">Ashen Wastes Studios</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="ai.html">AI</a></li>
+        <li><a href="ashen-gpt.html">Ashen AI</a></li>
+        <li><a href="gaming-technology.html">Gaming Technology</a></li>
+        <li><a href="wasteland-engine-docs.html" class="active">Engine Docs</a></li>
+        <li><a href="games.html">Games</a></li>
+        <li><a href="philosophy.html">Philosophy</a></li>
+      </ul>
+    </div>
+  </nav>
 
-<header class="page-header container">
-  <div class="breadcrumb"><a href="index.html">Home</a> / <a href="gaming-technology.html">Gaming Technology</a> / Wasteland Engine Documentation</div>
-  <h1>Wasteland Engine.</h1>
-  <p>Complete engine documentation — architecture, systems, and APIs.</p>
-</header>
+  <header class="page-header container">
+    <div class="breadcrumb"><a href="index.html">Home</a> / <a href="gaming-technology.html">Gaming Technology</a> /
+      Wasteland Engine Documentation</div>
+    <h1>Wasteland Engine.</h1>
+    <p>Complete engine documentation — architecture, systems, and APIs.</p>
+  </header>
 
-<section class="container">
+  <section class="container">
 
-<!-- Table of Contents -->
-<div class="docs-toc">
-<h3>Table of Contents</h3>
-<ul>
-<li><a href="#overview">Overview</a></li>
-<li><a href="#core">Core Systems</a></li>
-<li><a href="#scene">Scene System</a></li>
-<li><a href="#rendering">Rendering</a></li>
-<li><a href="#resources">Rendering Resources</a></li>
-<li><a href="#physics">Physics</a></li>
-<li><a href="#scripting">Scripting</a></li>
-<li><a href="#editor">DemonCore Editor</a></li>
-<li><a href="#volumetrics">Volumetrics &amp; Water</a></li>
-<li><a href="#building">Building</a></li>
-<li><a href="#premake">Build Configuration</a></li>
-<li><a href="#structure">Project Structure</a></li>
-</ul>
-</div>
+    <!-- Table of Contents -->
+    <div class="docs-toc">
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#core">Core Systems</a></li>
+        <li><a href="#scene">Scene System</a></li>
+        <li><a href="#rendering">Rendering</a></li>
+        <li><a href="#resources">Rendering Resources</a></li>
+        <li><a href="#physics">Physics</a></li>
+        <li><a href="#scripting">Scripting</a></li>
+        <li><a href="#editor">DemonCore Editor</a></li>
+        <li><a href="#volumetrics">Volumetrics &amp; Water</a></li>
+        <li><a href="#building">Building</a></li>
+        <li><a href="#premake">Build Configuration</a></li>
+        <li><a href="#structure">Project Structure</a></li>
+      </ul>
+    </div>
 
-<!-- Overview -->
-<div id="overview" class="docs-section">
-<h2>Overview</h2>
-<p>Wasteland Engine is a 2D/3D game engine built from scratch in C++17. It uses a layered architecture with an Application core, a Scene/Entity system built on EnTT, multiple rendering backends (OpenGL, DirectX 11/12, Vulkan via NVRHI), AI-powered ray tracing (Nova), and a full editor (DemonCore-Editor).</p>
+    <!-- Overview -->
+    <div id="overview" class="docs-section">
+      <h2>Overview</h2>
+      <p>Wasteland Engine is a 2D/3D game engine built from scratch in C++17. It uses a layered architecture with an
+        Application core, a Scene/Entity system built on EnTT, multiple rendering backends (OpenGL, DirectX 11/12,
+        Vulkan via NVRHI), AI-powered ray tracing (Nova), and a full editor (DemonCore-Editor).</p>
 
-<h3>Key Facts</h3>
-<table>
-<tr><th>Property</th><th>Value</th></tr>
-<tr><td>Language</td><td>C++17</td></tr>
-<tr><td>Build System</td><td>Premake5</td></tr>
-<tr><td>Entity System</td><td>EnTT (ECS)</td></tr>
-<tr><td>Rendering</td><td>OpenGL, D3D11, D3D12, Vulkan</td></tr>
-<tr><td>Physics</td><td>Box2D (2D), Box3D (3D)</td></tr>
-<tr><td>Scripting</td><td>Python (pybind11)</td></tr>
-<tr><td>Editor</td><td>DemonCore-Editor (ImGui)</td></tr>
-<tr><td>Platform</td><td>Windows, Linux, macOS</td></tr>
-</table>
-</div>
+      <h3>Key Facts</h3>
+      <table>
+        <tr>
+          <th>Property</th>
+          <th>Value</th>
+        </tr>
+        <tr>
+          <td>Language</td>
+          <td>C++17</td>
+        </tr>
+        <tr>
+          <td>Build System</td>
+          <td>Premake5</td>
+        </tr>
+        <tr>
+          <td>Entity System</td>
+          <td>EnTT (ECS)</td>
+        </tr>
+        <tr>
+          <td>Rendering</td>
+          <td>OpenGL, D3D11, D3D12, Vulkan</td>
+        </tr>
+        <tr>
+          <td>Physics</td>
+          <td>Box2D (2D), Box3D (3D)</td>
+        </tr>
+        <tr>
+          <td>Scripting</td>
+          <td>Python (pybind11)</td>
+        </tr>
+        <tr>
+          <td>Editor</td>
+          <td>DemonCore-Editor (ImGui)</td>
+        </tr>
+        <tr>
+          <td>Platform</td>
+          <td>Windows, Linux, macOS</td>
+        </tr>
+      </table>
+    </div>
 
-<!-- Core Systems -->
-<div id="core" class="docs-section">
-<h2>Core Systems</h2>
+    <!-- Core Systems -->
+    <div id="core" class="docs-section">
+      <h2>Core Systems</h2>
 
-<h3>Application (<code>Wasteland/Core/Application.h</code>)</h3>
-<p>The <code>Application</code> class is the entry point for all Wasteland programs. It owns the window, runs the main loop, and manages the layer stack.</p>
-<pre><code>class Application {
+      <h3>Application (<code>Wasteland/Core/Application.h</code>)</h3>
+      <p>The <code>Application</code> class is the entry point for all Wasteland programs. It owns the window, runs the
+        main loop, and manages the layer stack.</p>
+      <pre><code>class Application {
 public:
     Application(const std::string& name = "Wasteland App");
     void Run();
@@ -369,11 +503,13 @@ public:
     void Close();
     static Application& Get();
 };</code></pre>
-<p>The main loop calls <code>OnUpdate()</code> on every layer, renders ImGui overlays, and swaps the window buffer. The static <code>Get()</code> singleton allows global access.</p>
+      <p>The main loop calls <code>OnUpdate()</code> on every layer, renders ImGui overlays, and swaps the window
+        buffer. The static <code>Get()</code> singleton allows global access.</p>
 
-<h3>Layer (<code>Wasteland/Core/Layer.h</code>)</h3>
-<p>Layers are the primary unit of engine functionality. Both the editor and game systems are implemented as layers.</p>
-<pre><code>class Layer {
+      <h3>Layer (<code>Wasteland/Core/Layer.h</code>)</h3>
+      <p>Layers are the primary unit of engine functionality. Both the editor and game systems are implemented as
+        layers.</p>
+      <pre><code>class Layer {
 public:
     virtual void OnAttach() {}
     virtual void OnDetach() {}
@@ -381,263 +517,439 @@ public:
     virtual void OnImGuiRender() {}
     virtual void OnEvent(Event& event) {}
 };</code></pre>
-<p>The <code>EditorLayer</code> (in DemonCore-Editor) and <code>Sandbox2D</code> are the two main layer implementations.</p>
+      <p>The <code>EditorLayer</code> (in DemonCore-Editor) and <code>Sandbox2D</code> are the two main layer
+        implementations.</p>
 
-<h3>Timestep (<code>Wasteland/Core/Timestep.h</code>)</h3>
-<p>A simple wrapper around a float representing seconds since last frame. Provides <code>GetSeconds()</code> and <code>GetMilliseconds()</code>.</p>
+      <h3>Timestep (<code>Wasteland/Core/Timestep.h</code>)</h3>
+      <p>A simple wrapper around a float representing seconds since last frame. Provides <code>GetSeconds()</code> and
+        <code>GetMilliseconds()</code>.</p>
 
-<h3>Window (<code>Wasteland/Core/Window.h</code>)</h3>
-<p>Abstracts platform-specific window creation (GLFW-backed). Handles input callbacks, vsync, and resize events.</p>
+      <h3>Window (<code>Wasteland/Core/Window.h</code>)</h3>
+      <p>Abstracts platform-specific window creation (GLFW-backed). Handles input callbacks, vsync, and resize events.
+      </p>
 
-<h3>Events (<code>Wasteland/Events/Event.h</code>)</h3>
-<p>Blocking event system. Event types include:</p>
-<ul>
-<li><code>WindowClose</code>, <code>WindowResize</code>, <code>WindowFocus</code></li>
-<li><code>KeyPressed</code>, <code>KeyReleased</code>, <code>KeyTyped</code></li>
-<li><code>MouseButtonPressed</code>, <code>MouseButtonReleased</code>, <code>MouseMoved</code>, <code>MouseScrolled</code></li>
-</ul>
-<p>Events are dispatched immediately via <code>EventDispatcher</code> which routes to handler functions.</p>
+      <h3>Events (<code>Wasteland/Events/Event.h</code>)</h3>
+      <p>Blocking event system. Event types include:</p>
+      <ul>
+        <li><code>WindowClose</code>, <code>WindowResize</code>, <code>WindowFocus</code></li>
+        <li><code>KeyPressed</code>, <code>KeyReleased</code>, <code>KeyTyped</code></li>
+        <li><code>MouseButtonPressed</code>, <code>MouseButtonReleased</code>, <code>MouseMoved</code>,
+          <code>MouseScrolled</code></li>
+      </ul>
+      <p>Events are dispatched immediately via <code>EventDispatcher</code> which routes to handler functions.</p>
 
-<h3>Log (<code>Wasteland/Core/Log.h</code>)</h3>
-<p>Static logger using spdlog. <code>WL_CORE_INFO()</code>, <code>WL_CORE_ERROR()</code>, etc. for engine-side logging.</p>
-</div>
+      <h3>Log (<code>Wasteland/Core/Log.h</code>)</h3>
+      <p>Static logger using spdlog. <code>WL_CORE_INFO()</code>, <code>WL_CORE_ERROR()</code>, etc. for engine-side
+        logging.</p>
+    </div>
 
-<!-- Scene System -->
-<div id="scene" class="docs-section">
-<h2>Scene System</h2>
+    <!-- Scene System -->
+    <div id="scene" class="docs-section">
+      <h2>Scene System</h2>
 
-<h3>Scene (<code>Wasteland/Scene/Scene.h</code>)</h3>
-<p>The <code>Scene</code> owns an <code>entt::registry</code> and manages entity lifetime. It handles three update paths:</p>
-<ul>
-<li><code>OnUpdateEditor()</code> — Editor preview with <code>EditorCamera</code></li>
-<li><code>OnUpdateRuntime()</code> — Play mode</li>
-<li><code>OnUpdateSimulation()</code> — Physics-only simulation</li>
-</ul>
-<p>The scene also manages volumetric volumes (fog, clouds), water surfaces, and light submission to the renderer.</p>
+      <h3>Scene (<code>Wasteland/Scene/Scene.h</code>)</h3>
+      <p>The <code>Scene</code> owns an <code>entt::registry</code> and manages entity lifetime. It handles three update
+        paths:</p>
+      <ul>
+        <li><code>OnUpdateEditor()</code> — Editor preview with <code>EditorCamera</code></li>
+        <li><code>OnUpdateRuntime()</code> — Play mode</li>
+        <li><code>OnUpdateSimulation()</code> — Physics-only simulation</li>
+      </ul>
+      <p>The scene also manages volumetric volumes (fog, clouds), water surfaces, and light submission to the renderer.
+      </p>
 
-<h3>Entity (<code>Wasteland/Scene/Entity.h</code>)</h3>
-<p>An Entity is a lightweight handle wrapping an <code>entt::entity</code> and its parent <code>Scene</code>. It provides a templated component API:</p>
-<pre><code>Entity entity = scene.CreateEntity("Player");
+      <h3>Entity (<code>Wasteland/Scene/Entity.h</code>)</h3>
+      <p>An Entity is a lightweight handle wrapping an <code>entt::entity</code> and its parent <code>Scene</code>. It
+        provides a templated component API:</p>
+      <pre><code>Entity entity = scene.CreateEntity("Player");
 entity.AddComponent&lt;TransformComponent&gt;();
 auto& transform = entity.GetComponent&lt;TransformComponent&gt;();
 bool has = entity.HasComponent&lt;SpriteRendererComponent&gt;();</code></pre>
 
-<h3>Components (<code>Wasteland/Scene/Components.h</code>)</h3>
-<p>All ECS components are plain structs:</p>
-<table>
-<tr><th>Component</th><th>Purpose</th></tr>
-<tr><td>IDComponent</td><td>UUID identifier</td></tr>
-<tr><td>TagComponent</td><td>Human-readable name</td></tr>
-<tr><td>TransformComponent</td><td>Translation, rotation, scale (cached matrix)</td></tr>
-<tr><td>SpriteRendererComponent</td><td>Color + texture + tiling for 2D</td></tr>
-<tr><td>CircleRendererComponent</td><td>Circle primitive for 2D</td></tr>
-<tr><td>CameraComponent</td><td>SceneCamera reference</td></tr>
-<tr><td>ScriptComponent</td><td>Python script instance</td></tr>
-<tr><td>Rigidbody2DComponent</td><td>Box2D body definition</td></tr>
-<tr><td>BoxCollider2DComponent</td><td>Box2D box shape</td></tr>
-<tr><td>Rigidbody3DComponent</td><td>Box3D body definition</td></tr>
-<tr><td>BoxCollider3DComponent</td><td>Box3D box shape</td></tr>
-<tr><td>DirectionalLightComponent</td><td>Sun/main directional light</td></tr>
-<tr><td>PointLightComponent</td><td>Omnidirectional point light</td></tr>
-<tr><td>SpotLightComponent</td><td>Cone spotlight</td></tr>
-<tr><td>MaterialComponent</td><td>PBR material (albedo, roughness, metallic)</td></tr>
-<tr><td>VolumetricFogComponent</td><td>Volumetric fog volume</td></tr>
-<tr><td>VolumetricCloudsComponent</td><td>Raymarched cloud volume</td></tr>
-<tr><td>WaterComponent</td><td>Gerstner-wave water surface</td></tr>
-<tr><td>MeshComponent</td><td>3D mesh + submeshes</td></tr>
-<tr><td>AnimationComponent</td><td>Skeletal animation state</td></tr>
-</table>
-</div>
+      <h3>Components (<code>Wasteland/Scene/Components.h</code>)</h3>
+      <p>All ECS components are plain structs:</p>
+      <table>
+        <tr>
+          <th>Component</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>IDComponent</td>
+          <td>UUID identifier</td>
+        </tr>
+        <tr>
+          <td>TagComponent</td>
+          <td>Human-readable name</td>
+        </tr>
+        <tr>
+          <td>TransformComponent</td>
+          <td>Translation, rotation, scale (cached matrix)</td>
+        </tr>
+        <tr>
+          <td>SpriteRendererComponent</td>
+          <td>Color + texture + tiling for 2D</td>
+        </tr>
+        <tr>
+          <td>CircleRendererComponent</td>
+          <td>Circle primitive for 2D</td>
+        </tr>
+        <tr>
+          <td>CameraComponent</td>
+          <td>SceneCamera reference</td>
+        </tr>
+        <tr>
+          <td>ScriptComponent</td>
+          <td>Python script instance</td>
+        </tr>
+        <tr>
+          <td>Rigidbody2DComponent</td>
+          <td>Box2D body definition</td>
+        </tr>
+        <tr>
+          <td>BoxCollider2DComponent</td>
+          <td>Box2D box shape</td>
+        </tr>
+        <tr>
+          <td>Rigidbody3DComponent</td>
+          <td>Box3D body definition</td>
+        </tr>
+        <tr>
+          <td>BoxCollider3DComponent</td>
+          <td>Box3D box shape</td>
+        </tr>
+        <tr>
+          <td>DirectionalLightComponent</td>
+          <td>Sun/main directional light</td>
+        </tr>
+        <tr>
+          <td>PointLightComponent</td>
+          <td>Omnidirectional point light</td>
+        </tr>
+        <tr>
+          <td>SpotLightComponent</td>
+          <td>Cone spotlight</td>
+        </tr>
+        <tr>
+          <td>MaterialComponent</td>
+          <td>PBR material (albedo, roughness, metallic)</td>
+        </tr>
+        <tr>
+          <td>VolumetricFogComponent</td>
+          <td>Volumetric fog volume</td>
+        </tr>
+        <tr>
+          <td>VolumetricCloudsComponent</td>
+          <td>Raymarched cloud volume</td>
+        </tr>
+        <tr>
+          <td>WaterComponent</td>
+          <td>Gerstner-wave water surface</td>
+        </tr>
+        <tr>
+          <td>MeshComponent</td>
+          <td>3D mesh + submeshes</td>
+        </tr>
+        <tr>
+          <td>AnimationComponent</td>
+          <td>Skeletal animation state</td>
+        </tr>
+      </table>
+    </div>
 
-<!-- Rendering -->
-<div id="rendering" class="docs-section">
-<h2>Rendering</h2>
+    <!-- Rendering -->
+    <div id="rendering" class="docs-section">
+      <h2>Rendering</h2>
 
-<h3>Renderer (<code>Wasteland/Renderer/Renderer.h</code>)</h3>
-<p>The static <code>Renderer</code> class initializes the active API and provides <code>BeginScene()</code>/<code>EndScene()</code>/<code>Submit()</code> for the 2D pipeline.</p>
+      <h3>Renderer (<code>Wasteland/Renderer/Renderer.h</code>)</h3>
+      <p>The static <code>Renderer</code> class initializes the active API and provides
+        <code>BeginScene()</code>/<code>EndScene()</code>/<code>Submit()</code> for the 2D pipeline.</p>
 
-<h3>Renderer2D (<code>Wasteland/Renderer/Renderer2D.h</code>)</h3>
-<p>Batch-renderer for 2D primitives. Draws quads, rotated quads, circles, and lines. All 2D draws are batched into a single vertex buffer per flush.</p>
-<pre><code>Renderer2D::BeginScene(camera);
+      <h3>Renderer2D (<code>Wasteland/Renderer/Renderer2D.h</code>)</h3>
+      <p>Batch-renderer for 2D primitives. Draws quads, rotated quads, circles, and lines. All 2D draws are batched into
+        a single vertex buffer per flush.</p>
+      <pre><code>Renderer2D::BeginScene(camera);
 Renderer2D::DrawQuad(position, size, color);
 Renderer2D::DrawRotatedQuad(pos, size, rotation, texture);
 Renderer2D::EndScene();</code></pre>
 
-<h3>Renderer3D (<code>Wasteland/Renderer/Renderer3D.h</code>)</h3>
-<p>Full 3D renderer with PBR materials, ray tracing support, volumetric effects, and water rendering. Key features:</p>
-<ul>
-<li><code>QualityPreset</code>: Low, Medium, High, Ultra</li>
-<li>Dynamic resolution scaling (0.5–1.0) with target FPS</li>
-<li>Ray tracing accumulation for progressive refinement</li>
-<li>Render scale adjustable at runtime</li>
-</ul>
+      <h3>Renderer3D (<code>Wasteland/Renderer/Renderer3D.h</code>)</h3>
+      <p>Full 3D renderer with PBR materials, ray tracing support, volumetric effects, and water rendering. Key
+        features:</p>
+      <ul>
+        <li><code>QualityPreset</code>: Low, Medium, High, Ultra</li>
+        <li>Dynamic resolution scaling (0.5–1.0) with target FPS</li>
+        <li>Ray tracing accumulation for progressive refinement</li>
+        <li>Render scale adjustable at runtime</li>
+      </ul>
 
-<h3>NVRHI (<code>Wasteland/vendor/nvrhi</code>)</h3>
-<p>NVIDIA Rendering Hardware Interface provides DirectX 11, DirectX 12, and Vulkan backends. The engine can switch APIs at runtime — all GPU resources are rebuilt via <code>RecreateResources()</code>.</p>
+      <h3>NVRHI (<code>Wasteland/vendor/nvrhi</code>)</h3>
+      <p>NVIDIA Rendering Hardware Interface provides DirectX 11, DirectX 12, and Vulkan backends. The engine can switch
+        APIs at runtime — all GPU resources are rebuilt via <code>RecreateResources()</code>.</p>
 
-<h3>Nova Renderer</h3>
-<p>Nova is the AI-powered rendering pipeline. It sits on top of Renderer3D and provides:</p>
-<ul>
-<li>AI denoising for ray-traced frames</li>
-<li>AI upscaling (DLSS-like) for performance</li>
-<li>Intelligent sample distribution to reduce noise</li>
-<li>Volumetric fog and cloud raymarching</li>
-<li>Gerstner wave simulation for water</li>
-</ul>
-</div>
+      <h3>Nova Renderer</h3>
+      <p>Nova is the AI-powered rendering pipeline. It sits on top of Renderer3D and provides:</p>
+      <ul>
+        <li>AI denoising for ray-traced frames</li>
+        <li>AI upscaling (DLSS-like) for performance</li>
+        <li>Intelligent sample distribution to reduce noise</li>
+        <li>Volumetric fog and cloud raymarching</li>
+        <li>Gerstner wave simulation for water</li>
+      </ul>
+    </div>
 
-<!-- Rendering Resources -->
-<div id="resources" class="docs-section">
-<h2>Rendering Resources</h2>
+    <!-- Rendering Resources -->
+    <div id="resources" class="docs-section">
+      <h2>Rendering Resources</h2>
 
-<h3>Shader (<code>Wasteland/Renderer/Shader.h</code>)</h3>
-<p>Abstract shader API. Supports uniform setting for int, float, vec2/3/4, and mat4. A <code>ShaderLibrary</code> manages loaded shaders.</p>
-<pre><code>Ref&lt;Shader&gt; shader = Shader::Create("assets/shaders/PBR.glsl");
+      <h3>Shader (<code>Wasteland/Renderer/Shader.h</code>)</h3>
+      <p>Abstract shader API. Supports uniform setting for int, float, vec2/3/4, and mat4. A <code>ShaderLibrary</code>
+        manages loaded shaders.</p>
+      <pre><code>Ref&lt;Shader&gt; shader = Shader::Create("assets/shaders/PBR.glsl");
 shader->Bind();
 shader->SetFloat3("u_Color", color);
 shader->SetMat4("u_ViewProjection", vp);</code></pre>
 
-<h3>Buffer (<code>Wasteland/Renderer/Buffer.h</code>)</h3>
-<p>Vertex and index buffers. <code>BufferElement</code> describes vertex attributes (Float, Float2, Float3, Mat4, Int, etc.). The layout is auto-calculated with offsets and strides.</p>
+      <h3>Buffer (<code>Wasteland/Renderer/Buffer.h</code>)</h3>
+      <p>Vertex and index buffers. <code>BufferElement</code> describes vertex attributes (Float, Float2, Float3, Mat4,
+        Int, etc.). The layout is auto-calculated with offsets and strides.</p>
 
-<h3>VertexArray (<code>Wasteland/Renderer/VertexArray.h</code>)</h3>
-<p>VAO wrapper. Binds vertex buffers and an index buffer together for draw calls.</p>
+      <h3>VertexArray (<code>Wasteland/Renderer/VertexArray.h</code>)</h3>
+      <p>VAO wrapper. Binds vertex buffers and an index buffer together for draw calls.</p>
 
-<h3>Texture (<code>Wasteland/Renderer/Texture.h</code>)</p>
-<p>Abstract texture with <code>Texture2D</code> subclass. Created from file path or dimensions. Under NVRHI, <code>GetNativeSRV()</code> returns a D3D shader resource view for ImGui rendering.</p>
+      <h3>Texture (<code>Wasteland/Renderer/Texture.h</code>)</p>
+        <p>Abstract texture with <code>Texture2D</code> subclass. Created from file path or dimensions. Under NVRHI,
+          <code>GetNativeSRV()</code> returns a D3D shader resource view for ImGui rendering.</p>
 
-<h3>Framebuffer (<code>Wasteland/Renderer/Framebuffer.h</code>)</h3>
-<p>Render target supporting multiple color attachments and depth/stencil. Used for the editor viewport, post-processing, and ray tracing targets. Format options: RGBA8, RED_INTEGER (for picking), DEPTH24STENCIL8.</p>
+        <h3>Framebuffer (<code>Wasteland/Renderer/Framebuffer.h</code>)</h3>
+        <p>Render target supporting multiple color attachments and depth/stencil. Used for the editor viewport,
+          post-processing, and ray tracing targets. Format options: RGBA8, RED_INTEGER (for picking), DEPTH24STENCIL8.
+        </p>
 
-<h3>Camera (<code>Wasteland/Renderer/Camera.h</code>)</h3>
-<p>Abstract base camera. Provides view and projection matrices.</p>
+        <h3>Camera (<code>Wasteland/Renderer/Camera.h</code>)</h3>
+        <p>Abstract base camera. Provides view and projection matrices.</p>
 
-<h3>SceneCamera (<code>Wasteland/Scene/SceneCamera.h</code>)</h3>
-<p>Supports perspective and orthographic projection. Configurable FOV, near/far clips, and aspect ratio. Automatically recalculates projection on change.</p>
+        <h3>SceneCamera (<code>Wasteland/Scene/SceneCamera.h</code>)</h3>
+        <p>Supports perspective and orthographic projection. Configurable FOV, near/far clips, and aspect ratio.
+          Automatically recalculates projection on change.</p>
 
-<h3>EditorCamera (<code>Wasteland/Renderer/EditorCamera.h</code>)</h3>
-<p>Fly-style camera for the editor. Pan, zoom, rotate. Orthographic mode for 2D editing.</p>
+        <h3>EditorCamera (<code>Wasteland/Renderer/EditorCamera.h</code>)</h3>
+        <p>Fly-style camera for the editor. Pan, zoom, rotate. Orthographic mode for 2D editing.</p>
 
-<h3>OrthographicCameraController (<code>Wasteland/Renderer/OrthographicCameraController.h</code>)</h3>
-<p>2D camera with zoom and pan. Used in the editor viewport for 2D scenes.</p>
-</div>
+        <h3>OrthographicCameraController (<code>Wasteland/Renderer/OrthographicCameraController.h</code>)</h3>
+        <p>2D camera with zoom and pan. Used in the editor viewport for 2D scenes.</p>
+    </div>
 
-<!-- Physics -->
-<div id="physics" class="docs-section">
-<h2>Physics</h2>
+    <!-- Physics -->
+    <div id="physics" class="docs-section">
+      <h2>Physics</h2>
 
-<h3>Box2D (<code>Wasteland/vendor/Box2D</code>)</h3>
-<p>2D physics engine. Bodies and colliders are created via <code>Rigidbody2DComponent</code> and <code>BoxCollider2DComponent</code>. The scene calls <code>OnPhysics2DStart()</code>/<code>OnPhysics2DStop()</code> to manage the physics world lifecycle.</p>
+      <h3>Box2D (<code>Wasteland/vendor/Box2D</code>)</h3>
+      <p>2D physics engine. Bodies and colliders are created via <code>Rigidbody2DComponent</code> and
+        <code>BoxCollider2DComponent</code>. The scene calls
+        <code>OnPhysics2DStart()</code>/<code>OnPhysics2DStop()</code> to manage the physics world lifecycle.</p>
 
-<h3>Box3D (<code>Wasteland/vendor/Box3D</code>)</h3>
-<p>3D physics engine (fork of Box3D). Managed by <code>Rigidbody3DComponent</code> and <code>BoxCollider3DComponent</code>. Provides 3D collision detection and rigid body dynamics.</p>
-</div>
+      <h3>Box3D (<code>Wasteland/vendor/Box3D</code>)</h3>
+      <p>3D physics engine (fork of Box3D). Managed by <code>Rigidbody3DComponent</code> and
+        <code>BoxCollider3DComponent</code>. Provides 3D collision detection and rigid body dynamics.</p>
+    </div>
 
-<!-- Scripting -->
-<div id="scripting" class="docs-section">
-<h2>Scripting</h2>
+    <!-- Scripting -->
+    <div id="scripting" class="docs-section">
+      <h2>Scripting</h2>
 
-<h3>Python Integration (<code>Wasteland/vendor/pybind11</code>)</h3>
-<p>Python 3.14+ is embedded via pybind11. Game scripts inherit from <code>ScriptableEntity</code> and can override <code>OnCreate()</code>, <code>OnUpdate()</code>, and <code>OnDestroy()</code>.</p>
-<pre><code>class PlayerController(script.ScriptableEntity):
+      <h3>Python Integration (<code>Wasteland/vendor/pybind11</code>)</h3>
+      <p>Python 3.14+ is embedded via pybind11. Game scripts inherit from <code>ScriptableEntity</code> and can override
+        <code>OnCreate()</code>, <code>OnUpdate()</code>, and <code>OnDestroy()</code>.</p>
+      <pre><code>class PlayerController(script.ScriptableEntity):
     def OnCreate(self):
         print("Player spawned")
     def OnUpdate(self, ts):
         transform = self.GetComponent(TransformComponent)
         transform.Translation.x += 1.0 * ts</code></pre>
 
-<h3>ScriptableEntity (<code>Wasteland/Scene/ScriptableEntity.h</code>)</h3>
-<p>Base class for all script components. Wraps an <code>Entity</code> and provides component access methods that delegate to the entity.</p>
+      <h3>ScriptableEntity (<code>Wasteland/Scene/ScriptableEntity.h</code>)</h3>
+      <p>Base class for all script components. Wraps an <code>Entity</code> and provides component access methods that
+        delegate to the entity.</p>
 
-<h3>ScriptComponent (<code>Components.h</code>)</h3>
-<p>Stores a <code>ScriptableEntity*</code> instance. Created when a Python script file is attached to an entity in the editor.</p>
-</div>
+      <h3>ScriptComponent (<code>Components.h</code>)</h3>
+      <p>Stores a <code>ScriptableEntity*</code> instance. Created when a Python script file is attached to an entity in
+        the editor.</p>
+    </div>
 
-<!-- Editor -->
-<div id="editor" class="docs-section">
-<h2>DemonCore Editor</h2>
+    <!-- Editor -->
+    <div id="editor" class="docs-section">
+      <h2>DemonCore Editor</h2>
 
-<h3>EditorLayer (<code>DemonCore-Editor/src/EditorLayer.h</code>)</h3>
-<p>The main editor layer. Owns the active scene, viewport framebuffer, gizmo state, and all editor panels. Handles scene serialization (YAML), play/stop/simulation modes, and toolbar rendering.</p>
+      <h3>EditorLayer (<code>DemonCore-Editor/src/EditorLayer.h</code>)</h3>
+      <p>The main editor layer. Owns the active scene, viewport framebuffer, gizmo state, and all editor panels. Handles
+        scene serialization (YAML), play/stop/simulation modes, and toolbar rendering.</p>
 
-<h3>Editor Panels</h3>
-<table>
-<tr><th>Panel</th><th>File</th><th>Purpose</th></tr>
-<tr><td>AIChatPanel</td><td>AIChatPanel.h</td><td>AI chat with tool execution and agentic mode</td></tr>
-<tr><td>SceneHierarchyPanel</td><td>SceneHierarchyPanel.h</td><td>Entity tree view + creation/deletion</td></tr>
-<tr><td>ScriptEditorPanel</td><td>ScriptEditorPanel.h</td><td>Code editor with syntax highlighting</td></tr>
-<tr><td>ScriptInspectorPanel</td><td>ScriptInspectorPanel.h</td><td>Script property inspector</td></tr>
-<tr><td>ContentBrowserPanel</td><td>ContentBrowserPanel.h</td><td>Asset file browser</td></tr>
-<tr><td>ModelDownloaderPanel</td><td>ModelDownloaderPanel.h</td><td>3D model download utility</td></tr>
-</table>
+      <h3>Editor Panels</h3>
+      <table>
+        <tr>
+          <th>Panel</th>
+          <th>File</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>AIChatPanel</td>
+          <td>AIChatPanel.h</td>
+          <td>AI chat with tool execution and agentic mode</td>
+        </tr>
+        <tr>
+          <td>SceneHierarchyPanel</td>
+          <td>SceneHierarchyPanel.h</td>
+          <td>Entity tree view + creation/deletion</td>
+        </tr>
+        <tr>
+          <td>ScriptEditorPanel</td>
+          <td>ScriptEditorPanel.h</td>
+          <td>Code editor with syntax highlighting</td>
+        </tr>
+        <tr>
+          <td>ScriptInspectorPanel</td>
+          <td>ScriptInspectorPanel.h</td>
+          <td>Script property inspector</td>
+        </tr>
+        <tr>
+          <td>ContentBrowserPanel</td>
+          <td>ContentBrowserPanel.h</td>
+          <td>Asset file browser</td>
+        </tr>
+        <tr>
+          <td>ModelDownloaderPanel</td>
+          <td>ModelDownloaderPanel.h</td>
+          <td>3D model download utility</td>
+        </tr>
+      </table>
 
-<h3>AIChatPanel (<code>DemonCore-Editor/src/Panels/AIChatPanel.h</code>)</h3>
-<p>Connects to any OpenAI-compatible API endpoint. Features:</p>
-<ul>
-<li>Chat history with user/assistant/tool roles</li>
-<li>Agentic mode: AI can call tools (file ops, entity inspection) and loop until done</li>
-<li>Engine context injection — loads <code>assets/ai/engine_reference.md</code> into system prompt</li>
-<li>Settings: API key, base URL, model, temperature, system prompt</li>
-</ul>
+      <h3>AIChatPanel (<code>DemonCore-Editor/src/Panels/AIChatPanel.h</code>)</h3>
+      <p>Connects to any OpenAI-compatible API endpoint. Features:</p>
+      <ul>
+        <li>Chat history with user/assistant/tool roles</li>
+        <li>Agentic mode: AI can call tools (file ops, entity inspection) and loop until done</li>
+        <li>Engine context injection — loads <code>assets/ai/engine_reference.md</code> into system prompt</li>
+        <li>Settings: API key, base URL, model, temperature, system prompt</li>
+      </ul>
 
-<h3>ToolServer (<code>DemonCore-Editor/src/Panels/ToolServer.h</code>)</h3>
-<p>Singleton that exposes engine tools to AI agents. Tools available:</p>
-<table>
-<tr><th>Tool</th><th>Description</th></tr>
-<tr><td>read_file</td><td>Read a text file</td></tr>
-<tr><td>write_file</td><td>Create/overwrite a file</td></tr>
-<tr><td>edit_file</td><td>Replace text in a file</td></tr>
-<tr><td>list_files</td><td>List directory contents</td></tr>
-<tr><td>memory_read</td><td>Read persistent memory</td></tr>
-<tr><td>memory_append</td><td>Append to persistent memory</td></tr>
-<tr><td>list_entities</td><td>List all scene entities</td></tr>
-<tr><td>get_entity_info</td><td>Get entity transform + components</td></tr>
-<tr><td>get_entity_script_state</td><td>Get script instance variables</td></tr>
-<tr><td>get_component_info</td><td>Inspect a specific component</td></tr>
-</table>
-</div>
+      <h3>ToolServer (<code>DemonCore-Editor/src/Panels/ToolServer.h</code>)</h3>
+      <p>Singleton that exposes engine tools to AI agents. Tools available:</p>
+      <table>
+        <tr>
+          <th>Tool</th>
+          <th>Description</th>
+        </tr>
+        <tr>
+          <td>read_file</td>
+          <td>Read a text file</td>
+        </tr>
+        <tr>
+          <td>write_file</td>
+          <td>Create/overwrite a file</td>
+        </tr>
+        <tr>
+          <td>edit_file</td>
+          <td>Replace text in a file</td>
+        </tr>
+        <tr>
+          <td>list_files</td>
+          <td>List directory contents</td>
+        </tr>
+        <tr>
+          <td>memory_read</td>
+          <td>Read persistent memory</td>
+        </tr>
+        <tr>
+          <td>memory_append</td>
+          <td>Append to persistent memory</td>
+        </tr>
+        <tr>
+          <td>list_entities</td>
+          <td>List all scene entities</td>
+        </tr>
+        <tr>
+          <td>get_entity_info</td>
+          <td>Get entity transform + components</td>
+        </tr>
+        <tr>
+          <td>get_entity_script_state</td>
+          <td>Get script instance variables</td>
+        </tr>
+        <tr>
+          <td>get_component_info</td>
+          <td>Inspect a specific component</td>
+        </tr>
+      </table>
+    </div>
 
-<!-- Volumetrics & Water -->
-<div id="volumetrics" class="docs-section">
-<h2>Volumetrics &amp; Water</h2>
+    <!-- Volumetrics & Water -->
+    <div id="volumetrics" class="docs-section">
+      <h2>Volumetrics &amp; Water</h2>
 
-<h3>Volumetric Fog (<code>VolumetricFogComponent</code>)</h3>
-<p>Screen-space raymarched fog. Submitted via <code>SubmitVolumetricVolumes()</code> between BeginScene/EndScene. Supports density, scattering, and absorption parameters.</p>
+      <h3>Volumetric Fog (<code>VolumetricFogComponent</code>)</h3>
+      <p>Screen-space raymarched fog. Submitted via <code>SubmitVolumetricVolumes()</code> between BeginScene/EndScene.
+        Supports density, scattering, and absorption parameters.</p>
 
-<h3>Volumetric Clouds (<code>VolumetricCloudsComponent</code>)</h3>
-<p>Raymarched volumetric clouds with noise-based density. Rendered as a post-process pass with lighting integration.</p>
+      <h3>Volumetric Clouds (<code>VolumetricCloudsComponent</code>)</h3>
+      <p>Raymarched volumetric clouds with noise-based density. Rendered as a post-process pass with lighting
+        integration.</p>
 
-<h3>Water System (<code>WaterComponent</code>)</h3>
-<p>Gerstner wave simulation for water surfaces. Features:</p>
-<ul>
-<li>Configurable wave parameters (amplitude, length, speed, choppiness)</li>
-<li>Phase wrapping (mod 2π) to prevent floating-point drift</li>
-<li>Distance LOD to reduce aliasing at distance</li>
-<li>Buoyancy queries: <code>GetWaterHeightAt()</code> returns still level + wave height</li>
-<li>Flow vectors for river currents</li>
-<li>Underwater detection: <code>IsUnderwater()</code></li>
-</ul>
-</div>
+      <h3>Water System (<code>WaterComponent</code>)</h3>
+      <p>Gerstner wave simulation for water surfaces. Features:</p>
+      <ul>
+        <li>Configurable wave parameters (amplitude, length, speed, choppiness)</li>
+        <li>Phase wrapping (mod 2π) to prevent floating-point drift</li>
+        <li>Distance LOD to reduce aliasing at distance</li>
+        <li>Buoyancy queries: <code>GetWaterHeightAt()</code> returns still level + wave height</li>
+        <li>Flow vectors for river currents</li>
+        <li>Underwater detection: <code>IsUnderwater()</code></li>
+      </ul>
+    </div>
 
-<!-- Building -->
-<div id="building" class="docs-section">
-<h2>Building</h2>
+    <!-- Building -->
+    <div id="building" class="docs-section">
+      <h2>Building</h2>
 
-<h3>Prerequisites</h3>
-<table>
-<tr><th>Component</th><th>Windows</th><th>Linux</th><th>macOS</th></tr>
-<tr><td>Compiler</td><td>Visual Studio 2022+</td><td>GCC/Clang</td><td>Xcode CLI Tools</td></tr>
-<tr><td>Python</td><td>3.14+</td><td>3.14+</td><td>3.14+</td></tr>
-<tr><td>CMake</td><td>3.16+ (for NVRHI)</td><td>3.16+</td><td>3.16+</td></tr>
-<tr><td>Vulkan SDK</td><td>1.3.296.0</td><td>1.3.296.0</td><td>—</td></tr>
-</table>
+      <h3>Prerequisites</h3>
+      <table>
+        <tr>
+          <th>Component</th>
+          <th>Windows</th>
+          <th>Linux</th>
+          <th>macOS</th>
+        </tr>
+        <tr>
+          <td>Compiler</td>
+          <td>Visual Studio 2022+</td>
+          <td>GCC/Clang</td>
+          <td>Xcode CLI Tools</td>
+        </tr>
+        <tr>
+          <td>Python</td>
+          <td>3.14+</td>
+          <td>3.14+</td>
+          <td>3.14+</td>
+        </tr>
+        <tr>
+          <td>CMake</td>
+          <td>3.16+ (for NVRHI)</td>
+          <td>3.16+</td>
+          <td>3.16+</td>
+        </tr>
+        <tr>
+          <td>Vulkan SDK</td>
+          <td>1.3.296.0</td>
+          <td>1.3.296.0</td>
+          <td>—</td>
+        </tr>
+      </table>
 
-<h3>Step 1: Clone</h3>
-<pre><code>git clone https://github.com/Ashen-Wastes-Studios/Wasteland-Engine.git
+      <h3>Step 1: Clone</h3>
+      <pre><code>git clone https://github.com/Ashen-Wastes-Studios/Wasteland-Engine.git
 cd Wasteland-Engine</code></pre>
 
-<h3>Step 2: Generate Projects</h3>
-<pre><code># Windows
+      <h3>Step 2: Generate Projects</h3>
+      <pre><code># Windows
 .\scripts\Win-GenProjects.bat
 
 # Linux
@@ -646,44 +958,44 @@ cd Wasteland-Engine</code></pre>
 # macOS
 ./scripts/Mac-GenProjects.sh</code></pre>
 
-<h3>Step 3: Build NVRHI</h3>
-<pre><code>cd Wasteland\vendor\nvrhi
+      <h3>Step 3: Build NVRHI</h3>
+      <pre><code>cd Wasteland\vendor\nvrhi
 mkdir build && cd build
 cmake .. -G "Visual Studio 17 2022" -A x64
 cmake --build . --config Release
 cmake --build . --config Debug</code></pre>
 
-<h3>Step 4: Build Engine</h3>
-<pre><code># Windows
+      <h3>Step 4: Build Engine</h3>
+      <pre><code># Windows
 msbuild Wasteland.slnx -property:Configuration=Release -property:Platform=x64
 
 # Linux & macOS
 make config=release_x64</code></pre>
 
-<h3>Step 5: Run</h3>
-<pre><code>.\bin\Release-windows-x86_64\DemonCore-Editor\DemonCore-Editor.exe</code></pre>
-</div>
+      <h3>Step 5: Run</h3>
+      <pre><code>.\bin\Release-windows-x86_64\DemonCore-Editor\DemonCore-Editor.exe</code></pre>
+    </div>
 
-<!-- premake5.lua -->
-<div id="premake" class="docs-section">
-<h2>Build Configuration (premake5.lua)</h2>
-<p>The workspace defines three configurations:</p>
-<ul>
-<li><strong>Debug</strong> — No optimizations, debug symbols, validation layers enabled</li>
-<li><strong>Release</strong> — Optimized, some validation</li>
-<li><strong>Dist</strong> — Fully optimized, no validation, distribution build</li>
-</ul>
-<p>Output directory: <code>bin/{cfg}-{system}-{arch}/</code></p>
-<p>Dependencies included:</p>
-<pre><code>GLFW, Glad, ImGui, glm, stb_image, entt,
+    <!-- premake5.lua -->
+    <div id="premake" class="docs-section">
+      <h2>Build Configuration (premake5.lua)</h2>
+      <p>The workspace defines three configurations:</p>
+      <ul>
+        <li><strong>Debug</strong> — No optimizations, debug symbols, validation layers enabled</li>
+        <li><strong>Release</strong> — Optimized, some validation</li>
+        <li><strong>Dist</strong> — Fully optimized, no validation, distribution build</li>
+      </ul>
+      <p>Output directory: <code>bin/{cfg}-{system}-{arch}/</code></p>
+      <p>Dependencies included:</p>
+      <pre><code>GLFW, Glad, ImGui, glm, stb_image, entt,
 yaml-cpp, ImGuizmo, Box2D, Box3D,
 pybind11, NVRHI, VulkanSDK</code></pre>
-</div>
+    </div>
 
-<!-- Project Structure -->
-<div id="structure" class="docs-section">
-<h2>Project Structure</h2>
-<pre><code>Wasteland/
+    <!-- Project Structure -->
+    <div id="structure" class="docs-section">
+      <h2>Project Structure</h2>
+      <pre><code>Wasteland/
 ├── Wasteland/                    # Static library (engine core)
 │   └── src/
 │       ├── Wasteland/Core/       # Application, Layer, Timestep, Log, Input, Window
@@ -703,16 +1015,18 @@ pybind11, NVRHI, VulkanSDK</code></pre>
 ├── vendor/bin/premake/           # Premake binary
 ├── premake5.lua                  # Build configuration
 └── Wasteland.slnx                # Visual Studio solution</code></pre>
-</div>
+    </div>
 
-</section>
+  </section>
 
-<footer>
-  <div class="container footer-inner">
-    <span>&copy; 2026 Ashen Wastes Studios</span>
-    <span><a href="https://github.com/Ashen-Wastes-Studios/Wasteland-Engine" style="color: var(--accent);" target="_blank" rel="noopener">GitHub Repository</a></span>
-  </div>
-</footer>
+  <footer>
+    <div class="container footer-inner">
+      <span>&copy; 2026 Ashen Wastes Studios</span>
+      <span><a href="https://github.com/Ashen-Wastes-Studios/Wasteland-Engine" style="color: var(--accent);"
+          target="_blank" rel="noopener">GitHub Repository</a></span>
+    </div>
+  </footer>
 
 </body>
+
 </html>
