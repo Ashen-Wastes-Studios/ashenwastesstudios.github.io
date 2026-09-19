@@ -105,13 +105,13 @@
       padding: 0;
     }
 
-    .container {
+    .container { position: relative; z-index: 1;
       max-width: 1000px;
       margin: 0 auto;
       padding: 0 2rem;
     }
 
-    nav {
+    nav { position: relative; z-index: 10;
       position: fixed;
       top: 0;
       left: 0;
@@ -523,7 +523,7 @@
     </style>
 </head>
 
-<body>
+<body data-bg="wireframe">
 
   <nav>
     <div class="nav-inner">
@@ -1163,6 +1163,7 @@ pybind11, NVRHI, VulkanSDK</code></pre>
     </div>
   </footer>
 
+<script src="js/backgrounds.js"></script>
 </body>
 
 </html>

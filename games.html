@@ -56,14 +56,14 @@
       display: block;
     }
 
-    .container {
+    .container { position: relative; z-index: 1;
       max-width: 1200px;
       margin: 0 auto;
       padding: 0 2rem;
     }
 
     /* Navigation - Cyberpunk */
-    nav {
+    nav { position: relative; z-index: 10;
       position: fixed;
       top: 0;
       left: 0;
@@ -362,7 +362,7 @@ a:hover {
 }
 
 /* Navigation border glow */
-nav {
+nav { position: relative; z-index: 10;
   border-bottom-color: var(--accent) !important;
   box-shadow: 0 2px 15px rgba(220, 20, 60, 0.15);
 }
@@ -390,7 +390,7 @@ nav {
 </style>
 </head>
 
-<body>
+<body data-bg="starfield">
 
   <nav>
     <div class="nav-inner">
@@ -436,6 +436,7 @@ nav {
     </div>
   </footer>
 
+<script src="js/backgrounds.js"></script>
 </body>
 
 </html>
