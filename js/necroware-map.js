@@ -18,93 +18,97 @@
   let lastMouseY = 0;
   let hoveredRegion = null;
 
-  // Color palette (matching reference image)
+  // Color palette (monochrome blood-red theme)
   const COLORS = {
-    ocean: '#4ecbff',
-    russia: '#a3c986',
-    canada: '#fffacd',
-    usa: '#ffa07a',
-    brazil: '#ffa07a',
-    australia: '#ffa07a',
-    china: '#fffacd',
-    africa: '#f5deb3',
-    europe: '#e8e8a0',
-    southAmerica: '#f0c8a0',
-    greenland: '#c8b896',
-    antarctica: '#e8e8f0',
-    india: '#ffe4b5',
-    defaultLand: '#f5deb3',
-    border: '#555555',
-    borderLight: '#888888',
-    labelText: '#000000',
-    corpOverlay: 'rgba(220, 20, 60, 0.25)',
-    waterBody: '#4ecbff'
+    // Base ocean - dark desaturated red
+    ocean: '#1a0a0a',
+    // Land variations - dark grays with subtle red tint
+    landDark: '#2a1515',
+    landMedium: '#3a1a1a',
+    landLight: '#4a2020',
+    landHighlight: '#5a2525',
+    // Borders - muted red
+    border: '#4a1a1a',
+    borderLight: '#5a2525',
+    // Labels - blood red
+    labelText: '#dc143c',
+    // Water bodies - dark crimson
+    waterBody: '#2a0f0f',
+    // Corp overlays - blood red variations
+    corpOverlay: 'rgba(220, 20, 60, 0.3)',
+    // City dots - bright blood red
+    cityDot: '#dc143c',
+    cityGlow: 'rgba(220, 20, 60, 0.5)',
+    // Tooltip
+    tooltipBg: 'rgba(15, 5, 5, 0.95)',
+    tooltipBorder: '#dc143c',
+    tooltipText: '#e0c0c0'
   };
 
   // Country polygons (simplified equirectangular coordinates 0-100)
   const countries = [
     // NORTH AMERICA
-    { name: 'Canada', color: COLORS.canada, polygon: [[8, 8], [18, 5], [25, 8], [28, 15], [22, 22], [15, 20], [8, 15]] },
-    { name: 'United States', color: COLORS.usa, polygon: [[8, 22], [15, 20], [22, 22], [25, 28], [22, 35], [15, 38], [8, 35], [5, 28]] },
-    { name: 'Mexico', color: COLORS.usa, polygon: [[8, 35], [15, 38], [18, 42], [12, 45], [8, 42]] },
-    { name: 'Greenland', color: COLORS.greenland, polygon: [[25, 5], [32, 3], [35, 8], [30, 12], [25, 10]] },
-    { name: 'Alaska', color: COLORS.canada, polygon: [[2, 10], [8, 8], [12, 12], [8, 18], [2, 15]] },
+    { name: 'Canada', color: COLORS.landMedium, polygon: [[8, 8], [18, 5], [25, 8], [28, 15], [22, 22], [15, 20], [8, 15]] },
+    { name: 'United States', color: COLORS.landLight, polygon: [[8, 22], [15, 20], [22, 22], [25, 28], [22, 35], [15, 38], [8, 35], [5, 28]] },
+    { name: 'Mexico', color: COLORS.landLight, polygon: [[8, 35], [15, 38], [18, 42], [12, 45], [8, 42]] },
+    { name: 'Greenland', color: COLORS.landDark, polygon: [[25, 5], [32, 3], [35, 8], [30, 12], [25, 10]] },
+    { name: 'Alaska', color: COLORS.landMedium, polygon: [[2, 10], [8, 8], [12, 12], [8, 18], [2, 15]] },
 
     // SOUTH AMERICA
-    { name: 'Brazil', color: COLORS.brazil, polygon: [[18, 48], [28, 45], [32, 50], [30, 60], [22, 68], [16, 60], [14, 52]] },
-    { name: 'Argentina', color: COLORS.southAmerica, polygon: [[16, 60], [22, 68], [20, 78], [14, 75], [12, 65]] },
-    { name: 'Colombia', color: COLORS.southAmerica, polygon: [[12, 45], [18, 48], [14, 52], [10, 50]] },
-    { name: 'Peru', color: COLORS.southAmerica, polygon: [[10, 50], [14, 52], [12, 65], [8, 60], [8, 55]] },
-    { name: 'Chile', color: COLORS.southAmerica, polygon: [[12, 65], [14, 75], [12, 82], [8, 78], [10, 68]] },
+    { name: 'Brazil', color: COLORS.landLight, polygon: [[18, 48], [28, 45], [32, 50], [30, 60], [22, 68], [16, 60], [14, 52]] },
+    { name: 'Argentina', color: COLORS.landMedium, polygon: [[16, 60], [22, 68], [20, 78], [14, 75], [12, 65]] },
+    { name: 'Colombia', color: COLORS.landMedium, polygon: [[12, 45], [18, 48], [14, 52], [10, 50]] },
+    { name: 'Peru', color: COLORS.landMedium, polygon: [[10, 50], [14, 52], [12, 65], [8, 60], [8, 55]] },
+    { name: 'Chile', color: COLORS.landMedium, polygon: [[12, 65], [14, 75], [12, 82], [8, 78], [10, 68]] },
 
     // EUROPE
-    { name: 'Russia', color: COLORS.russia, polygon: [[42, 12], [85, 8], [95, 15], [92, 28], [80, 35], [65, 32], [50, 28], [42, 22]] },
-    { name: 'France', color: COLORS.europe, polygon: [[38, 25], [42, 22], [45, 28], [40, 32], [36, 28]] },
-    { name: 'Germany', color: COLORS.europe, polygon: [[42, 22], [45, 20], [48, 25], [45, 30], [40, 28]] },
-    { name: 'UK', color: COLORS.europe, polygon: [[35, 20], [38, 18], [40, 22], [37, 25]] },
-    { name: 'Spain', color: COLORS.europe, polygon: [[33, 28], [38, 25], [40, 32], [35, 35]] },
-    { name: 'Italy', color: COLORS.europe, polygon: [[42, 28], [45, 25], [48, 30], [45, 35], [42, 32]] },
-    { name: 'Poland', color: COLORS.europe, polygon: [[45, 20], [50, 18], [52, 22], [48, 25], [45, 22]] },
-    { name: 'Sweden', color: COLORS.europe, polygon: [[42, 10], [48, 8], [50, 12], [45, 18], [42, 15]] },
-    { name: 'Norway', color: COLORS.europe, polygon: [[38, 5], [45, 3], [48, 8], [42, 10], [38, 8]] },
-    { name: 'Finland', color: COLORS.europe, polygon: [[48, 8], [55, 5], [58, 10], [52, 15], [48, 12]] },
-    { name: 'Ukraine', color: COLORS.europe, polygon: [[50, 22], [58, 20], [62, 25], [55, 28], [50, 25]] },
+    { name: 'Russia', color: COLORS.landDark, polygon: [[42, 12], [85, 8], [95, 15], [92, 28], [80, 35], [65, 32], [50, 28], [42, 22]] },
+    { name: 'France', color: COLORS.landMedium, polygon: [[38, 25], [42, 22], [45, 28], [40, 32], [36, 28]] },
+    { name: 'Germany', color: COLORS.landMedium, polygon: [[42, 22], [45, 20], [48, 25], [45, 30], [40, 28]] },
+    { name: 'UK', color: COLORS.landMedium, polygon: [[35, 20], [38, 18], [40, 22], [37, 25]] },
+    { name: 'Spain', color: COLORS.landMedium, polygon: [[33, 28], [38, 25], [40, 32], [35, 35]] },
+    { name: 'Italy', color: COLORS.landMedium, polygon: [[42, 28], [45, 25], [48, 30], [45, 35], [42, 32]] },
+    { name: 'Poland', color: COLORS.landMedium, polygon: [[45, 20], [50, 18], [52, 22], [48, 25], [45, 22]] },
+    { name: 'Sweden', color: COLORS.landMedium, polygon: [[42, 10], [48, 8], [50, 12], [45, 18], [42, 15]] },
+    { name: 'Norway', color: COLORS.landMedium, polygon: [[38, 5], [45, 3], [48, 8], [42, 10], [38, 8]] },
+    { name: 'Finland', color: COLORS.landMedium, polygon: [[48, 8], [55, 5], [58, 10], [52, 15], [48, 12]] },
+    { name: 'Ukraine', color: COLORS.landMedium, polygon: [[50, 22], [58, 20], [62, 25], [55, 28], [50, 25]] },
 
     // AFRICA
-    { name: 'Nigeria', color: COLORS.africa, polygon: [[38, 45], [45, 42], [48, 48], [42, 52], [36, 48]] },
-    { name: 'Egypt', color: COLORS.africa, polygon: [[48, 35], [55, 32], [58, 38], [52, 42], [48, 38]] },
-    { name: 'South Africa', color: COLORS.africa, polygon: [[42, 65], [52, 62], [55, 68], [48, 72], [40, 70]] },
-    { name: 'Ethiopia', color: COLORS.africa, polygon: [[55, 42], [62, 40], [65, 48], [58, 52], [55, 48]] },
-    { name: 'DR Congo', color: COLORS.africa, polygon: [[42, 52], [50, 50], [52, 58], [45, 62], [40, 58]] },
-    { name: 'Kenya', color: COLORS.africa, polygon: [[55, 52], [60, 50], [62, 58], [58, 60], [55, 55]] },
-    { name: 'Morocco', color: COLORS.africa, polygon: [[32, 35], [38, 32], [40, 38], [35, 40]] },
-    { name: 'Algeria', color: COLORS.africa, polygon: [[35, 38], [42, 35], [45, 42], [38, 45], [35, 42]] },
-    { name: 'Tanzania', color: COLORS.africa, polygon: [[55, 58], [60, 56], [62, 62], [58, 65], [55, 62]] },
-    { name: 'Madagascar', color: COLORS.africa, polygon: [[62, 62], [65, 60], [68, 65], [65, 70], [62, 68]] },
+    { name: 'Nigeria', color: COLORS.landDark, polygon: [[38, 45], [45, 42], [48, 48], [42, 52], [36, 48]] },
+    { name: 'Egypt', color: COLORS.landDark, polygon: [[48, 35], [55, 32], [58, 38], [52, 42], [48, 38]] },
+    { name: 'South Africa', color: COLORS.landDark, polygon: [[42, 65], [52, 62], [55, 68], [48, 72], [40, 70]] },
+    { name: 'Ethiopia', color: COLORS.landDark, polygon: [[55, 42], [62, 40], [65, 48], [58, 52], [55, 48]] },
+    { name: 'DR Congo', color: COLORS.landDark, polygon: [[42, 52], [50, 50], [52, 58], [45, 62], [40, 58]] },
+    { name: 'Kenya', color: COLORS.landDark, polygon: [[55, 52], [60, 50], [62, 58], [58, 60], [55, 55]] },
+    { name: 'Morocco', color: COLORS.landDark, polygon: [[32, 35], [38, 32], [40, 38], [35, 40]] },
+    { name: 'Algeria', color: COLORS.landDark, polygon: [[35, 38], [42, 35], [45, 42], [38, 45], [35, 42]] },
+    { name: 'Tanzania', color: COLORS.landDark, polygon: [[55, 58], [60, 56], [62, 62], [58, 65], [55, 62]] },
+    { name: 'Madagascar', color: COLORS.landDark, polygon: [[62, 62], [65, 60], [68, 65], [65, 70], [62, 68]] },
 
     // ASIA
-    { name: 'China', color: COLORS.china, polygon: [[65, 28], [80, 25], [88, 32], [85, 42], [75, 45], [65, 40], [60, 35]] },
-    { name: 'India', color: COLORS.india, polygon: [[62, 38], [72, 35], [75, 42], [70, 50], [62, 48], [60, 42]] },
-    { name: 'Japan', color: COLORS.china, polygon: [[85, 28], [90, 25], [92, 32], [88, 35], [85, 32]] },
-    { name: 'Indonesia', color: COLORS.defaultLand, polygon: [[75, 52], [85, 48], [90, 55], [85, 62], [75, 58]] },
-    { name: 'Saudi Arabia', color: COLORS.defaultLand, polygon: [[55, 38], [62, 35], [65, 42], [58, 45], [55, 42]] },
-    { name: 'Iran', color: COLORS.defaultLand, polygon: [[55, 32], [65, 28], [68, 35], [62, 40], [55, 38]] },
-    { name: 'Thailand', color: COLORS.defaultLand, polygon: [[72, 42], [78, 40], [80, 48], [75, 50], [72, 45]] },
-    { name: 'Vietnam', color: COLORS.defaultLand, polygon: [[78, 42], [82, 40], [85, 48], [80, 50], [78, 45]] },
-    { name: 'South Korea', color: COLORS.china, polygon: [[82, 28], [86, 26], [88, 32], [84, 34], [82, 30]] },
-    { name: 'Pakistan', color: COLORS.defaultLand, polygon: [[60, 35], [68, 32], [70, 38], [65, 42], [60, 40]] },
-    { name: 'Kazakhstan', color: COLORS.defaultLand, polygon: [[58, 22], [68, 18], [72, 25], [65, 28], [58, 25]] },
-    { name: 'Mongolia', color: COLORS.defaultLand, polygon: [[68, 18], [80, 15], [85, 22], [78, 25], [70, 22]] },
-    { name: 'Turkey', color: COLORS.defaultLand, polygon: [[48, 28], [55, 25], [58, 30], [52, 35], [48, 32]] },
-    { name: 'Myanmar', color: COLORS.defaultLand, polygon: [[70, 40], [75, 38], [78, 45], [73, 48], [70, 45]] },
+    { name: 'China', color: COLORS.landMedium, polygon: [[65, 28], [80, 25], [88, 32], [85, 42], [75, 45], [65, 40], [60, 35]] },
+    { name: 'India', color: COLORS.landMedium, polygon: [[62, 38], [72, 35], [75, 42], [70, 50], [62, 48], [60, 42]] },
+    { name: 'Japan', color: COLORS.landMedium, polygon: [[85, 28], [90, 25], [92, 32], [88, 35], [85, 32]] },
+    { name: 'Indonesia', color: COLORS.landDark, polygon: [[75, 52], [85, 48], [90, 55], [85, 62], [75, 58]] },
+    { name: 'Saudi Arabia', color: COLORS.landDark, polygon: [[55, 38], [62, 35], [65, 42], [58, 45], [55, 42]] },
+    { name: 'Iran', color: COLORS.landDark, polygon: [[55, 32], [65, 28], [68, 35], [62, 40], [55, 38]] },
+    { name: 'Thailand', color: COLORS.landDark, polygon: [[72, 42], [78, 40], [80, 48], [75, 50], [72, 45]] },
+    { name: 'Vietnam', color: COLORS.landDark, polygon: [[78, 42], [82, 40], [85, 48], [80, 50], [78, 45]] },
+    { name: 'South Korea', color: COLORS.landMedium, polygon: [[82, 28], [86, 26], [88, 32], [84, 34], [82, 30]] },
+    { name: 'Pakistan', color: COLORS.landDark, polygon: [[60, 35], [68, 32], [70, 38], [65, 42], [60, 40]] },
+    { name: 'Kazakhstan', color: COLORS.landDark, polygon: [[58, 22], [68, 18], [72, 25], [65, 28], [58, 25]] },
+    { name: 'Mongolia', color: COLORS.landDark, polygon: [[68, 18], [80, 15], [85, 22], [78, 25], [70, 22]] },
+    { name: 'Turkey', color: COLORS.landDark, polygon: [[48, 28], [55, 25], [58, 30], [52, 35], [48, 32]] },
+    { name: 'Myanmar', color: COLORS.landDark, polygon: [[70, 40], [75, 38], [78, 45], [73, 48], [70, 45]] },
 
     // OCEANIA
-    { name: 'Australia', color: COLORS.australia, polygon: [[78, 58], [88, 55], [92, 62], [88, 72], [80, 75], [75, 68]] },
-    { name: 'New Zealand', color: COLORS.defaultLand, polygon: [[92, 72], [96, 70], [98, 76], [94, 78], [92, 75]] },
-    { name: 'Papua New Guinea', color: COLORS.defaultLand, polygon: [[88, 55], [92, 52], [95, 58], [90, 60], [88, 58]] },
+    { name: 'Australia', color: COLORS.landLight, polygon: [[78, 58], [88, 55], [92, 62], [88, 72], [80, 75], [75, 68]] },
+    { name: 'New Zealand', color: COLORS.landDark, polygon: [[92, 72], [96, 70], [98, 76], [94, 78], [92, 75]] },
+    { name: 'Papua New Guinea', color: COLORS.landDark, polygon: [[88, 55], [92, 52], [95, 58], [90, 60], [88, 58]] },
 
     // ANTARCTICA
-    { name: 'Antarctica', color: COLORS.antarctica, polygon: [[10, 90], [30, 88], [50, 90], [70, 88], [90, 90], [90, 95], [10, 95]] }
+    { name: 'Antarctica', color: COLORS.landHighlight, polygon: [[10, 90], [30, 88], [50, 90], [70, 88], [90, 90], [90, 95], [10, 95]] }
   ];
 
   // Water bodies (oceans and seas)
@@ -287,7 +291,7 @@
     // City dot
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fillStyle = isHovered ? '#ffffff' : '#ffcc00';
+    ctx.fillStyle = isHovered ? '#ffffff' : COLORS.cityDot;
     ctx.fill();
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 2;
@@ -323,9 +327,33 @@
   }
 
   function drawBackground() {
-    // Ocean background
-    ctx.fillStyle = COLORS.ocean;
+    // Ocean background - dark with red tint
+    const gradient = ctx.createRadialGradient(
+      canvas.width / 2, canvas.height / 2, 0,
+      canvas.width / 2, canvas.height / 2, canvas.width
+    );
+    gradient.addColorStop(0, '#1a0a0a');
+    gradient.addColorStop(0.5, '#150808');
+    gradient.addColorStop(1, '#0a0505');
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Add subtle blood-red grid lines
+    ctx.strokeStyle = 'rgba(220, 20, 60, 0.05)';
+    ctx.lineWidth = 1;
+    const gridSize = 60;
+    for (let x = offsetX % gridSize; x < canvas.width; x += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+    for (let y = offsetY % gridSize; y < canvas.height; y += gridSize) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
   }
 
   function drawLabels() {
