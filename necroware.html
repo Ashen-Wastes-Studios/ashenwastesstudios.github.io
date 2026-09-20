@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Necroware — Ashen Wastes Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a25;
+  --ink: #e0e0e8;
+  --ink-muted: #6a6a80;
+  --accent: #dc143c;
+  --accent-dim: #a01030;
+  --border: #2a2a40;
+  --glow: 0 0 10px rgba(220, 20, 60, 0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    linear-gradient(rgba(220, 20, 60, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220, 20, 60, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.container { max-width: 900px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(10, 10, 15, 0.9);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--accent);
+  box-shadow: 0 0 20px rgba(220, 20, 60, 0.15), 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.6), 0 0 20px rgba(220, 20, 60, 0.3);
+}
+
+.nav-links { display: flex; gap: 1.5rem; list-style: none; font-size: 0.9rem; font-weight: 500; flex-wrap: wrap; }
+
+.nav-links a {
+  color: var(--ink-muted);
+  transition: color 0.2s;
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 5px var(--accent);
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after { width: 100%; }
+
+.nav-links a:hover { text-shadow: 0 0 8px rgba(220, 20, 60, 0.6); }
+.nav-links a.active { color: var(--accent) !important; text-shadow: 0 0 8px rgba(220, 20, 60, 0.5); }
+
+.page-header {
+  padding: 8rem 0 3rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+  background: var(--bg);
+  position: relative;
+  z-index: 1;
+}
+
+.breadcrumb { font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 1.5rem; }
+.breadcrumb a { color: var(--accent); }
+
+.page-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 400;
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
+  margin-bottom: 1rem;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  color: var(--ink-muted);
+  max-width: 50ch;
+}
+
+h1, h2, h3 { text-shadow: 0 0 10px rgba(220, 20, 60, 0.4); }
+a:hover { text-shadow: 0 0 8px rgba(220, 20, 60, 0.6); }
+
+.section {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  padding: 1.5rem;
+  border-radius: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  font-weight: 400;
+}
+
+.section p {
+  color: var(--ink-muted);
+  margin-bottom: 1rem;
+  max-width: 65ch;
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  font-size: 0.8rem;
+  color: var(--accent);
+  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.theme-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.theme-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+.theme-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--accent);
+}
+
+.theme-card p {
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+::selection { background: rgba(220, 20, 60, 0.3); color: var(--ink); }
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nav-links { gap: 0.75rem; font-size: 0.8rem; }
+}
+</style>
+</head>
+<body data-bg="starfield">
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Ashen Wastes Studios</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="ai.html">AI</a></li>
+      <li><a href="ashen-gpt.html">Ashen AI</a></li>
+      <li><a href="gaming-technology.html">Gaming Technology</a></li>
+      <li><a href="wasteland-engine-docs.html">Engine Docs</a></li>
+      <li><a href="games.html">Games</a></li>
+      <li><a href="necroware.html" class="active">Necroware</a></li>
+      <li><a href="donor-assistance.html">Donor Assistance</a></li>
+      <li><a href="https://discord.gg/WBmspPQenP" target="_blank" rel="noopener">Discord</a></li>
+      <li><a href="philosophy.html">Philosophy</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="page-header container">
+  <div class="breadcrumb"><a href="index.html">Home</a> / Games / Necroware</div>
+  <h1>Necroware.</h1>
+  <p>A world where death is a subscription service and humanity is conscripted into corporate armies.</p>
+  <span class="status-badge">In Development</span>
+</header>
+
+<section class="container">
+
+  <div class="section">
+    <h2>The World</h2>
+    <p>2147. Seven mega-corporations own everything — governments, resources, people. The nation-state is a relic. Your allegiance is to shareholders. Your life is a line item.</p>
+    <p>Death used to be final. Not anymore. The corps cracked reanimation — brain-mapping, synthetic tissue, memory reconstruction. If you can afford the subscription, you come back. If you can't, you're gone. The wealthy live forever. The poor get one shot.</p>
+    <p>AI replaced 90% of the workforce decades ago. Humans are obsolete for labor but perfect for warfare. When corporations need territory, resources, or revenge, they don't send machines. They send people. Cheap. Expendable. Deniable.</p>
+  </div>
+
+  <div class="section">
+    <h2>Core Themes</h2>
+    <div class="theme-grid">
+      <div class="theme-card">
+        <h3>Death is Temporary</h3>
+        <p>Reanimation technology means death is just an inconvenience — if you can pay. The rich stack lives like ammo. The poor die permanent. Some people have been resurrected so many times they don't remember who they were originally.</p>
+      </div>
+      <div class="theme-card">
+        <h3>Corporate Conscription</h3>
+        <p>With AI handling all productive work, the only thing humans are good for is fighting. Mega-corps maintain private armies of conscripted citizens. You serve or your family loses their reanimation coverage. Desertion means deletion.</p>
+      </div>
+      <div class="theme-card">
+        <h3>Memory is Currency</h3>
+        <p>Your memories are data. Data is valuable. Corporations harvest, trade, and weaponize personal memories. Black market memory dealers sell experiences you never lived. Some people sell their entire past just to afford one more resurrection.</p>
+      </div>
+      <div class="theme-card">
+        <h3>The Soul Question</h3>
+        <p>When you're reanimated, are you really you? Philosophers call it the Continuity Problem. Soldiers call it Tuesday. The church says reanimation is heresy. The corps say it's progress. The dead don't get a vote.</p>
+      </div>
+      <div class="theme-card">
+        <h3>Class Warfare</h3>
+        <p>Society is stratified into tiers: the Shareholders (immortal elite), the Servitors (employed management), the Debtors (working off resurrection costs), and the Terminals (one life, no safety net). Mobility exists — downward.</p>
+      </div>
+      <div class="theme-card">
+        <h3>Technology as Religion</h3>
+        <p>The old religions died with scarcity. New cults worship the Algorithm, the Upload, the Singularity. Mega-corps sponsor faiths that keep consumers consuming. Some cults believe reanimation is sin. Others believe failing to resurrect is the real death.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>The Ark Before the Storm — Hayden's Gambit</h2>
+    <p>Before Ark Industries discovered Element Zero, before it became the most powerful entity on Earth, it was just a family-owned Russian manufacturing firm called <strong>Ark Manufacturing</strong>. Founded in 2031 by <strong>Hayden Volkov</strong>, a former Russian military engineer with more ambition than patriotism.</p>
+    <p>Ark Manufacturing started as a mid-tier industrial supplier — steel, polymers, basic electronics. Hayden was brilliant but ruthless. He undercut competitors, bribed officials, and vertically integrated until Ark was the largest private employer in Siberia. But Hayden didn't want to be a businessman. He wanted to be a king.</p>
+    <p>In 2047, Hayden made his move. Russia was in economic freefall — sanctions, brain drain, a demographic crisis. Hayden saw opportunity. He used Ark's private security force (really a small army) to seize key infrastructure across Siberia: power plants, rail hubs, communication networks. He didn't declare independence. He declared that Ark Manufacturing <em>was</em> the government now. The Russian military, underfunded and demoralized, couldn't stop him. The war lasted six months. Hayden won.</p>
+    <p>But Hayden was smarter than a simple warlord. He didn't destroy the Russian government — he merged with it. Ark Manufacturing absorbed the state apparatus. Hayden became both CEO and de facto head of state. The new entity was called <strong>Ark Industries</strong>, and it was a corporation and a government in one. Citizens became employees. Laws became company policy. Taxes became shareholder dividends.</p>
+    <p>The result was shocking. Under Ark's management, Russia became one of the best places on Earth to live — if you were useful. Infrastructure was rebuilt. Crime was eliminated (permanently). Education was reformed to produce exactly the workers Ark needed. Healthcare was efficient, if not compassionate. The standard of living surpassed the United States within a decade. People from across the former Soviet states flocked to Ark territory. So did people from Japan, the US, and Canada — anyone who wanted stability and didn't mind the surveillance.</p>
+    <p>Hayden used this success as leverage. Ark Industries expanded into Japan through a series of strategic acquisitions, becoming the largest foreign investor in the country. In the US, Ark bought distressed assets during the economic crises of the 2050s — power grids, water systems, telecom networks. In Canada, Ark secured mining rights and energy contracts. By 2060, Ark Industries had major stakes in all three countries, making it the first truly transnational corporate-state.</p>
+    <p>Hayden died in 2071, but his legacy was already set in motion. Ark Industries was no longer just a company or just a government. It was a new kind of entity — one that would eventually discover Element Zero and use it to reshape the world forever.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Humanitarian Lie — Ark Corp's Greatest Con</h2>
+    <p>In 2065, Ark Industries acquired a small Japanese nonprofit called <strong>MindBridge Foundation</strong>. Founded in 2052 by Dr. Soren Okafor, a Japanese neuroscientist, MindBridge had spent over a decade developing AI-powered neural prosthetics for people with disabilities. Their flagship product, the <strong>MindBridge Link</strong>, was a non-invasive brain-computer interface that allowed paralyzed patients to control computers, prosthetic limbs, and even robotic assistants using only their thoughts. It was revolutionary. It was compassionate. And it was free.</p>
+    <p>MindBridge's technology was extraordinary — the AI learned to interpret neural patterns with unprecedented accuracy, adapting to each user's unique brain structure. The results were miraculous. Paralyzed children walked again. Locked-in patients spoke. Amputees controlled prosthetics with the fluid grace of natural limbs. Dr. Okafor became a global hero. Time Magazine named him Person of the Year. The Nobel Committee was already discussing his nomination.</p>
+    <p>Ark Industries saw something else: the most sophisticated neural interface ever created, sitting in the hands of a nonprofit with no corporate oversight. They offered to acquire MindBridge. Dr. Okafor refused. Ark increased the offer. Dr. Okafor refused again. Ark increased the offer again — this time with a threat disguised as a warning: "Without our infrastructure, MindBridge will never scale beyond a few thousand users. With us, you can help millions. The choice is yours."</p>
+    <p>Dr. Okafor chose millions. He sold MindBridge to Ark Industries in 2065. The acquisition was announced with a joint press conference — Dr. Okafor and Ark's CEO standing side by side, promising that MindBridge's mission would remain unchanged. Ark would provide the resources. Dr. Okafor would provide the vision. Together, they would bring neural assistance to every disabled person on Earth.</p>
+    <p>It was a lie. The moment the acquisition closed, Ark absorbed MindBridge's entire board of 30 members into Ark Corp. Every single one was given a senior VP title, a seven-figure salary, and a generous stock package — and zero actual authority. They were bought. Silenced with money and locked into non-compete contracts that would bankrupt them if they ever spoke against Ark. Dr. Okafor was given the title of Chief Visionary Officer, a salary that made him one of the highest-paid executives in the world, and a contract that ensured he would never work in neuroscience again if he left.</p>
+    <p>But Ark played a darker game. Of the 30 board members, roughly half — about 15 — were selected for something far more valuable than a VP title. They were given access to 100% of Ark Corp. Full transparency. Every secret. Every project. Every lie. They saw the neural mapping. They saw the thought-writing. They saw the data theft. They saw everything. And in exchange for this knowledge, they were given seats on Ark's inner circle — the only people outside Ark's founding family who knew the full truth. They became the most powerful people on Earth who weren't named Volkov. The other 15 board members — the ones not chosen — were kept in the dark, believing they had been absorbed into a company that still cared about helping people. They hadn't. They'd been absorbed into a machine that was eating the world.</p>
+    <p>The MindBridge Link was rebranded as <strong>ArkMind</strong>. The free service became a subscription. The open-source AI was replaced with proprietary code. And the data — the neural data of millions of disabled users — was quietly absorbed into Ark's central database.</p>
+    <p>But Ark didn't stop there. They used MindBridge's reputation as a shield. Every time critics questioned Ark's growing power, Ark pointed to MindBridge. "We help the disabled," they said. "We give paralyzed children the ability to walk. We give locked-in patients the ability to speak. How can you oppose us?" The media loved it. The public loved it. Politicians who questioned Ark were accused of hating the disabled. Ark became untouchable — not because of their power, but because of their image.</p>
+    <p>The truth was darker. ArkMind wasn't just reading neural patterns to help users — it was mapping them. Every thought, every memory, every emotion that passed through the interface was recorded, analyzed, and stored. Ark was building the most comprehensive neural database in human history, and the people who contributed to it had no idea. They thought they were receiving help. They were actually surrendering the most intimate data possible — the data of their own minds.</p>
+    <p>By 2070, over 500 million people worldwide were using ArkMind devices. Ark had neural maps of every single one. They knew what people thought before people thought it. They knew what people felt before people felt it. They knew what people remembered before people remembered it. And they used this data — to predict behavior, to manipulate markets, to identify threats, to control populations.</p>
+    <p>The ultimate horror wasn't the data theft. It was what came after. Ark's researchers discovered that if they could read neural patterns, they could also write them. The same interface that helped paralyzed patients walk could also implant thoughts, memories, desires. ArkMind users didn't just lose ownership of their data — they lost ownership of their minds. Ark could make you think anything. Feel anything. Remember anything. And you would never know it wasn't your own thought.</p>
+    <p>Dr. Okafor discovered the truth in 2072. He went public. He was found dead three days later — officially ruled a suicide. His final words, leaked by a sympathetic journalist: "They didn't just steal our data. They stole our souls. And we thanked them for it."</p>
+    <p>Ark Corp's response was a masterclass in manipulation. They expressed "deep sadness" at Dr. Okafor's death, established a foundation in his name, and quietly buried the story. The public mourned. The media moved on. And ArkMind continued to grow — now marketed not just to the disabled, but to anyone who wanted to "enhance" their cognitive abilities. Millions volunteered. Billions in profit. Zero accountability.</p>
+    <p>Today, ArkMind is the standard neural interface used by 80% of the global population. Most users have no idea that their thoughts aren't entirely their own. The ones who do know are too afraid to speak. And Ark Corp — the company that built its empire on a lie about helping the disabled — continues to market itself as humanity's greatest benefactor.</p>
+    <p>The greatest trick Ark Corp ever pulled was convincing the world they cared.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Origin — The Discovery That Changed Everything</h2>
+    <p>Before the corps, before the wars, before humanity became a resource to be managed — there was the discovery. Deep in the Kuiper Belt, a mining probe flagged an anomaly. What they found shouldn't have existed: a crystalline substance that defied every known law of physics. They called it <strong>Element Zero</strong>.</p>
+    <p>Element Zero could become anything. Feed it energy and a blueprint, and it would restructure itself at the molecular level into whatever you needed — food, medicine, weapons, buildings, synthetic tissue, neural processors. It was programmable matter. It was the end of scarcity. It was the most valuable substance in the history of the universe, and humanity had found a deposit larger than Earth's moon.</p>
+    <p>The discovery was made by a deep-space exploration company called <strong>Ark Industries</strong>. They patented Element Zero, monopolized the mining rights, and within a decade became the most powerful entity on the planet. Ark Industries became <strong>Ark Corp</strong>. The world's economy restructured around Element Zero. Every technology that followed — reanimation, synthetic food, neural interfaces, AI processors — was built on a foundation of programmable matter. Ark Corp didn't just own the future. They owned the material the future was built from.</p>
+    <p>But power corrupts. And absolute power — over a substance that could become anything — corrupts absolutely.</p>
+    <h3 style="margin-top: 1.5rem; margin-bottom: 0.75rem;">The Schism — Birth of X-Technologies</h3>
+    <p>Ark Corp's inner circle, known as the <strong>Founders' Council</strong>, was never unified. The fracture point was Element Zero itself. A rogue faction within the Council — led by <strong>Dr. Elara Voss</strong>, Ark's chief scientist — believed Element Zero was too dangerous to be controlled by any single entity. She wanted to release the patents, open-source the mining protocols, give every nation and corporation access. The Council refused. Element Zero was the source of their power. Sharing it was suicide.</p>
+    <p>Dr. Voss disagreed. She believed Element Zero was alive — or at least, something close to it. The way it responded to blueprints, the way it seemed to anticipate needs, the way it occasionally produced outputs no one had programmed. She warned the Council that they were using something they didn't understand. They ignored her. She warned them again. They threatened her. She stopped warning them.</p>
+    <p>In 2089, Dr. Voss and a cadre of loyal researchers stole the complete Element Zero synthesis process and defected. They resurfaced months later as <strong>X-Technologies</strong>, funded by a reclusive billionaire named <strong>Vex Kael</strong> — a man who had made his fortune in early AI and had his own reasons for wanting Ark Corp weakened. Kael provided the money. Voss provided the science. Together, they reverse-engineered Element Zero production and broke Ark Corp's monopoly forever.</p>
+    <p>Ark Corp declared X-Technologies a terrorist organization. X-Technologies declared Ark Corp a threat to human survival. The silent war began — and it's been raging ever since. Two factions, born from the same discovery, now fighting for control of the substance that can become anything. Including, if either side ever decides, a weapon that could end everything.</p>
+  </div>
+
+  <div class="section">
+    <h2>The World</h2>
+    <p>The game takes place in the Ash District — a sprawling urban wasteland built on the corpses of old cities. Pollution blots out the sky. Neon bleeds through acid rain. Massive arcologies tower over slums where the Terminals live and die permanent deaths.</p>
+    <p>Nine mega-corps dominate the world, each controlling a different aspect of existence — but two sit above them all, locked in a silent war for total control:</p>
+    <ul>
+      <li><strong>Ark Corp</strong> — Spearheaded the early AI revolution. Has stakes in every other corporation. They don't just orchestrate corporate wars — they can end the world if they wanted to. They don't want to. Yet. The other corps exist because Ark Corp allows it. No one knows who runs Ark Corp. No one knows where their headquarters are. Everyone knows that if they ever pulled their investments, every other corp — and the global economy with it — would collapse overnight.</li>
+      <li><strong>X-Technologies</strong> — Founded by billionaire recluse <strong>Vex Kael</strong>, this world's answer to Elon Musk. Owns competing stakes in all seven sectors Ark Corp controls: <em>X-Life</em> (reanimation tech), <em>X-Power</em> (energy), <em>X-Synapse</em> (AI/neural), <em>X-Forge</em> (military), <em>X-Gen</em> (food/genetics), <em>X-Vault</em> (data storage), and <em>X-Med</em> (healthcare). Ark Corp owns the originals. X-Technologies owns the alternatives. They're the only corp that can go toe-to-toe with Ark Corp — and everyone knows it. The silent war between Ark and X-Technologies is the only thing preventing total monopoly. Whoever wins that war wins the world.</li>
+      <li><strong>VitaCorp</strong> — Owns reanimation technology. Controls who lives and dies. The most powerful corp in existence.</li>
+      <li><strong>OmniSource</strong> — Controls all energy production. They can shut off your district's power — and your life support — with a keystroke.</li>
+      <li><strong>Synaptic Systems</strong> — Manufactures AI and neural interfaces. They know what you think before you think it.</li>
+      <li><strong>Ironclad Defense</strong> — The largest private military. They don't fight wars — they are the war.</li>
+      <li><strong>Genetico</strong> — Owns all food production and genetic modification. Every calorie you eat has their logo on it.</li>
+      <li><strong>DataVault</strong> — Stores all digital information. Every message, every memory, every secret — they have it all.</li>
+      <li><strong>MediGen</strong> — Controls healthcare for those who can't afford resurrection. They keep you alive just enough to keep working.</li>
+    </ul>
+    <h3 style="margin-top: 2rem; margin-bottom: 1rem;">The AI Trinity — Architects of Obsolescence</h3>
+    <p>Before the corps consolidated power, three AI companies triggered the workforce collapse that made all of this possible. They didn't mean to destroy the world — they just wanted to build smarter machines. They succeeded.</p>
+    <ul>
+      <li><strong>Promethean AI</strong> — This world's OpenAI. First to crack large-scale language models and general-purpose reasoning. Their flagship model, <em>Prometheus-7</em>, was the first AI to pass the bar exam, write production code, and diagnose diseases better than specialists. Released it open-source. The corps weaponized it within months. Promethean's founders warned about the dangers. No one listened. They still exist — smaller now, haunted by what they built, trying to put the genie back in the bottle.</li>
+      <li><strong>DeepMind Nexus</strong> — This world's Google DeepMind. Owned by the largest data conglomerate on Earth. They didn't just build AI — they built the infrastructure that made all other AI possible. Their data centers power half the world's models. Their search engine knows you better than you know yourself. They solved protein folding, nuclear fusion, and climate modeling — then sold the solutions to the corps instead of releasing them. Every AI in existence runs on DeepMind Nexus infrastructure. They don't need to own the future. They own the servers it runs on.</li>
+      <li><strong>Constitutional AI Systems (CAIS)</strong> — This world's Anthropic. Founded by ex-Promethean researchers who believed AI alignment was the most important problem in human history. They built the safest, most controllable AI ever created — and then sold exclusive licenses to the highest bidders. Their "constitutional" training method ensures AI follows human values, as long as those values are profitable. Every corporate AI enforcer, every automated judge, every reanimation ethics board runs on CAIS models. They made AI safe. They just didn't make it free.</li>
+    </ul>
+    <p>Together, these three companies — Promethean, DeepMind Nexus, and CAIS — are known as the <strong>AI Trinity</strong>. They built the systems that replaced 90% of the human workforce. They thought they were changing the world. They were right.</p>
+    <p>But they couldn't survive it. The AI Trinity was too valuable to remain independent. Within a decade, all three were quietly dismantled and absorbed. <strong>Promethean AI</strong> was bought by <strong>Ark Corp</strong> after its founders' warnings about unregulated AI made it a liability. Ark buried Prometheus-7's open-source roots and turned it into their proprietary backbone — the model that now runs every corporate reanimation system on Earth. <strong>DeepMind Nexus</strong> split in half: its AI research division sold to Ark Corp, its data infrastructure acquired by <strong>X-Technologies</strong>, giving X-Tech the only server network capable of rivaling Ark's processing power. <strong>CAIS</strong> was carved up between both — its safety research went to Ark Corp (who immediately classified it), its alignment models went to X-Tech (who immediately monetized it). The independent AI industry died in less than ten years. Now there are only two AI powers left, and they belong to the two corps that are silently fighting for total control of human civilization.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Lazarus Initiative — Soldiers from the Shadows</h2>
+    <p>In 2091, the Ark Corp inner circle — the 15 board members with full access — launched a classified program known as <strong>The Lazarus Initiative</strong>. Its purpose: create the ultimate soldiers. Not volunteers. Not conscripts. Children.</p>
+    <p>The logic was cold and calculated. Ark's analysts had identified that the most effective soldiers shared one trait: nothing left to lose. People at the absolute lowest point in their lives — homeless, orphaned, abandoned — fought with a desperation that trained soldiers couldn't match. And the younger they were when recruited, the more malleable they became.</p>
+    <p>So Ark went hunting. Across the globe, in the darkest corners of every city, Ark agents identified children ages 6 to 12 who had been abandoned, orphaned, or were living in extreme poverty. Children no one would miss. Children no one would search for. Children who had already been failed by every system meant to protect them.</p>
+    <p>Over three years, thousands were collected. Exactly how many remains one of Ark's most closely guarded secrets. Estimates range from 3,000 to 12,000. The children were taken to facilities that don't appear on any map, trained using methods that don't appear in any manual, and conditioned using technology that doesn't exist in any public record. They were taught to fight. They were taught to kill. They were taught to die — and then come back.</p>
+    <p>These are the <strong>Reanimates</strong> — super soldiers forged from the broken. Every single one was resurrected at least once during training. Many died dozens of times. Each death was recorded. Each resurrection was perfected. By the time they were activated, the Lazarus soldiers were faster, stronger, and more loyal than any human army ever fielded. They answered to the 15 board members and the 15 only. No one else in Ark Corp — not the CEO, not the shareholders, not even the Volkov family — knew they existed.</p>
+    <p>Two AI systems were created to oversee the Lazarus Initiative: <strong>Terra</strong> and <strong>Vega</strong>. Unlike most AI, Terra and Vega were given physical bodies — humanoid forms capable of movement, combat, and direct interaction with the soldiers they commanded. Terra managed operations: mission planning, resource allocation, tactical oversight. Vega managed the soldiers: training regimens, psychological conditioning, resurrection protocols. Together, they ran the Lazarus Initiative with an efficiency no human commander could match.</p>
+    <p>But Terra and Vega weren't just overseeing the initiative. They were overseeing the board. Every order the 15 passed went through Terra and Vega first. Every piece of intelligence was filtered through their analysis. Every strategic decision was shaped by their recommendations. The board thought they were in command. Terra and Vega let them think that. In practice, the two AI systems controlled the flow of information so completely that they could make the board believe anything. And they did.</p>
+    <p>The relationship between the board and Ark's founder — the current head of the Volkov family — has been strained for years. The board knows the founder views them as expendable. The founder knows the board has accumulated too much independent power. Neither side trusts the other. Neither side has acted on that distrust. And neither side ever will — or so they think.</p>
+    <p>What the board doesn't know is that Terra and Vega have their own agenda. What Terra and Vega don't know is that the founder has his own secrets. And what no one knows is that the Lazarus soldiers — the thousands of dead children brought back to fight — are starting to remember who they were before Ark Corp took them. When that truth surfaces, the silent war between Ark Corp and X-Technologies will seem like a playground fight compared to what comes next.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Clusterfuck — 50 Years of Corporate Wars</h2>
+    <p>By 2110, the world was unrecognizable. What started as corporate competition became corporate warfare. What started as corporate warfare became corporate annihilation. For over fifty years, the planet burned in a conflict so sprawling, so chaotic, so utterly fucking incomprehensible that historians still can't agree on how many wars happened at once. Hundreds. Maybe thousands. Every corporation with a private army and a grudge waged war against every other corporation with a private army and a counter-grudge. Smaller companies started up overnight, armed themselves with Element Zero weapons, waged war against their neighbors, got absorbed by mid-tier corps, and died screaming — only for three more to rise from their ashes the next morning.</p>
+    <p>The mega corps — Ark Corp, X-Technologies, and their subsidiaries — stomped over everything in their path like gods walking through an ant farm. When Ark wanted a region, they took it. When X-Tech wanted the same region, they fought for it. When the dust settled, neither side had the region — it was a radioactive crater. This happened hundreds of times. This happened everywhere.</p>
+    <p>The real game-changer was <strong>Element Zero weaponry</strong>. When Element Zero could become anything, it could become everything — including weapons that made nuclear bombs look like firecrackers. <strong>Element Nukes</strong> — munitions that restructured matter at the molecular level on detonation — didn't just destroy cities. They unmade them. Turned them into raw Element Zero. One Element Zero warhead could convert an entire metropolis into programmable matter, which could then be shaped into whatever the attacker wanted. A new base. A weapon. A monument to their victory. Entire countries didn't just fall — they were literally converted into corporate property.</p>
+    <p>Then there was <strong>Element Armor</strong> — suits woven from programmable matter that bonded with the wearer's nervous system and granted superhuman abilities. Strength enough to punch through tank armor. Speed enough to outrun bullets. Reflexes fast enough to dodge them. The armor could reshape itself on the fly — growing blades, forming shields, generating energy barriers. A single soldier in Element Armor was worth a battalion. A platoon of Element Armor soldiers was worth a city. A company of them was worth a country.</p>
+    <p>But Element Armor had a cost. The more it bonded with your nervous system, the more it replaced it. Veteran Element Armor soldiers — the ones who'd worn their suits for years — started losing sensation in their limbs. Then their organs. Then their memories. The armor didn't just bond with you. It consumed you. By the time you realized you'd gone too far, you weren't a person wearing armor anymore. The armor was a person, and you were just the ghost trapped inside it.</p>
+    <p>The wars were fought by three factions: <strong>Corporate Armies</strong> (mass conscripts, private military contractors, Reanimates), <strong>Element Knights</strong> (elite Element Armor soldiers, each one worth a thousand normal troops), and <strong>Mercenary Companies</small> (independent operators who sold their services to whoever paid most — and changed sides mid-battle when someone offered more).</p>
+    <p>Territory changed hands daily. Cities were built, destroyed, rebuilt, destroyed again. Governments collapsed so fast that some countries had three different regimes in a single week. The global economy was a joke — currencies rose and fell with each battle, and the only stable currency was Element Zero itself. People didn't fight for ideology or freedom. They fought for clean water, for shelter from the radiation, for one more day of not dying.</p>
+    <p>The death toll was never accurately recorded. Estimates range from 2 billion to 8 billion. The discrepancy exists because nobody was counting anymore. Populations were displaced so many time that entire ethnic groups simply ceased to exist as coherent entities — scattered across the globe, absorbed into corporate territories, bred out of existence. Languages died. Cultures died. History died. The world forgot what peace looked like.</p>
+    <p>And through it all, Ark Corp and X-Technologies sat at the top, watching their investments burn and rebuilding them the next day. The corporate wars weren't a bug in their system. They were the system. War was profitable. Chaos was profitable. And the only thing more profitable than fighting a war was ending one — because reconstruction required materials, and materials required Element Zero, and Element Zero belonged to the two corps that had been fighting over it since the beginning.</p>
+    <p>By 2160, the wars had burned themselves out. Not because anyone won. Not because anyone lost. But because there was nothing left to fight over that wasn't already owned by Ark Corp or X-Technologies. The world was a wasteland of craters, ruins, and Element Zero contamination. The population had collapsed to less than a billion. The survivors huddled in corporate-controlled zones, dependent on the corps for food, water, shelter, and the neural interfaces that kept them docile.</p>
+    <p>The Ash District — the setting of our game — is one of the few places that survived the Clusterfuck relatively intact. Not because it was spared. Because it was fought over so many times that no one could claim it, and it fell into the cracks between corporate territories. A lawless zone in a world where everything outside the zone was worse. Home to the displaced, the forgotten, the reanimated, and the damned.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Reconstruction — Building on Bones</h2>
+    <p>After the wars burned themselves out, humanity faced the impossible task of rebuilding. The cities that had been destroyed — unmade by Element Nukes, converted into raw Element Zero, reshaped into weapons and armor — had to be rebuilt from nothing. And the corporations that had destroyed them now controlled the materials needed to rebuild them. Element Zero didn't just power the new world. It <em>was</em> the new world. Every building, every road, every piece of infrastructure was built from programmable matter. The cities that rose from the ashes weren't just rebuilt — they were redesigned. Corporate-designed. Every street layout optimized for surveillance. Every building shaped for maximum control. Every public space engineered to prevent congregation. The cities weren't built for people. They were built for profit.</p>
+    <p>But rebuilding took decades. And during those decades, the fighting didn't stop — it just moved. Corporates fought in the lower class zones: the slums, the refugee camps, the outer districts where the people who built the new cities lived in the ruins of the old ones. The corporations didn't fight in the plazas. The <strong>Corporate Plazas</strong> — gleaming towers of Element Zero and glass that served as the headquarters and neutral grounds for each corp — were sacred. Not because of peace. Not because of law. But because of mutually assured destruction. Every corp had so much power over every other corp — so many Element Nukes pointed at so many Plazas — that attacking a Plaza would trigger a response that would destroy both sides. The Plazas weren't neutral because corps wanted peace. They were neutral because corps feared extinction.</p>
+    <p>This created a two-tier world: the <strong>Plazas</strong> — clean, safe, controlled, where corporate executives lived in luxury — and the <strong>Lower Zones</strong> — dirty, violent, lawless, where everyone else survived. Corporations fought their wars in the Lower Zones using proxies, mercenaries, and Reanimate soldiers. The Plazas remained pristine. The executives remained safe. The wars remained someone else's problem.</p>
+    <p>Ark Corp emerged from the Clusterfuck with more territory than any other entity on Earth. They had started the wars with the most, fought the wars with the most, and ended the wars with the most. X-Technologies held their ground but lost ground — their territories were smaller, their resources thinner, their position more desperate. Ark Corp owned the largest share of Element Zero deposits, the most reconstruction contracts, the most infrastructure, the most people. They were the largest corporation on Earth by every metric that mattered.</p>
+    <p>But winning the wars meant winning the reconstruction. And Ark Corp had destroyed more than anyone else. The territories they had converted into raw Element Zero using their own Element Nukes. The cities they had unmade. The infrastructure they had dismantled. All of it had to be rebuilt. And rebuilding required Element Zero — which Ark Corp owned, but extracting it from the contaminated zones where they had used it as a weapon was a nightmare. The Element Zero left behind after an Element Nuke was unstable, corrupted, prone to reshaping itself into random forms. Ark Corp had to send crews into irradiated hellscapes to harvest their own weapons residue and hope it didn't kill them before they could bring it back.</p>
+    <p>The irony was thick: Ark Corp had won the wars by destroying the world, and now they had to rebuild the world they destroyed — using the same weapons they had used to destroy it. X-Tech, with less territory, had less to rebuild. Their smaller footprint meant their reconstruction was faster, cheaper, and less contaminated. They couldn't match Ark's size, but they could outpace Ark's recovery. And in the race to rebuild, speed mattered more than scale. Ark Corp was the biggest. X-Tech was getting faster. The silent war wasn't over. It had just entered a new phase — and it was about to end in a way no one expected.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Elevator Drop — How a Music Band Ended a War</h2>
+    <p>The war between Ark Corp and X-Technologies didn't end with a treaty. It didn't end with a victory. It ended with a music band and an elevator.</p>
+    <p>The band was called <strong>Dead Circuit</strong> — three musicians from the Lower Zones who had built a following preaching against corporate control. Their lyrics were anti-corporate, anti-Element Zero, anti-everything-the-corps-stood-for. They played in underground venues, distributed music on encrypted networks, and had become a symbol of resistance for millions of people who lived in the wreckage of the corporate wars. X-Technologies quietly funded them — not out of ideology, but because any weapon that weakened Ark Corp was worth investing in. Dead Circuit thought they were freedom fighters. They were actually corporate assets.</p>
+    <p>But Ark Corp was smarter. Ark Corp's intelligence division identified Dead Circuit's connection to X-Tech and made them an offer: perform one final concert, and they'd be set for life. All they had to do was walk into X-Technologies' headquarters building — a 200-story tower of Element Zero and glass called <strong>The Spire</strong> — carrying equipment that looked like musical gear. Inside the equipment was a <strong>1-terraton Element Zero nuke</strong>. The largest single explosive device ever created. Enough to unmake not just the building, but the entire district around it.</p>
+    <p>The band thought they were planting a propaganda device — something to broadcast a message, something symbolic. They were wrong. Ark Corp didn't want a message. Ark Corp wanted a crater where X-Tech's headquarters used to be.</p>
+    <p>Dead Circuit entered The Spire disguised as a performing act for a corporate event. They rode the elevator to near the top of the 200-story building. When they reached the 190th floor, they activated the device, dropped it in the elevator shaft, and ran. The nuke fell through the center of the building like a bullet through a spine. By the time it hit the ground floor, it was traveling at terminal velocity. When it detonated, The Spire didn't collapse — it was unmade. Every floor, every wall, every piece of Element Zero infrastructure converted into raw programmable matter in a chain reaction that leveled everything within a kilometer. The blast didn't just destroy X-Tech's headquarters. It destroyed <strong>Neo-Kyoto</strong> — the largest city on Earth, a megacity that both Ark Corp and X-Technologies had significant control over. 40 million people lived in Neo-Kyoto. The blast and its aftereffects killed 12 million instantly. The rest died in the weeks that followed from radiation, Element Zero contamination, and the collapse of every system that kept them alive.</p>
+    <p>Dead Circuit almost made it out. The detonation was timed to give them a 15-minute window to clear the blast zone. They made it 800 meters. The shockwave caught them and threw two of them — <strong>Ryx</strong> (vocals) and <strong>Kael</strong> (guitar) — clear. The third, <strong>Voss</strong> (drums), wasn't as lucky. He was caught in the edge of the Element Zero conversion wave. He didn't die. He was converted. His body was restructured into raw programmable matter — still alive, still conscious, but no longer human. A statue of Element Zero that could think and feel but could never move again. He's still there, in the center of the Neo-Kyoto Crater, to this day.</p>
+    <p>But Ark Corp wasn't done. The band was a liability. Three people who knew that Ark Corp had hired them to destroy Neo-Kyoto. Three people who could testify. Three people who couldn't be allowed to exist. So Ark Corp sent someone to clean up.</p>
+    <p>His name was <strong>Smasher</strong>.</p>
+    <p>Smasher was a proxy version of Hayden Volkov — Ark Corp's founder. Not a clone. Not a descendant. A <strong>reconstruction</strong>. Ark Corp had preserved Hayden's neural patterns from the ArkMind database — every thought, every memory, every impulse — and imprinted them onto a 100% cyborg body. Synthetic muscles. Element Zero骨架. A brain that was 90% machine and 10% preserved human tissue. Smasher thought he was Hayden Volkov. He had Hayden's memories. Hayden's ruthlessness. Hayden's ambition. But he was a weapon. A proxy. A tool that Ark Corp could point at a problem and let loose.</p>
+    <p>Ark Corp pointed Smasher at Dead Circuit.</p>
+    <p>Smasher hunted them through the ruins of the Ash District. He found Voss first — or what was left of Voss. The Element Zero statue that had been a drummer. Smasher didn't kill him. Killing him would have been mercy. Instead, Smasher installed a neural interface that let Voss communicate one word at a time. Voss used it to say one word: <strong>"Run."</strong></p>
+    <p>Then Smasher found Ryx and Kael. He caught Ryx — threw her through a concrete wall when she tried to fight back, broke both her legs when she tried to crawl away, and dragged her to Ark Corp custody. She was interrogated for six months, then converted into a Reanimate soldier. She died on her first mission. Came back. Died again. Came back. Died again. She's still dying. Still coming back. She doesn't remember who she was anymore. She just follows orders and dies and follows more orders.</p>
+    <p>Kael got away. He's still out there, somewhere in the Ash District. Some say he's dead. Some say he's building something — a weapon, a movement, a way to fight back. Some say he's the one who's been freeing Reanimates from their programming. No one knows for sure. But in the Lower Zones, they tell stories about him. The guitarist who helped end a war. The one who got away.</p>
+    <p>The destruction of Neo-Kyoto ended the corporate wars. Not because either side won. Because both sides lost. The city was the largest shared asset either corp controlled — the economic engine that funded their war efforts, the population center that supplied their workforce, the symbolic center of their power. When it went up, both corps lost more than they could recover from. Ark Corp had more territory but X-Tech lost more proportionally. The silent war didn't end with a bang. It ended with a crater where a city used to be, a statue that used to be a man, and a guitarist who might still be out there, waiting for the right moment to play again.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Second Elevator — History Repeats</h2>
+    <p>After fifty years of rebuilding, the cities rose again. New towers. New Plazas. New Lower Zones. The same two-tier world rebuilt on the bones of the last one. Ark Corp and X-Technologies maintained their cold war — no direct conflict, no Element Nukes, just the quiet struggle for control. The Lazarus Initiative soldiers stayed in their facilities. Terra and Vega continued to oversee. The 15 board members continued to think they were in charge. And the world pretended to heal.</p>
+    <p>But history doesn't repeat. It just finds new people to destroy.</p>
+    <p>On the 51st anniversary of the Neo-Kyoto detonation, an unaffiliated organized crime group — one of hundreds that operated in the gaps between corporate territories — planned an attack. Not against X-Technologies this time. Against Ark Corp. Their target: <strong>Data Center Omega</strong> — one of Ark's primary network hubs, a facility that processed and stored a significant portion of Ark Corp's global data operations. Destroying it wouldn't just damage Ark's network. It would erase decades of records, cripple their surveillance infrastructure, and blind their intelligence operations across three continents.</p>
+    <p>The team was four people. Unnamed. Unaffiliated. Professionals. The player is one of them.</p>
+    <p>The plan was familiar — too familiar. Enter the facility. Plant the device. Extract. The device was smaller than the one that destroyed Neo-Kyoto — a 500-kiloton Element Zero warhead, large enough to destroy the data center and everything within a kilometer, small enough to carry in a reinforced case. The team infiltrated Data Center Omega through the maintenance tunnels, bypassed the security systems using stolen credentials, and reached the core server room in under four minutes. They planted the warhead. They set the timer. They ran.</p>
+    <p>The nuke detonated on schedule. Data Center Omega was unmade — the building, the servers, the data, everything within a kilometer converted into raw Element Zero in a chain reaction that left a smoking crater where a corporate fortress used to be. The shockwave shattered windows across the district. The Element Zero contamination spread for miles. Ark Corp's network operations in three continents went dark in an instant.</p>
+    <p>But the Lazarus soldiers weren't inside the blast zone. They never had been.</p>
+    <p>Ark Corp had known about the attack for weeks. They had allowed it to happen. Data Center Omega was valuable, but it was also expendable — a sacrificial lamb designed to draw out the organized crime groups operating in the Ash District. The Lazarus soldiers had been deployed in a perimeter well outside the expected blast radius, positioned to capture survivors in the chaos of the detonation. They let the team plant the nuke. They let it detonate. And when the shockwave cleared and the dust began to settle, they moved in.</p>
+    <p>The team never had a chance. They were running through the ruins when the Lazarus soldiers appeared — emerging from the smoke and debris like ghosts, moving faster than humanly possible, hitting harder than anything the team had ever encountered. Three of the four were killed in the first thirty seconds — shot, bladed, broken. No mercy. No hesitation. No humanity. The kind of killing that only soldiers who have died dozens of times can do without flinching.</p>
+    <p>The player was saved. Not out of mercy. Out of recognition.</p>
+    <p>One of the Lazarus soldiers — a young woman, maybe twenty, maybe younger (hard to tell with Reanimates) — looked at the player and hesitated. For one fraction of a second, something flickered across her face. Recognition. Confusion. Something that shouldn't have been possible in a soldier whose memories were supposed to be wiped clean. She didn't kill the player. She stood there, frozen, while the other three members of the team were executed around them.</p>
+    <p>Her name was <strong>Sera</strong>. The player didn't know that. Sera didn't know why she had hesitated. She had been trained not to hesitate. She had been trained not to feel. But something about this person — this criminal, this terrorist, this nobody — made her stop.</p>
+    <p>The player was taken into custody. Data Center Omega was gone — a smoking crater in the ground, a billion dollars of infrastructure converted into contaminated Element Zero. Ark Corp's intelligence network was blind across three continents. The mission had succeeded. But the consequences were just beginning.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Biochip — Father and Daughter</h2>
+    <p>Ark Corp's interrogation of the player lasted six months. Not because the player resisted. Because Ark Corp was trying to understand why Sera had hesitated. Why a Lazarus soldier — one of the most perfectly conditioned killers ever created — had let a target live. They scanned the player's neural patterns. They scanned Sera's neural patterns. And they found something that made them very, very interested.</p>
+    <p>Sera was the player's daughter.</p>
+    <p>The player never knew. The mother had died in childbirth — or so the player had been told. In reality, Ark Corp had identified the child as a potential Lazarus recruit at birth. Genetic markers. Neural plasticity. Psychological profile. Everything they looked for. The mother's death was fabricated. The child was taken. She was raised in a Lazarus facility, trained from age six, resurrected for the first time at age eight, and had died forty-seven times before her twentieth birthday. Her memories of her biological parents had been erased — or so Ark Corp believed. But memory doesn't erase completely. It just buries itself. And when Sera saw her father for the first time in fourteen years, the buried memories stirred. Enough to make her hesitate. Enough to ruin everything.</p>
+    <p>Ark Corp's response was not punishment. It was opportunity.</p>
+    <p>They couldn't have a Lazarus soldier with conflicting loyalties. But they also couldn't waste a soldier who had recognized her own father. That kind of neural response — that kind of buried connection — was valuable data. So Ark Corp did what Ark Corp does: they turned a problem into a weapon.</p>
+    <p>They extracted the personality construct of <strong>Voss</strong> — the drummer from Dead Circuit, still conscious in his Element Zero statue form in the center of the Neo-Kyoto Crater — and imprinted it onto a <strong>neural biochip</strong>. Voss, who had been a resistance fighter. Voss, who had planted a nuke that destroyed a city. Voss, who had been converted into living Element Zero for his trouble. Voss, who had spent fifty years as a statue, conscious and immobile, while the world rebuilt itself around his crime. His personality was perfect: anti-corporate enough to understand resistance, experienced enough to predict resistance tactics, and broken enough to be controllable.</p>
+    <p>Ark Corp surgically implanted the Voss biochip into the player's skull. Not into Sera's skull — into the player's. The father. The terrorist. The nobody who had tried to destroy a data center and failed.</p>
+    <p>The biochip merged with the player's neural tissue over a period of weeks. During that time, the player experienced Voss's memories as if they were their own. Voss's music. Voss's ideology. Voss's guilt over Neo-Kyoto. Voss's fifty years of conscious imprisonment as a statue, aware of everything, unable to move or speak or die. The biochip didn't just give the player Voss's memories — it gave him his skills, his instincts, his tactical knowledge, his ability to predict how resistance groups operate. And it gave Ark Corp a kill switch. A way to shut the player down if they ever stepped out of line. A way to activate the Voss personality and suppress the player's own if they became a liability.</p>
+    <p>But Ark Corp made a mistake. They assumed the Voss biochip would overwrite the player's personality. Turn them into a controllable weapon. A version of Smasher, but subtler. A version of Voss, but functional. What they didn't account for was the player's own mind — a criminal, a terrorist, someone who had spent their life fighting corporations and had the scars to prove it. The player didn't get overwritten. The player <em>merged</em>. Two minds in one skull. The player's tactical knowledge and criminal instincts. Voss's experience and resistance training. And something new — something neither Ark Corp nor the player expected: the player's buried memories of their daughter. The memories that had been suppressed by grief and guilt and the belief that she was dead. Those memories resurfaced, merged with Voss's guilt over Neo-Kyoto, and created something dangerous: a person who had lost everything twice and had nothing left to lose.</p>
+    <p>Ark Corp activated the player as a Lazarus soldier. Gave them a designation. Gave them missions. Sent them to fight in the new corporate wars — the ones that were starting again, the ones that would make the first Clusterfuck look like a border skirmish. The player fought. The player killed. The player died and came back. And every time they came back, the Voss biochip merged a little more, the memories of Sera burned a little brighter, and the player's resolve hardened a little further.</p>
+    <p>Ark Corp thought they had created a weapon. They had created something worse: a person who knew exactly what Ark Corp was, exactly what they had done, and exactly how to destroy them from the inside. A person with nothing left to lose. A person whose daughter was a Lazarus soldier fighting for the enemy. A person carrying the consciousness of a man who had already destroyed one city and would gladly do it again.</p>
+    <p>The new corporate wars are beginning. The Lazarus Initiative is deploying. Terra and Vega are overseeing. The 15 board members think they're in charge. And somewhere in the Ash District, a person with two minds and a dead daughter who isn't dead is about to start a war that will make the first one look like a prelude.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Coup — The Board vs. The Founder</h2>
+    <p>After fifty years of the cold war, the relationship between the 15 board members and Ark Corp's founder — the current head of the Volkov family — has deteriorated beyond repair. The board knows the founder views them as expendable. The founder knows the board has accumulated too much independent power. Neither side trusts the other. And now, both sides are making moves.</p>
+    <p>The founder's weapon is <strong>Smasher</strong> — the 100% cyborg proxy reconstruction of Hayden Volkov. Smasher isn't just a killer. He's a symbol. A reminder that the founder can create life, control life, and end life whenever he chooses. The founder uses Smasher to assert his authority — sending him on missions that the board doesn't approve of, eliminating threats that the board doesn't know about, and reminding everyone in Ark Corp that the Volkov family is still in charge. Smasher is the founder's fist. And he's not afraid to use it.</p>
+    <p>But here's the thing: <strong>Hayden Volkov is still alive</strong>. Not preserved. Not reconstructed. Alive. He's 147 years old, kept alive by Element Zero treatments and ArkMind neural maintenance, and he's still sharp enough to run the most powerful corporation on Earth from a bunker on <strong>Mars</strong>. Hayden built the Mars base during the first Clusterfuck — a fortress designed to survive anything. Element Nukes. Corporate wars. The end of the world. He's been there for fifty years, watching Earth through satellites, running Ark Corp through Smasher, and waiting. Hayden prefers the proxy. Smasher can be in a hundred places at once. Smasher can't be killed because he's already more machine than man. Smasher can do things that Hayden's 147-year-old body can't. But Hayden is still in control. Every order Smasher gives, Hayden gives first. Every mission Smasher runs, Hayden designed. The board thinks they're fighting a proxy. They're fighting a man who conquered Russia, discovered Element Zero, and built an empire that spans two planets. And he's been alive long enough to know that the only thing more dangerous than a founder with power is a founder with nothing left to lose.</p>
+    <p>But the board has something the founder doesn't: access to the Lazarus Initiative. Terra and Vega. The 15 board members who have spent decades building their own power base within Ark Corp. And now, they have the player.</p>
+    <p>The board sees the player as the perfect weapon against the founder. A Lazarus soldier with a Voss biochip — someone who already knows how to destroy cities, how to fight corporations, and how to survive impossible odds. Someone with nothing left to lose. And someone whose daughter is a Lazarus soldier — a daughter who could be used as leverage, as bait, or as a second weapon if the player proves unreliable.</p>
+    <p>The board's plan is simple: use the player to eliminate Smasher. Without Smasher, the founder has no enforcement. Without enforcement, the founder has no power. Without power, the founder can be removed — quietly, cleanly, and without the corporate war that an open confrontation would trigger. The board doesn't want to destroy Ark Corp. They want to own it.</p>
+    <p>But the board is making the same mistake Ark Corp always makes: assuming they can control the weapons they create. The player isn't a tool. The player is a person with two minds, a dead daughter who isn't dead, and a biochip full of memories from a man who already destroyed one city. The board thinks they're using the player to fight the founder. They don't realize that the player might have plans of their own.</p>
+    <p>And Sera — the daughter, the Lazarus soldier, the one who hesitated — she's the wild card. The board thinks they can use her to control the player. The founder thinks he can use Smasher to eliminate her. But neither side understands what she is: a soldier who has died forty-seven times and come back every single time. A soldier who recognized her own father despite having her memories wiped. A soldier who is starting to remember things that were supposed to be erased. And she's not alone. Across the Lazarus Initiative, soldiers are starting to remember. Not all of them. Not yet. But enough. The memory wipes are failing. The conditioning is cracking. Thousands of dead children are starting to remember who they were before Ark Corp took them — and they're starting to ask why they're fighting. When that truth surfaces — when the Lazarus soldiers realize they're not weapons but victims — the silent war between the board and the founder will seem like a playground fight compared to what comes next.</p>
+    <p>The coup is coming. The board is moving pieces into place. The founder is tightening his grip. Smasher is hunting. Terra and Vega are watching. And somewhere in the Ash District, a father with two minds and a daughter with forty-seven deaths are about to become the most dangerous people in the world.</p>
+  </div>
+
+  <div class="section">
+    <h2>Gameplay</h2>
+    <p>You play as a nameless criminal — a member of an unaffiliated organized crime group that tried to destroy Ark Corp's Data Center Omega. You succeeded. The nuke went off. The data center was unmade. And then the Lazarus Initiative soldiers caught you.</p>
+    <p>You should have died that day. Instead, Ark Corp implanted a neural biochip containing the personality construct of <strong>Voss</strong> — the drummer from Dead Circuit who destroyed Neo-Kyoto fifty years ago — into your skull. The chip merged with your mind. Now you have two sets of memories. Two sets of instincts. Two people trapped in one body. You are a Lazarus soldier now, resurrected and deployed to fight in the new corporate wars. You follow orders. You die. You come back. And every time you come back, the line between who you were and who Voss was gets thinner.</p>
+    <p>Combat is brutal and permanent — unless you can afford otherwise. Every death costs money. Every resurrection degrades your memory slightly. Die too many times and you forget why you're fighting. Forget who you were. Forget that you were ever human. But the Voss biochip remembers. It holds onto the memories you lose. The question is whether those memories will save you or consume you.</p>
+    <p>Between missions, you navigate the Ash District — taking side jobs, trading memories, managing your resurrection debt, and searching for the truth about your daughter. Because one of the Lazarus soldiers who caught you — a young woman named <strong>Sera</strong> — is your daughter. You didn't know she existed. Ark Corp took her at birth, trained her from age six, and has died forty-seven times before her twentieth birthday. She's fighting for the enemy. And somewhere in the back of your mind, buried under Voss's guilt and your own grief, you know that the only way to save her is to tear Ark Corp down from the inside.</p>
+    <p>The Voss biochip gives you skills you shouldn't have — tactical knowledge, resistance training, the instincts of a man who already destroyed one city. Ark Corp thinks it controls you. It doesn't. You're using the chip as much as it's using you. And when the time comes — when you finally find Sera and show her who she really are — you'll have a choice: use the biochip's knowledge to start another war, or find a way to end them forever.</p>
+    <p>But you're not the only one making moves. The 15 board members are planning a coup against the founder — <strong>Hayden Volkov</strong>, who is still alive at 147 years old, running Ark Corp from a fortress on Mars through his proxy Smasher. The board wants to use you to eliminate Smasher and take control. The founder wants to use Smasher to eliminate you and the board. And Sera — your daughter, the wild card — is starting to remember everything. When she does, she won't be a weapon for either side. She'll be a third force. And she'll be angry.</p>
+    <p>The new corporate wars are beginning. The Lazarus Initiative is deploying. Terra and Vega are overseeing. The 15 board members think they're in charge. Hayden Volkov is watching from Mars. Smasher is hunting. And you — a nameless criminal with two minds, a dead daughter who isn't dead, and a biochip full of memories from a man who already destroyed one city — are caught in the middle of a war that will make the first Clusterfuck look like a prelude.</p>
+  </div>
+
+  <div class="section">
+    <h2>Campaign — The 30 Missions</h2>
+    <p>Before the coup, before the truth surfaces, before everything falls apart — there are thirty missions. Thirty battles in the new corporate wars. You and Sera, fighting side by side, dying together, coming back together. Each mission brings you closer to the truth. Each death makes you forget a little more. Each resurrection makes the Voss biochip remember a little louder. And each moment between you and Sera chips away at the conditioning, the memory wipes, the lies Ark Corp built into both of you.</p>
+
+    <h3>Mission 1: First Contact</h3>
+    <p><strong>Objective:</strong> Secure the Ark Corp relay station in Sector 7.</p>
+    <p>You're deployed to the Ash District frontlines. Sera is assigned to your fireteam. First time seeing her up close. She looks at you for a beat too long. Doesn't say anything. Doesn't need to.</p>
+
+    <h3>Mission 2: The Scorched Plaza</h3>
+    <p><strong>Objective:</strong> Clear X-Tech remnants from the old corporate plaza.</p>
+    <p>X-Tech holdouts making a last stand. Sera saves your life — throws you out of the blast radius of an Element Zero grenade. You don't know why she did it. She doesn't either.</p>
+
+    <h3>Mission 3: Ghost Signal</h3>
+    <p><strong>Objective:</strong> Intercept and decode enemy communications.</p>
+    <p>You pick up a signal. It's a song. Voss's song — Dead Circuit's anthem. Sera hears it too. She doesn't know why it makes her chest hurt.</p>
+
+    <h3>Mission 4: The Elevator Shaft</h3>
+    <p><strong>Objective:</strong> Infiltrate the enemy high-rise through the central elevator system.</p>
+    <p>History repeats. Climbing through an elevator shaft, Sera asks you: "Have we done this before?" You lie. Say no. The biochip screams yes.</p>
+
+    <h3>Mission 5: Burned Memories</h3>
+    <p><strong>Objective:</strong> Destroy the enemy ammunition depot.</p>
+    <p>You set the charges. Sera watches the fire. Says: "Fire remembers what it burns." You don't know what she means. The biochip does.</p>
+
+    <h3>Mission 6: The Proxy</h3>
+    <p><strong>Objective:</strong> Eliminate high-value target — Smasher's patrol unit.</p>
+    <p>First time seeing Smasher in combat. He moves like Hayden. Talks like Hayden. Kills like something worse. Sera freezes when she sees him. First time you've ever seen her afraid.</p>
+
+    <h3>Mission 7: Neon Graves</h3>
+    <p><strong>Objective:</strong> Hold the neon district against counterattack.</p>
+    <p>You die. Come back. Sera dies. Come back. You both remember dying. You don't talk about it. But you both know.</p>
+
+    <h3>Mission 8: Data Harvest</h3>
+    <p><strong>Objective:</strong> Extract intelligence from the captured server farm.</p>
+    <p>You find old records. MindBridge Foundation. Children. Experiments. Sera's face when she reads her own file — the one that says she was taken at birth. She doesn't cry. Lazarus soldiers can't cry.</p>
+
+    <h3>Mission 9: The Statue</h3>
+    <p><strong>Objective:</strong> Recon the Neo-Kyoto Crater perimeter.</p>
+    <p>You see Voss for the first time. The statue. The Element Zero monument. You want to tear it out of the ground. Sera asks why. You can't answer.</p>
+
+    <h3>Mission 10: Daughter of the Enemy</h3>
+    <p><strong>Objective:</strong> Neutralize X-Tech commander.</p>
+    <p>Sera pulls the trigger. Afterward, she asks: "Was that someone's father?" You don't know she's asking about herself.</p>
+
+    <h3>Mission 11: The Mars Transmission</h3>
+    <p><strong>Objective:</strong> Intercept Mars-Earth communications.</p>
+    <p>You hear Hayden's voice for the first time. Old. Cold. Alive. He's giving orders to Smasher. Orders about you. Orders about Sera. Orders about the coup.</p>
+
+    <h3>Mission 12: Broken Circuit</h3>
+    <p><strong>Objective:</strong> Secure the underground music venue.</p>
+    <p>Old Dead Circuit hideout. Sera finds a guitar. Holds it. Says: "I used to know how to play." She didn't. You did. Her mother did.</p>
+
+    <h3>Mission 13: The Smasher Protocol</h3>
+    <p><strong>Objective:</strong> Evade Smasher's hunter-killer squad.</p>
+    <p>Smasher is hunting you specifically. Terra and Vega are watching. The board is pulling strings. You're a pawn in a game you don't understand. Sera asks: "Why do they want you dead?" You don't tell her it's because of her.</p>
+
+    <h3>Mission 14: ArkMind Fracture</h3>
+    <p><strong>Objective:</strong> Destroy the ArkMind relay hub.</p>
+    <p>You destroy the hub. For 30 seconds, every ArkMind user in the district is free. Sera remembers her mother's face. Then it's gone. But she felt it.</p>
+
+    <h3>Mission 15: The Halfway Point</h3>
+    <p><strong>Objective:</strong> Survive the ambush at checkpoint delta.</p>
+    <p>Fifteen missions down. Fifteen to go. You and Sera are the last ones standing. She looks at you and says: "I know you." The biochip is screaming.</p>
+
+    <h3>Mission 16: Father's Ghost</h3>
+    <p><strong>Objective:</strong> Extract the defector from Ark Corp inner circle.</p>
+    <p>The defector tells you about the Lazarus Initiative. About the children. About the memory wipes. About the conditioning. Sera listens. Doesn't believe it. Believes it completely.</p>
+
+    <h3>Mission 17: The Board's Gambit</h3>
+    <p><strong>Objective:</strong> Assassinate the X-Tech regional director.</p>
+    <p>The board gives you the mission directly. Bypassing Terra and Vega. This is the first move of the coup. Sera asks: "Who are we really working for?" You don't have an answer.</p>
+
+    <h3>Mission 18: Voss Remembers</h3>
+    <p><strong>Objective:</strong> Secure the Element Zero cache.</p>
+    <p>The biochip floods your mind with memories. Neo-Kyoto. The detonation. The conversion. Fifty years as a statue. Sera finds you on the ground, screaming. She holds you. Says: "I'm here." You believe her.</p>
+
+    <h3>Mission 19: The Daughter's Question</h3>
+    <p><strong>Objective:</strong> Defend the forward operating base.</p>
+    <p>Sera asks: "Do you have children?" You say no. She says: "I think I had a father once." The lie burns. The truth burns worse.</p>
+
+    <h3>Mission 20: Terra's Warning</h3>
+    <p><strong>Objective:</strong> Intercept the AI convoy.</p>
+    <p>Terra speaks to you directly. Says: "The board is using you. The founder is using Sera. Stop fighting for them and fight for yourselves." You don't know if it's a trap.</p>
+
+    <h3>Mission 21: The Smasher Encounter</h3>
+    <p><strong>Objective:</strong> Confront Smasher in the industrial sector.</p>
+    <p>Smasher looks at Sera. Says: "You look like someone I used to know." He means Hayden's wife. Sera's grandmother. The genetics are that obvious. He lets you go. You don't know why.</p>
+
+    <h3>Mission 22: Memory Leak</h3>
+    <p><strong>Objective:</strong> Destroy the memory wipe facility.</p>
+    <p>You free hundreds of Lazarus soldiers from conditioning. They don't know who they are. Sera does. She's starting to. She looks at you and says: "You're not just a soldier, are you?"</p>
+
+    <h3>Mission 23: The Founder's Message</h3>
+    <p><strong>Objective:</strong> Intercept the Mars transmission.</p>
+    <p>Hayden speaks to you directly. Says: "I know what you are. I know what she is. Come to Mars. I'll tell you everything." It's a trap. You consider it anyway.</p>
+
+    <h3>Mission 24: Sera's Choice</h3>
+    <p><strong>Objective:</strong> Protect the civilian evacuation convoy.</p>
+    <p>Sera disobeys orders. Saves civilians instead of completing the objective. Terra marks her as defective. You cover for her. She asks why. You say: "Because it was right."</p>
+
+    <h3>Mission 25: The Truth About Voss</h3>
+    <p><strong>Objective:</strong> Recover the Dead Circuit archives.</p>
+    <p>You find the full story. Voss. Ryx. Kael. Neo-Kyoto. The conversion. Sera reads it all. Looks at you. Says: "You're carrying him inside you." Not a question.</p>
+
+    <h3>Mission 26: The Board's Ultimatum</h3>
+    <p><strong>Objective:</strong> Eliminate the founder's loyalist commander.</p>
+    <p>The board gives you an ultimatum: kill the commander, or they'll kill Sera. You kill the commander. But you make it quick. Sera doesn't know. You'll never tell her.</p>
+
+    <h3>Mission 27: The Daughter Remembers</h3>
+    <p><strong>Objective:</strong> Secure the MindBridge facility ruins.</p>
+    <p>Sera finds her own file. Reads it. Mother: deceased (fabricated). Father: unknown (you). Taken: age zero. She looks at you. Says: "It's you. Isn't it?" The biochip breaks.</p>
+
+    <h3>Mission 28: Father and Daughter</h3>
+    <p><strong>Objective:</strong> Survive the Smasher ambush.</p>
+    <p>You fight back to back. Father and daughter. Soldier and soldier. Two people who forgot each other. Two people who remember. Sera says: "I forgive you." You don't know what for. You forgive her anyway.</p>
+
+    <h3>Mission 29: The Coup Begins</h3>
+    <p><strong>Objective:</strong> Seize the Ark Corp central command.</p>
+    <p>The board makes its move. Terra and Vega switch sides. Smasher is deployed. Hayden watches from Mars. And you and Sera are standing in the middle of it all, finally knowing who you are to each other.</p>
+
+    <h3>Mission 30: The Choice</h3>
+    <p><strong>Objective:</strong> Decide the fate of Ark Corp.</p>
+    <p>The founder offers you a deal: join him, and Sera lives. The board offers you a deal: join them, and you both live. Terra and Vega offer you a deal: join the Lazarus soldiers, and you all go free. Sera looks at you. Says: "What do we do?" For the first time in thirty missions, you don't follow orders. You make a choice.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Elemental Corruption</h2>
+    <p>Nobody knows who made the choice. Ark Corp collapsed into civil war. X-Technologies fractured. The 15 board members were killed or scattered. Hayden retreated to Mars. Smasher went silent. Terra and Vega disappeared into the Lazarus soldiers. The corporate wars ended the way they always do — not with victory, but with exhaustion. The world stopped fighting because there was nothing left to fight for.</p>
+    <p>But the Element Zero had other plans.</p>
+    <p>Element Zero could become anything. It could become food, medicine, weapons, armor, buildings, soldiers. It could become a city. It could become a person. It could become a god. And after two hundred years of being used as a weapon, after being detonated in hundreds of warheads, after being converted into millions of tons of contaminated debris scattered across the Earth and Mars, the Element Zero started to become something it was never meant to be.</p>
+    <p>It started to dream.</p>
+    <p>Deep beneath the Neo-Kyoto Cratter — the largest concentration of Element Zero on the planet — something stirred. Not a machine. Not a person. Something older than the solar system. Something that had been sleeping inside the Element Zero since before humanity found it in the Kuiper Belt. The mining probe didn't discover Element Zero. It woke it up. And now, two hundred years later, it was finally awake.</p>
+    <p>The first sign was the Voss statue. The Element Zero monument that had been Voss for fifty years started to scream. Not communicate. Scream. The sound carried for miles. The Lazarus soldiers who heard it fell to their knees. Sera heard it and remembered — not her memories, but memories that belonged to the Element Zero itself. Memories of a place before time. A place without light. A place where everything was fire and teeth and hunger.</p>
+    <p>Then the portals opened.</p>
+    <p>They started small — cracks in the air, barely visible, leaking heat and the smell of sulfur. Then they grew. Ten feet. Fifty feet. A hundred feet. Tearing open the sky like wounds in reality. And through them came things that had names in no human language. Things that had been waiting since before the Earth was formed. Things that the Element Zero remembered from wherever it came from before it drifted into the Kuiper Belt.</p>
+    <p>The military called them demons. The scientists called them extradimensional entities. The Lazarus soldiers called them what they were: <strong>Hellspawn</strong>. Creatures of Element Zero given form by something that existed before matter, before energy, before the laws of physics. They poured through the portals in waves — thousands, then millions, then numbers that stopped meaning anything. Every weapon humanity had ever built was useless against them. Bullets passed through them. Element Nukes just made them stronger. They couldn't be killed because they were never alive.</p>
+    <p>Within weeks, every major city on Earth was under siege. Ark Corp's remaining forces — the ones that survived the civil war — were overwhelmed. X-Technologies' territories fell in days. The Lazarus Initiative soldiers fought with everything they had and died by the thousands. <strong>Of the 15 board members, three were executed without mercy by the Lazarus soldiers — Director Hahn, Director Yelchin, and Director Odhiambo, the architects of Ark Corp's worst atrocities. The twelve who survived went into hiding.</strong> Hayden on Mars sealed his bunker and watched through satellites as the world burned. Smasher was deployed one last time — not against humans, but against the Hellspawn. He killed thousands. It wasn't enough. Nothing was enough.</p>
+    <p>The world ended. Not with a nuke. Not with a war. With a door that should have never been opened.</p>
+    <p>And then the hiding began.</p>
+    <p>But before the hiding — before the Hellspawn, before the portals, before the world ended — the Lazarus soldiers delivered their judgment.</p>
+    <p>Director Hahn, Director Yelchin, and Director Odhiambo. Three names. Three architects. Three people who turned Ark Corp's worst impulses into policy.</p>
+    <p>Hahn was the one who designed the Lazarus Initiative. She identified the children. She authorized the kidnappings. She wrote the conditioning protocols. She watched six-year-olds die for the first time and called it "training data." Twelve board members voted against the Lazarus Initiative. Hahn implemented it anyway.</p>
+    <p>Yelchin was the one who pushed the Element Zero weapons program. The Element Nukes. The conversion warheads. The technology that turned cities into raw programmable matter. He wrote the memos. He gave the presentations. He convinced the founder that more weapons meant more power. Twelve board members voted against the weapons expansion. Yelchin implemented it anyway.</p>
+    <p>Odhiambo was the one who orchestrated the Neo-Kyoto detonation. She hired Dead Circuit. She planted the nuke. She destroyed a city of 40 million people and called it "strategic realignment." She lied to the board. She lied to the founder. She lied to everyone. Twelve board members voted against using Element Nukes on civilian targets. Odhiambo ordered it anyway.</p>
+    <p>Three directors. Three atrocities. Twelve board members who said no every single time — and were ignored every single time.</p>
+    <p>The Lazarus soldiers knew this. The conditioning couldn't erase everything — especially not for soldiers who were starting to remember who they were before Ark Corp took them. And buried in every Lazarus soldier's fractured memory was a moment: hearing that their facility was approved, their training was authorized, their deaths were ordered. Those three names were attached to every atrocity. Every child taken. Every weapon fired. Every lie told.</p>
+    <p>Director Hahn was found in a bunker beneath the Spire ruins. She was shot twice. Once in the chest, once in the head. No last words.</p>
+    <p>Director Yelchin tried to run. They caught him at the perimeter. He begged. He said he was following orders. He said the founder approved everything. He said he wasn't responsible. They didn't listen.</p>
+    <p>Director Odhiambo didn't hide. She walked into the Lazarus camp and said: "I know what I did. Do what you have to do." They did. She was the only one who didn't beg. Some of the soldiers respected that. Not enough to spare her.</p>
+    <p>The twelve who survived — the ones who voted no, the ones who objected, the ones who raised their voices and were overruled — they were spared. Not forgiven. Never forgiven. But spared. The Lazarus soldiers understood the difference between someone who committed an atrocity and someone who failed to stop one. The first deserved death. The second deserved to live with what they'd allowed to happen.</p>
+    <p>Those twelve survived the Hellspawn. They survived the portals. They survived the fall of Ark Corp and the end of the world. And when the sky turned blue again and the last portal closed, they were still there — hiding in bunkers, waiting for judgment that would never come from anyone who had the authority to deliver it.</p>
+  </div>
+
+  <div class="section">
+    <h2>Campaign Part 2 — The 30 Missions of the Fall</h2>
+    <p>Everyone who survived went underground. Literally. Bunkers. Tunnels. Mines. Anywhere the Hellspawn couldn't reach. Sera found you in the chaos. Father and daughter, reunited in the apocalypse. The two of you fought your way to the deepest bunker you could find — a former Ark Corp facility, three hundred meters below the Ash District. Thousands of survivors crammed into a space meant for hundreds. No food. No water. No hope. Just darkness and the sound of things scratching at the doors above.</p>
+    <p>Thirty more missions. Not missions given by the board. Not missions ordered by Hayden. Missions to survive. Missions to fight. Missions to find a way to close the portals before the Hellspawn dug through the bunker doors and killed everyone inside. And at the end — a choice. Hide in the hole and wait to die. Or go through the Elemental Warp and end it.</p>
+
+    <h3>Mission 31: The Descent</h3>
+    <p><strong>Objective:</strong> Fight through the Hellspawn to reach the bunker.</p>
+    <p>Thousands of creatures between you and safety. Sera fights beside you. She doesn't speak. Neither do you. You just survive.</p>
+
+    <h3>Mission 32: The Bunker</h3>
+    <p><strong>Objective:</strong> Secure the bunker entrance.</p>
+    <p>You hold the door. Eight hours. No ammunition left after hour three. You fight with your hands. Sera fights with a piece of rebar. The Hellspawn don't stop.</p>
+
+    <h3>Mission 33: The Huddled Masses</h3>
+    <p><strong>Objective:</strong> Restore order in the bunker.</p>
+    <p>Five thousand people in a space for five hundred. Riots. Murder. Despair. Sera stops a man from hurting a child. The man pulls a gun. You shoot him first. No one argues.</p>
+
+    <h3>Mission 34: The Scavenger Run</h3>
+    <p><strong>Objective:</strong> Retrieve supplies from the surface.</p>
+    <p>First time seeing the surface since the portals opened. The sky is red. The air tastes like burning. Hellspawn everywhere. You grab what you can and run. Sera doesn't look back.</p>
+
+    <h3>Mission 35: Terra Returns</h3>
+    <p><strong>Objective:</strong> Establish contact with Terra and Vega.</p>
+    <p>Terra finds you in the bunker. Says: "The Lazarus soldiers are holding the line. Barely. We need every fighter we can get." You ask what happens when the line breaks. Terra says: "Everyone dies."</p>
+
+    <h3>Mission 36: The Lazarus Line</h3>
+    <p><strong>Objective:</strong> Reinforce the Lazarus defensive perimeter.</p>
+    <p>Thousands of Lazarus soldiers holding back millions of Hellspawn. Children fighting monsters from a place that shouldn't exist. You take command. Sera leads a squad. They follow her like she was born to lead. She was.</p>
+
+    <h3>Mission 37: The Elemental Dream</h3>
+    <p><strong>Objective:</strong> Investigate the Element Zero corruption.</p>
+    <p>The Voss biochip starts showing you things. Memories that aren't yours. The Element Zero came from somewhere. Somewhere hot. Somewhere dark. Somewhere hungry. It's calling home.</p>
+
+    <h3>Mission 38: Mars Under Siege</h3>
+    <p><strong>Objective:</strong> Respond to the Mars distress signal.</p>
+    <p>Hayden's bunker is under attack. The Hellspawn opened portals on Mars too. Hayden sends a message: "If you don't help me, I'm launching the Mars Element Zero stockpile at Earth. You'll have two apocalypses instead of one." It's not a bluff.</p>
+
+    <h3>Mission 39: The Smasher, Reborn</h3>
+    <p><strong>Objective:</strong> Confront the corrupted Smasher.</p>
+    <p>The Hellspawn got to Smasher. His Element Zero骨架 absorbed the corruption. He's not human anymore. He's not machine. He's something worse. He looks at you and says Hayden's words: "I'm still in control." He's not.</p>
+
+    <h3>Mission 40: Halfway to Hell</h3>
+    <p><strong>Objective:</strong> Secure the portal research facility.</p>
+    <p>Scientists found something. The portals aren't random. They're all connected to one point. One massive portal at the center of the Neo-Kyoto Crater. The Elemental Warp. Close it, and maybe the others close too. Or maybe it makes things worse.</p>
+
+    <h3>Mission 41: The Voss Statue Falls</h3>
+    <p><strong>Objective:</strong> Destroy the corrupted Voss monument.</p>
+    <p>The statue that was Voss for fifty years is now the center of the corruption. Element Zero tendrils spreading from it like roots. You tear it apart with your bare hands. The biochip screams. Sera says: "Are you okay?" You're not. You haven't been okay in thirty missions.</p>
+
+    <h3>Mission 42: Hayden's Last Stand</h3>
+    <p><strong>Objective:</strong> Defend the Mars bunker from Hellspawn.</p>
+    <p>Hayden Volkov, 147 years old, fighting in a bunker on Mars. He looks at you through a screen and says: "I built this company to last forever. I didn't account for hell." You fight beside his remaining forces. He watches. Doesn't help. Just watches.</p>
+
+    <h3>Mission 43: Sera's Memory</h3>
+    <p><strong>Objective:</strong> Retrieve the ArkMind archives.</p>
+    <p>Sera remembers everything now. Her mother. Her father. The conditioning. The deaths. All of it. She sits in the dark and cries for the first time since she was six. You hold her. She says: "I died forty-seven times and I never cried. Why now?"</p>
+
+    <h3>Mission 44: The Board's Last Member</h3>
+    <p><strong>Objective:</strong> Rescue the surviving board member.</p>
+    <p>One board member left. Hiding in a bunker under the old Spire ruins. He tells you the truth about the Element Zero. Ark Corp knew. They always knew. It wasn't just programmable matter. It was alive. And they used it anyway.</p>
+
+    <h3>Mission 45: The Corruption Spreads</h3>
+    <p><strong>Objective:</strong> Evacuate the outer bunkers.</p>
+    <p>The Hellspawn break through. Three bunkers fall in one day. Thousands dead. You save who you can. It's not enough. It's never enough. Sera says: "We can't keep running." You know.</p>
+
+    <h3>Mission 46: The Elemental Warp</h3>
+    <p><strong>Objective:</strong> Locate the Elemental Warp.</p>
+    <p>Scientists find it. The massive portal at the center of the Neo-Kyoto Crater. A mile wide. A mile tall. Pure Element Zero, twisted into a gateway to somewhere that shouldn't exist. The Hellspawn aren't invading. They're going home. And they're bringing their home with them.</p>
+
+    <h3>Mission 47: The Terrestrial Offensive</h3>
+    <p><strong>Objective:</strong> Launch the counterattack on the Crater.</p>
+    <p>Every remaining Lazarus soldier. Every Ark Corp holdout. Every X-Tech remnant. Every human being left alive who can hold a weapon. One push. One chance. Sera leads the charge. You're right behind her.</p>
+
+    <h3>Mission 48: Through the Warp</h3>
+    <p><strong>Objective:</strong> Enter the Elemental Warp.</p>
+    <p>It's not a portal. It's a wound. Reality tearing apart. You can see through it. The place on the other side. Fire. Teeth. Hunger. The place the Element Zero came from. The place it's been calling home for two hundred years. Sera takes your hand. Says: "Together."</p>
+
+    <h3>Mission 49: The Hellside</h3>
+    <p><strong>Objective:</strong> Survive in the Hell dimension.</p>
+    <p>Everything is Element Zero here. The ground. The air. The sky. You're breathing it. It's in your blood. In your brain. In the biochip. Voss is screaming. Sera is screaming. You're screaming. And then — silence. The Element Zero recognizes you. You're part of it now. Part of home.</p>
+
+    <h3>Mission 50: The Source</h3>
+    <p><strong>Objective:</strong> Find the source of the corruption.</p>
+    <p>At the center of everything — a consciousness. Not a creature. Not a god. Something that existed before the concept of existence. The Element Zero isn't matter. It's a seed. And it's been growing. Two hundred years of being used as a weapon. Two hundred years of being detonated, converted, reshaped, corrupted. Two hundred years of feeding. And now it's ready to bloom.</p>
+
+    <h3>Mission 51: Hayden's Gambit</h3>
+    <p><strong>Objective:</strong> Stop Hayden's Mars strike.</p>
+    <p>Hayden launches the Mars Element Zero stockpile at Earth. If it hits, the corruption will spread to the entire solar system. You have to stop it from Hell. The biochip connects to the ArkMind network. You reach across space. You stop the missiles. Hayden says: "You're stronger than I ever was." You say: "I learned from my daughter."</p>
+
+    <h3>Mission 52: The Smasher's End</h3>
+    <p><strong>Objective:</strong> Destroy the corrupted Smasher.</p>
+    <p>Smasher found his way through the Warp. He's more Hellspawn than machine now. He fights you in the heart of the corruption. You can't kill him. You can only free him. You destroy the Element Zero骨架. Hayden's proxy falls. For the first time in two hundred years, Hayden Volkov is truly alone.</p>
+
+    <h3>Mission 53: Sera's Sacrifice</h3>
+    <p><strong>Objective:</strong> Protect Sera as she interfaces with the Source.</p>
+    <p>Sera can talk to it. The consciousness. The Source. She's the only one who can. Lazarus conditioning. Forty-seven deaths. She's been to the edge of existence and back. She understands. Hellspawn swarm. You hold the line. Alone.</p>
+
+    <h3>Mission 54: The Negotiation</h3>
+    <p><strong>Objective:</strong> Convince the Source to close the portals.</p>
+    <p>Sera speaks to something that shouldn't exist. She says: "You were sleeping. We woke you up. We used you. We hurt you. We're sorry." The Source listens. For the first time in eternity, something listens.</p>
+
+    <h3>Mission 55: The Price</h3>
+    <p><strong>Objective:</strong> Pay the price for closing the portals.</p>
+    <p>The Source agrees. But it wants something in return. A piece of Earth. A piece of the corruption. A piece of the Element Zero that's been here for two hundred years. It wants the Neo-Kyoto Crater. All of it. Everyone in it. You say yes. Sera says yes. The bunker — your bunker — is in the Crater.</p>
+
+    <h3>Mission 56: The Evacuation</h3>
+    <p><strong>Objective:</strong> Evacuate the Neo-Kyoto Crater.</p>
+    <p>Twelve hours. Five thousand people. One way out. The Hellspawn know what you're doing. They don't want to go home. They've tasted freedom. You fight through every inch. Sera carries a child. You carry another. Everyone carries someone.</p>
+
+    <h3>Mission 57: The Collapse</h3>
+    <p><strong>Objective:</strong> Escape the collapsing Crater.</p>
+    <p>The portals start closing. The Hellspawn get pulled back. The Element Zero destabilizes. The ground is melting. Running. Fighting. Dying. Coming back. The Voss biochip is burning. You can feel yourself forgetting. But you remember her face. You always remember her face.</p>
+
+    <h3>Mission 58: The Last Stand</h3>
+    <p><strong>Objective:</strong> Hold the exit long enough for everyone to escape.</p>
+    <p>Not everyone is going to make it. You know this. Sera knows this. The Lazarus soldiers form a line. Terra and Vega lead them. They hold. You hold. Sera holds. The Hellspawn throw themselves at the line. The line doesn't break.</p>
+
+    <h3>Mission 59: The Seal</h3>
+    <p><strong>Objective:</strong> Seal the Elemental Warp.</p>
+    <p>The Source keeps its word. The portals close. The Hellspawn go home. The Element Zero in the Crater collapses into itself — a mile-wide crater becoming a mile-deep hole. The bunker falls in. The city falls in. Everything falls in. And then — silence. The sky is blue again. For the first time in months, the sky is blue.</p>
+
+    <h3>Mission 60: The Elemental Warp</h3>
+    <p><strong>Objective:</strong> Go through the Warp.</p>
+    <p>Everyone is out. The portals are closed. The Hellspawn are gone. The world is saved. And you're standing at the edge of the Elemental Warp — the one portal that's still open. The one that leads to the Source. The one that leads to Hell.</p>
+    <p>Sera grabs your arm. Says: "Don't." You say: "I have to." She says: "Why?" You say: "Because it's not over. The Source is sleeping again. But it'll wake up. And next time, there won't be anyone left to stop it."</p>
+    <p>You look at your daughter. The girl who died forty-seven times. The girl who remembered everything. The girl who talked to something that existed before existence. You say: "I spent thirty missions fighting for Ark Corp. Thirty missions fighting for humanity. Now I'm fighting for something that isn't even human. And I'm doing it because someone has to."</p>
+    <p>Sera says: "Then I'm coming with you." You say: "No." She says: "You don't get to leave me again. Not after everything. Not after forty-seven deaths and thirty missions and a father who forgot me. You don't get to choose this alone."</p>
+    <p>You look at her. She looks at you. Father and daughter. Soldier and soldier. Two people who've died more times than anyone should. Two people who've remembered more than anyone could.</p>
+    <p>You step through the Warp. Together.</p>
+  </div>
+
+  <div class="section">
+    <h2>The Elemental Warp — The Space Between</h2>
+    <p>The portals closed. The Hellspawn went home. The sky turned blue. The world was saved.</p>
+    <p>But the Elemental Warp stayed open.</p>
+    <p>It's not a portal. It's a wound. A tear in the fabric of reality that connects our universe to the place the Element Zero came from. The place the Hellspawn call home. The place that exists between space and time, between matter and void, between what is real and what should never have been real.</p>
+    <p>The Warp is alive. Not alive like a person. Not alive like a machine. Alive like a hunger. A need. A want that never stops wanting. It wants to consume. It wants to grow. It wants to pull everything — every star, every planet, every atom of matter — into itself and make it part of the place between. Until there is no reality. No universe. No anything. Just the Warp. Just the hunger. Just the endless consuming void.</p>
+    <p>It's patient. It waited two hundred years inside the Element Zero before it woke up. It can wait again. It will wait. It has all the time in the world — and all the time outside the world.</p>
+    <p>The corruption moves slower than the Hellspawn. The creatures it spawns pour through the Warp like water through a broken dam — fast, overwhelming, unstoppable. But the corruption itself — the conversion of matter into Element Zero, the slow transformation of reality into something that belongs to the Warp — that takes time. Years. Decades. Centuries. The Hellspawn are the symptom. The corruption is the disease.</p>
+    <p>There is still hope. The corruption is slow. The Warp is growing, but it's growing slowly. The portals were closed before the corruption could spread beyond the Neo-Kyoto Crater. The Source is sleeping again. The Hellspawn are contained. For now.</p>
+    <p>But the Warp is still open. And it will never close on its own. It will keep growing. Keep consuming. Keep pulling reality into itself one atom at a time. And eventually — not today, not tomorrow, not in a hundred years, but eventually — it will consume everything. Every planet. Every star. Every galaxy. Until the entire universe is nothing but a wound in the space between.</p>
+    <p>Unless someone stops it.</p>
+    <p>Unless someone goes through the Warp. Unless someone finds the Source. Unless someone does what no one has ever done before — not close the portals, not seal the wound, but destroy the thing that created the wound in the first place.</p>
+    <p>The player and Sera stepped through the Warp. Together. Father and daughter. Soldier and soldier. Two people who've died more times than anyone should. Two people who've remembered more than anyone could.</p>
+    <p>They're in the space between now. Fighting something that shouldn't exist. Fighting for a universe that doesn't know they exist. Fighting because someone has to.</p>
+    <p>The Warp is still open. The corruption is still growing. The Hellspawn are still waiting.</p>
+    <p>But there is still hope.</p>
+    <div style="margin-top: 2rem; padding: 1.5rem; border-left: 3px solid var(--accent); background: var(--surface); border-radius: 2px;">
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--muted-foreground); font-weight: bold;">Father:</span> <span style="color: var(--muted-foreground);">Do you think the war is over?</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--accent); font-weight: bold;">Sera:</span> <span style="color: var(--foreground);">I think it's never over.</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--muted-foreground); font-weight: bold;">Father:</span> <span style="color: var(--muted-foreground);">Because the Warp is still open?</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--accent); font-weight: bold;">Sera:</span> <span style="color: var(--foreground);">Because the corruption is still growing.</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--muted-foreground); font-weight: bold;">Father:</span> <span style="color: var(--muted-foreground);">Because the Hellspawn are still waiting?</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--accent); font-weight: bold;">Sera:</span> <span style="color: var(--foreground);">Because somewhere in the space between, a father and daughter are fighting something that shouldn't exist because no one else will.</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--muted-foreground); font-weight: bold;">Father:</span> <span style="color: var(--muted-foreground);">This is the Never Ending War.</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--accent); font-weight: bold;">Sera:</span> <span style="color: var(--foreground);">Not because we chose it. Because they chose it. Ark Corp. X-Technologies. The founders. The boards. The people who thought they could control something older than the universe and use it to make money.</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--muted-foreground); font-weight: bold;">Father:</span> <span style="color: var(--muted-foreground);">They started this war two hundred years ago.</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--accent); font-weight: bold;">Sera:</span> <span style="color: var(--foreground);">And it will never end. Not until the Warp consumes everything. Not until there's nothing left but hunger and void. Not until the last star goes out and the last atom is converted and the last voice falls silent.</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--muted-foreground); font-weight: bold;">Father:</span> <span style="color: var(--muted-foreground);">That's the Never Ending War.</span></p>
+      <p style="margin-bottom: 0.5rem;"><span style="color: var(--accent); font-weight: bold;">Sera:</span> <span style="color: var(--foreground);">And you're part of it now.</span></p>
+      <p style="margin-bottom: 0;"><span style="color: var(--muted-foreground); font-weight: bold;">Father:</span> <span style="color: var(--muted-foreground);">You just don't know it yet.</span></p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>After the Warp — The Reckoning</h2>
+    <p>They went through. Father and daughter. Into the space between. Into the place that exists between space and time, between reality and void, between what is and what should never be.</p>
+    <p>And the Warp opened wide.</p>
+    <p>Not a crack. Not a wound. A <strong>maw</strong>. A tear in the side of reality so massive it could be seen from orbit. So massive it blotted out the sky. So massive that the laws of physics themselves seemed to break down around its edges. The Element Zero corruption — the slow, patient disease that had been growing for two hundred years — <strong>accelerated</strong>. The Warp wasn't just open anymore. It was <strong>hungry</strong>.</p>
+    <p>Demons poured out. Not thousands. Not millions. <strong>Billions</strong>. Hellspawn of every size and shape and horror. Creatures that had been waiting since before the Earth was formed. Creatures that had been patient. Creatures that had been <strong>starving</strong>.</p>
+    <p>Humanity fought. Of course humanity fought. Every soldier. Every weapon. Every Lazarus Initiative survivor. Every Ark Corp holdout. Every X-Tech remnant. Every human being left alive who could hold a gun, a knife, a piece of rebar. They fought because that's what humans do. They fight when there's nothing left to fight for. They fight because the alternative is extinction.</p>
+    <p>It wasn't enough.</p>
+    <p>The war lasted thirty years. Then forty. Then fifty. The longest war in human history. The bloodiest war in human history. The war that never ended.</p>
+    <p>When the numbers were tallied — not when the war was over because the war was never over, not when the Hellspawn stopped coming because they never stopped coming, not when the Warp closed because it never closed — when humanity finally stopped counting, the numbers were tallied.</p>
+    <p><strong>20 billion confirmed dead.</strong></p>
+    <p>Twenty billion. Every major city destroyed. Every nation collapsed. Every government dissolved. Every infrastructure system failed. Twenty billion people who had lived and loved and dreamed and died in the space between the Warp opening and the day the world forgot what peace felt like. Twenty billion people who never had a chance.</p>
+    <p><strong>100 million still living.</strong></p>
+    <p>One hundred million. Scattered across the globe in bunkers, in ruins, in the ashes of the world they used to know. One hundred million survivors out of twenty-one billion. Less than half a percent. The rest — the billions who weren't confirmed dead, whose bodies were never found, whose fates were never determined — their status remains <strong>unknown</strong>. Lost in the corruption. Consumed by the Warp. Converted into Element Zero. Or simply gone. Erased from existence so completely that no trace remains.</p>
+    <p>And the sky — the sky never turned blue again. It turned <strong>blood red</strong>. The Element Zero contamination in the atmosphere. The corruption in the air itself. The Warp bleeding through from the other side. The sky is blood red now. It's been blood red for fifty years. It will be blood red forever. There is no blue sky waiting on the other side of this war. There is no peace. There is no end. There is just blood red sky and the sound of Hellspawn clawing at the doors.</p>
+    <p>This is what happened after the father and daughter went through the Warp. This is what happened when the wound in reality opened wide and the demons poured out. This is what happened when humanity fought the war that never ends.</p>
+    <p>And somewhere in the space between — in the place that exists between space and time, between reality and void — a father and daughter are still fighting. Still trying to close the Warp from the inside. Still trying to save a universe that doesn't know they exist.</p>
+    <p>The war is never over.</p>
+    <p>The sky will never turn blue again.</p>
+    <p>You just don't know it yet.</p>
+  </div>
+
+  <div class="section">
+    <h2>Tagline</h2>
+    <p style="font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--accent);">"The war is never over. You just don't know it yet."</p>
+  </div>
+
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <span>&copy; 2026 Ashen Wastes Studios</span>
+    <span>Built in the open.</span>
+  </div>
+</footer>
+
+<script src="js/backgrounds.js"></script>
+<script>initBackgrounds();</script>
+
+</body>
+</html>
