@@ -12,6 +12,7 @@ The official website for Ashen Wastes Studios — a game development studio and 
 | `gaming-technology.html` | Wasteland Engine and Nova Renderer — Vulkan-first, AI-powered ray tracing |
 | `wasteland-engine-docs.html` | Complete Wasteland Engine documentation — all systems, APIs, components, panels |
 | `games.html` | Current and upcoming titles — The Never Ending War, Wasteland |
+| `donor-assistance.html` | Donor Assistance Program — direct help for donors |
 | `philosophy.html` | Company philosophy — open source, anti-monopoly, safety over speed |
 
 ## Local Development

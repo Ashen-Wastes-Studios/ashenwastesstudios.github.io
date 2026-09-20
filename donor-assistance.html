@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Donor Assistance Program — Ashen Wastes Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface-2: #1a1a25;
+  --ink: #e0e0e8;
+  --ink-muted: #6a6a80;
+  --accent: #dc143c;
+  --accent-dim: #a01030;
+  --border: #2a2a40;
+  --glow: 0 0 10px rgba(220, 20, 60, 0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    linear-gradient(rgba(220, 20, 60, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220, 20, 60, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.container { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(10, 10, 15, 0.9);
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--accent);
+  box-shadow: 0 0 20px rgba(220, 20, 60, 0.15), 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.6), 0 0 20px rgba(220, 20, 60, 0.3);
+}
+
+.nav-links { display: flex; gap: 1.5rem; list-style: none; font-size: 0.9rem; font-weight: 500; flex-wrap: wrap; }
+
+.nav-links a {
+  color: var(--ink-muted);
+  transition: color 0.2s;
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 5px var(--accent);
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after { width: 100%; }
+
+.nav-links a:hover { text-shadow: 0 0 8px rgba(220, 20, 60, 0.6); }
+.nav-links a.active { color: var(--accent) !important; text-shadow: 0 0 8px rgba(220, 20, 60, 0.5); }
+
+.page-header {
+  padding: 8rem 0 3rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+}
+
+.breadcrumb { font-size: 0.85rem; color: var(--ink-muted); margin-bottom: 1.5rem; }
+.breadcrumb a { color: var(--accent); }
+
+.page-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 400;
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
+  margin-bottom: 1rem;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  color: var(--ink-muted);
+  max-width: 50ch;
+}
+
+h1, h2, h3 { text-shadow: 0 0 10px rgba(220, 20, 60, 0.4); }
+a:hover { text-shadow: 0 0 8px rgba(220, 20, 60, 0.6); }
+
+.section {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section:last-child {
+  border-bottom: none;
+}
+
+.section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  font-weight: 400;
+}
+
+.section p {
+  color: var(--ink-muted);
+  margin-bottom: 1rem;
+  max-width: 65ch;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 1.5rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover {
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+.feature-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--accent);
+}
+
+.feature-card p {
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+  margin: 0;
+}
+
+.cta-box {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  padding: 2rem;
+  margin-top: 2rem;
+  text-align: center;
+  box-shadow: var(--glow);
+}
+
+.cta-box h3 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--accent);
+}
+
+.cta-box p {
+  margin: 0 auto 1.5rem;
+  max-width: 50ch;
+}
+
+.donate-btn {
+  display: inline-block;
+  padding: 0.875rem 2rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 2px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.2s;
+  border: none;
+  cursor: pointer;
+}
+
+.donate-btn:hover {
+  background: var(--accent-dim);
+  box-shadow: 0 0 15px rgba(220, 20, 60, 0.5);
+  transform: translateY(-1px);
+}
+
+ul {
+  color: var(--ink-muted);
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
+
+::selection { background: rgba(220, 20, 60, 0.3); color: var(--ink); }
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nav-links { gap: 0.75rem; font-size: 0.8rem; }
+}
+</style>
+</head>
+<body data-bg="particles">
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Ashen Wastes Studios</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="ai.html">AI</a></li>
+      <li><a href="ashen-gpt.html">Ashen AI</a></li>
+      <li><a href="gaming-technology.html">Gaming Technology</a></li>
+      <li><a href="wasteland-engine-docs.html">Engine Docs</a></li>
+      <li><a href="games.html">Games</a></li>
+      <li><a href="donor-assistance.html" class="active">Donor Assistance</a></li>
+      <li><a href="https://discord.gg/WBmspPQenP" target="_blank" rel="noopener">Discord</a></li>
+      <li><a href="philosophy.html">Philosophy</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="page-header container">
+  <div class="breadcrumb"><a href="index.html">Home</a> / Donor Assistance Program</div>
+  <h1>Donor Assistance Program.</h1>
+  <p>Direct, personalized support for your projects — available to our monthly donors.</p>
+</header>
+
+<section class="container">
+
+  <div class="section">
+    <h2>What is the Donor Assistance Program?</h2>
+    <p>The Donor Assistance Program gives you direct access to our team for hands-on help with your projects. Whether you need custom game engine technology, AI solutions, or specialized coding work, we provide one-on-one guidance and development support.</p>
+    <p><strong>Anyone who donates $10 or more per month qualifies for this program.</strong> No matter the platform — Patreon, Ko-fi, GitHub Sponsors, or direct payment — if you're supporting us at $10+/month, you're in.</p>
+  </div>
+
+  <div class="section">
+    <h2>What we can help with</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>Custom Game Engine Tech</h3>
+        <p>Custom rendering pipelines, physics systems, editor tools, shader development, or help integrating Wasteland Engine into your workflow.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Custom AI Solutions</h3>
+        <p>NPC behavior systems, procedural content generation, fine-tuning models for your use case, or integrating AI into your game or application.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Custom Streaming Tools</h3>
+        <p>Custom OBS plugins, chat integrations, stream overlays, automation tools, or anything else you need for your streaming setup.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Custom Creator Tools</h3>
+        <p>Asset pipelines, automation scripts, content management systems, or any custom software to make your creative workflow easier.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Code Review & Architecture</h3>
+        <p>Get expert feedback on your codebase, help designing system architecture, or guidance on solving complex technical problems.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Priority Bug Fixes</h3>
+        <p>If you're using our open source projects, get priority attention on bugs, feature requests, and pull request reviews.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>How it works</h2>
+    <ul>
+      <li><strong>Donate $10+/month</strong> through any platform — Patreon, Ko-fi, GitHub Sponsors, PayPal, or crypto.</li>
+      <li><strong>Join our Discord</strong> and open a ticket in the #donor-assistance channel with your proof of donation.</li>
+      <li><strong>Tell us what you need</strong> — we'll scope out the work and give you a timeline.</li>
+      <li><strong>We get to work</strong> — direct communication with our developers until your project is done.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>What qualifies?</h2>
+    <p>Any recurring monthly donation of $10 or more. This includes:</p>
+    <ul>
+      <li>Patreon ($10+/month tier)</li>
+      <li>Ko-fi (monthly membership or recurring tip)</li>
+      <li>GitHub Sponsors ($10+/month)</li>
+      <li>PayPal (recurring monthly payment)</li>
+      <li>Crypto (equivalent monthly value)</li>
+    </ul>
+    <p>One-time donations don't qualify, but if you set up any recurring payment of $10+/month, you're in for as long as the donation continues.</p>
+  </div>
+
+  <div class="cta-box">
+    <h3>Ready to get started?</h3>
+    <p>Donate $10+/month and join our Discord to unlock direct assistance from our team. We'll help you build what you need.</p>
+    <a href="https://discord.gg/WBmspPQenP" class="donate-btn" target="_blank" rel="noopener">Join Discord →</a>
+  </div>
+
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <span>&copy; 2026 Ashen Wastes Studios</span>
+    <span>Built in the open.</span>
+  </div>
+</footer>
+
+<script src="js/backgrounds.js"></script>
+<script>initBackgrounds();</script>
+
+</body>
+</html>
