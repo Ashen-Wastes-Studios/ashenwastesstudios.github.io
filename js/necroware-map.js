@@ -381,6 +381,12 @@
 
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Save context and apply transformations for pan/zoom
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+    ctx.scale(scale, scale);
+    
     drawBackground();
 
     // Draw continents
@@ -410,7 +416,10 @@
       drawLoreLocation(location, isHovered);
     });
 
-    // Draw tooltip
+    // Restore context so tooltip draws in screen space
+    ctx.restore();
+    
+    // Draw tooltip (outside the transform so it stays in screen space)
     if (hoveredRegion) {
       drawTooltip();
     }
@@ -500,13 +509,17 @@
     return inside;
   }
 
-  function getRegionAtPoint(x, y) {
+  function getRegionAtPoint(screenX, screenY) {
+    // Convert screen coordinates to map coordinates (accounting for pan/zoom)
+    const x = (screenX - offsetX) / scale;
+    const y = (screenY - offsetY) / scale;
+    
     // Lore locations first (highest priority)
     for (const loc of loreLocations) {
       const lx = loc.x * canvas.width / 100;
       const ly = loc.y * canvas.height / 100;
       const dist = Math.sqrt((x - lx) ** 2 + (y - ly) ** 2);
-      if (dist < 20) return loc.name;
+      if (dist < 25) return loc.name;
     }
 
     // Corporation regions
@@ -542,22 +555,22 @@
   // Event handlers
   canvas.addEventListener('mousemove', (e) => {
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const screenX = e.clientX - rect.left;
+    const screenY = e.clientY - rect.top;
 
     if (isDragging) {
-      offsetX += x - lastMouseX;
-      offsetY += y - lastMouseY;
-      lastMouseX = x;
-      lastMouseY = y;
+      offsetX += screenX - lastMouseX;
+      offsetY += screenY - lastMouseY;
+      lastMouseX = screenX;
+      lastMouseY = screenY;
       draw();
       return;
     }
 
-    lastMouseX = x;
-    lastMouseY = y;
+    lastMouseX = screenX;
+    lastMouseY = screenY;
 
-    const newHovered = getRegionAtPoint(x, y);
+    const newHovered = getRegionAtPoint(screenX, screenY);
     if (newHovered !== hoveredRegion) {
       hoveredRegion = newHovered;
       canvas.style.cursor = hoveredRegion ? 'pointer' : 'default';
@@ -568,8 +581,9 @@
   canvas.addEventListener('mousedown', (e) => {
     if (e.button === 0) {
       isDragging = true;
-      lastMouseX = e.clientX - canvas.getBoundingClientRect().left;
-      lastMouseY = e.clientY - canvas.getBoundingClientRect().top;
+      const rect = canvas.getBoundingClientRect();
+      lastMouseX = e.clientX - rect.left;
+      lastMouseY = e.clientY - rect.top;
       canvas.style.cursor = 'grabbing';
     }
   });
@@ -599,6 +613,7 @@
     const newScale = Math.max(0.5, Math.min(5, scale * zoom));
     const scaleChange = newScale / scale;
 
+    // Zoom toward mouse position in screen space
     offsetX = mouseX - (mouseX - offsetX) * scaleChange;
     offsetY = mouseY - (mouseY - offsetY) * scaleChange;
     scale = newScale;
@@ -666,14 +681,21 @@
         if (region.polygon) {
           const centerX = region.polygon.reduce((sum, p) => sum + p[0], 0) / region.polygon.length;
           const centerY = region.polygon.reduce((sum, p) => sum + p[1], 0) / region.polygon.length;
+          // Map center in canvas pixels
+          const mapX = centerX * canvas.width / 100;
+          const mapY = centerY * canvas.height / 100;
           scale = 2;
-          offsetX = canvas.width / 2 - (centerX * canvas.width / 100) * scale;
-          offsetY = canvas.height / 2 - (centerY * canvas.height / 100) * scale;
+          // Center the region in the viewport
+          offsetX = canvas.width / 2 - mapX * scale;
+          offsetY = canvas.height / 2 - mapY * scale;
           draw();
         } else if (region.x !== undefined) {
-          scale = 2.5;
-          offsetX = canvas.width / 2 - (region.x * canvas.width / 100) * scale;
-          offsetY = canvas.height / 2 - (region.y * canvas.height / 100) * scale;
+          // Map coordinates in canvas pixels
+          const mapX = region.x * canvas.width / 100;
+          const mapY = region.y * canvas.height / 100;
+          scale = 3;
+          offsetX = canvas.width / 2 - mapX * scale;
+          offsetY = canvas.height / 2 - mapY * scale;
           draw();
         }
       }
