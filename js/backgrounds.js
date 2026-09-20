@@ -1,9 +1,18 @@
 // GALAXY UNIVERSE — Full Featured Version
 function initBackgrounds() {
-  const canvas = document.createElement('canvas');
-  canvas.id = 'bg-canvas';
-  canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
-  document.body.prepend(canvas);
+  const bgType = document.body.dataset.bg || 'particles';
+  
+  // Skip backgrounds for interactive map (handled by necroware-map.js)
+  if (bgType === 'map') return;
+  
+  // Check if canvas already exists (e.g., for interactive map)
+  let canvas = document.getElementById('bg-canvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'bg-canvas';
+    canvas.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;';
+    document.body.prepend(canvas);
+  }
   const ctx = canvas.getContext('2d');
 
   let w, h;
@@ -25,8 +34,6 @@ function initBackgrounds() {
   window.addEventListener('mousedown', e => { mouse.down = true; createExplosion(mouse.x, mouse.y); });
   window.addEventListener('mouseup', () => mouse.down = false);
   window.addEventListener('mouseleave', () => mouse.active = false);
-
-  const bgType = document.body.dataset.bg || 'particles';
 
   const themes = {
     particles: { colors: ['#dc143c', '#ff6b6b', '#ff8e53', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'], spiralArms: [2, 3, 4], gridSpacing: 300, connectionDist: 400 },
