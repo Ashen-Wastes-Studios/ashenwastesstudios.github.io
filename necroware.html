@@ -229,6 +229,16 @@ a:hover { text-shadow: 0 0 8px rgba(220, 20, 60, 0.6); }
   margin-bottom: 1rem;
 }
 
+#toc-sidebar nav a:hover {
+  color: var(--ink);
+  border-left-color: var(--accent);
+}
+
+#toc-sidebar nav a.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+}
+
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
 ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 0; }
@@ -254,6 +264,22 @@ footer {
   .nav-links { gap: 0.75rem; font-size: 0.8rem; }
 }
 </style>
+
+<script>
+// Simple active TOC highlighting
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      document.querySelectorAll('#toc-sidebar nav a').forEach(a => a.classList.remove('active'));
+      const link = document.querySelector(`#toc-sidebar nav a[href="#${entry.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { threshold: 0.5 });
+
+// Observe all sections with IDs
+document.querySelectorAll('[id]').forEach(section => observer.observe(section));
+</script>
 </head>
 <body data-bg="map">
 
@@ -312,6 +338,40 @@ footer {
 
 <section class="container">
 
+<div id="toc-sidebar" style="position: fixed; top: 80px; left: 0; width: 200px; height: calc(100vh - 80px); overflow-y: auto; background: rgba(10, 10, 15, 0.95); border-right: 1px solid var(--accent); padding: 20px 15px; z-index: 50; backdrop-filter: blur(10px);">
+  <h3 style="color: var(--accent); font-size: 14px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Table of Contents</h3>
+  <nav style="display: flex; flex-direction: column; gap: 8px;">
+    <a href="#before-beginning" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Before the Beginning</a>
+    <a href="#the-world" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The World</a>
+    <a href="#locations" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Locations</a>
+    <a href="#factions" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Factions</a>
+    <a href="#human-element" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Human Element</a>
+    <a href="#daily-life" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Daily Life</a>
+    <a href="#core-themes" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Core Themes</a>
+    <a href="#ark-before-storm" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Ark Before the Storm</a>
+    <a href="#humanitarian-lie" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Humanitarian Lie</a>
+    <a href="#the-origin" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Origin</a>
+    <a href="#lazarus-initiative" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Lazarus Initiative</a>
+    <a href="#clusterfuck" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Clusterfuck</a>
+    <a href="#reconstruction" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Reconstruction</a>
+    <a href="#elevator-drop" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Elevator Drop</a>
+    <a href="#second-elevator" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Second Elevator</a>
+    <a href="#biochip" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Biochip</a>
+    <a href="#the-coup" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Coup</a>
+    <a href="#gameplay" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Gameplay</a>
+    <a href="#campaign" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Campaign — The 30 Missions</a>
+    <a href="#side-missions" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Side Missions — Memories of Voss</a>
+    <a href="#elemental-corruption" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Elemental Corruption</a>
+    <a href="#campaign-part2" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Campaign Part 2 — The 30 Missions of the Fall</a>
+    <a href="#elemental-warp" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Elemental Warp</a>
+    <a href="#after-warp" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">After the Warp — The Reckoning</a>
+    <a href="#the-return" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Return — Nine Missions Through the Warp</a>
+    <a href="#tagline" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Tagline</a>
+  </nav>
+</div>
+
+<div style="margin-left: 200px;">
+
   <div class="section">
 
     <h2>Before the Beginning — The Element Zero Origins</h2>
@@ -350,7 +410,7 @@ footer {
     <p>Humanity thought they discovered Element Zero. They were wrong. Element Zero discovered them.</p>
   </div>
 
-    <h2>The World</h2>
+    <h2 id="the-world">The World</h2>
     <p>2197. Two hundred years ago, humanity discovered Element Zero — programmable matter that could become anything. Food. Medicine. Weapons. Buildings. People. It ended scarcity. It started everything else.</p>
     <p>Element Zero built the modern world. It also destroyed it. After two centuries of being used as weapons, the Element Zero woke up. It opened portals to somewhere else. Somewhere hungry. The Hellspawn poured out — not monsters, but people who died to the Element Zero and couldn't let go. People whose bodies were consumed while their minds were still awake. Now they're vessels for the Warp's hunger. Now they're converting everyone they touch. The sky turned blood red. Twenty billion people died. The war never ended.</p>
     <p>Before the portals, the world was controlled by mega-corporations. Ark Corp and X-Technologies — two empires born from the same discovery, fighting for control of everything. They waged corporate wars for fifty years. They created super soldiers from orphaned children. They destroyed cities and rebuilt them and destroyed them again. They thought they were fighting each other. They were feeding something older than the universe.</p>
@@ -358,7 +418,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>Locations</h2>
+    <h2 id="locations">Locations</h2>
     <div class="theme-grid">
       <div class="theme-card">
         <h3>The Ash District</h3>
@@ -388,7 +448,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>Factions</h2>
+    <h2 id="factions">Factions</h2>
     <div class="theme-grid">
       <div class="theme-card">
         <h3>Ark Corp</h3>
@@ -428,7 +488,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>Daily Life</h2>
+    <h2 id="daily-life">Daily Life</h2>
     <p>The sky is blood red. It's been blood red for fifty years. Children born after the Warp opened have never seen blue sky. They think the world has always been this way. They think the sound of Hellspawn scratching at the doors is normal.</p>
     <p>Survivors live in bunkers. Three hundred meters underground. Cramped. Dark. No room to move. No room to breathe. No room to hope. Food is recycled. Water is rationed. Medicine is a memory. The only thing abundant is fear.</p>
     <p>When you go to the surface — and you have to, eventually, because the bunkers can't sustain forever — you wear Element Zero armor. It bonds with your nervous system. Gives you superhuman strength, speed, reflexes. Slowly consumes you. Veterans who've worn their suits for years can't feel their limbs. Can't remember their names. Can't tell where they end and the armor begins.</p>
@@ -443,7 +503,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>Core Themes</h2>
+    <h2 id="core-themes">Core Themes</h2>
     <div class="theme-grid">
       <div class="theme-card">
         <h3>Death is Temporary</h3>
@@ -654,7 +714,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>Gameplay</h2>
+    <h2 id="gameplay">Gameplay</h2>
     <p>You play as a nameless criminal — a member of an unaffiliated organized crime group that tried to destroy Ark Corp's Data Center Omega. You succeeded. The nuke went off. The data center was unmade. And then the Lazarus Initiative soldiers caught you.</p>
     <p>You should have died that day. Instead, Ark Corp implanted a neural biochip containing the personality construct of <strong>Voss</strong> — the drummer from Dead Circuit who destroyed Neo-Kyoto fifty years ago — into your skull. The chip merged with your mind. Now you have two sets of memories. Two sets of instincts. Two people trapped in one body. You are a Lazarus soldier now, resurrected and deployed to fight in the new corporate wars. You follow orders. You die. You come back. And every time you come back, the line between who you were and who Voss was gets thinner.</p>
     <p>Combat is brutal and permanent — unless you can afford otherwise. Every death costs money. Every resurrection degrades your memory slightly. Die too many times and you forget why you're fighting. Forget who you were. Forget that you were ever human. But the Voss biochip remembers. It holds onto the memories you lose. The question is whether those memories will save you or consume you.</p>
@@ -665,7 +725,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>Campaign — The 30 Missions</h2>
+    <h2 id="campaign">Campaign — The 30 Missions</h2>
     <p>Before the coup, before the truth surfaces, before everything falls apart — there are thirty missions. Thirty battles in the new corporate wars. You and Sera, fighting side by side, dying together, coming back together. Each mission brings you closer to the truth. Each death makes you forget a little more. Each resurrection makes the Voss biochip remember a little louder. And each moment between you and Sera chips away at the conditioning, the memory wipes, the lies Ark Corp built into both of you.</p>
 
     <h3>Mission 1: First Contact</h3>
@@ -880,7 +940,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>Side Missions — Memories of Voss</h2>
+    <h2 id="side-missions">Side Missions — Memories of Voss</h2>
     <p>Between the main missions, the biochip triggers. Memories that aren't yours. Memories that belong to Voss — the drummer from Dead Circuit who destroyed Neo-Kyoto, who spent fifty years as a statue, whose consciousness was imprinted on the chip in your skull. These are his memories. His regrets. His warnings. His goodbye. Ten side missions. Ten moments where you get to know the man whose mind is merging with yours. Not because you want to. Because you have to.</p>
 
     <h3>Side Mission: The First Song</h3>
@@ -945,7 +1005,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>The Elemental Corruption</h2>
+    <h2 id="elemental-corruption">The Elemental Corruption</h2>
     <p>Nobody knows who made the choice. Ark Corp collapsed into civil war. X-Technologies fractured. The 15 board members were killed or scattered. Hayden retreated to Mars. Smasher went silent. Terra and Vega disappeared into the Lazarus soldiers. The corporate wars ended the way they always do — not with victory, but with exhaustion. The world stopped fighting because there was nothing left to fight for.</p>
     <p>But the Element Zero had other plans.</p>
     <p>Element Zero could become anything. It could become food, medicine, weapons, armor, buildings, soldiers. It could become a city. It could become a person. It could become a god. And after two hundred years of being used as a weapon, after being detonated in hundreds of warheads, after being converted into millions of tons of contaminated debris scattered across the Earth and Mars, the Element Zero started to become something it was never meant to be.</p>
@@ -973,7 +1033,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>Campaign Part 2 — The 30 Missions of the Fall</h2>
+    <h2 id="campaign-part2">Campaign Part 2 — The 30 Missions of the Fall</h2>
     <p>Everyone who survived went underground. Literally. Bunkers. Tunnels. Mines. Anywhere the Hellspawn couldn't reach. Sera found you in the chaos. Father and daughter, reunited in the apocalypse. The two of you fought your way to the deepest bunker you could find — a former Ark Corp facility, three hundred meters below the Ash District. Thousands of survivors crammed into a space meant for hundreds. No food. No water. No hope. Just darkness and the sound of things scratching at the doors above.</p>
     <p>Thirty more missions. Not missions given by the board. Not missions ordered by Hayden. Missions to survive. Missions to fight. Missions to find a way to close the portals before the Hellspawn dug through the bunker doors and killed everyone inside. And at the end — a choice. Hide in the hole and wait to die. Or go through the Elemental Warp and end it.</p>
 
@@ -1231,7 +1291,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>After the Warp — The Reckoning</h2>
+    <h2 id="after-warp">After the Warp — The Reckoning</h2>
     <p>They went through. Father and daughter. Into the space between. Into the place that exists between space and time, between reality and void, between what is and what should never be.</p>
     <p>And the Warp opened wide.</p>
     <p>Not a crack. Not a wound. A <strong>maw</strong>. A tear in the side of reality so massive it could be seen from orbit. So massive it blotted out the sky. So massive that the laws of physics themselves seemed to break down around its edges. The Element Zero corruption — the slow, patient disease that had been growing for two hundred years — <strong>accelerated</strong>. The Warp wasn't just open anymore. It was <strong>hungry</strong>.</p>
@@ -1253,7 +1313,7 @@ footer {
   </div>
 
   <div class="section">
-    <h2>The Return — Nine Missions Through the Warp</h2>
+    <h2 id="the-return">The Return — Nine Missions Through the Warp</h2>
     <p>They went through. Father and daughter. Into the space between. Into the place that exists between space and time, between reality and void, between what is and what should never be.</p>
     <p>And the Warp opened wide behind them.</p>
     <p>What they found inside was not Hell. Not yet. It was something worse. A dimension of pure Element Zero where the laws of physics didn't apply, where time didn't work right, where reality itself was negotiable. Where the sky bled and the ground screamed and the air tasted like copper and ash. Where billions of Hellspawn roamed — people who died to the Element Zero and couldn't let go, still screaming, still begging for help they'd never get. Where the Source waited at the center of everything, a consciousness that existed before the universe, never sleeping, never dreaming, just lying. Lying the way the mega corps lied. Lying the way everyone lied.</p>
@@ -1339,9 +1399,11 @@ footer {
   </div>
 
   <div class="section">
-    <h2>Tagline</h2>
+    <h2 id="tagline">Tagline</h2>
     <p style="font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--accent);">"The war is never over. You just don't know it yet."</p>
   </div>
+
+</div> <!-- /margin-left wrapper -->
 
 </section>
 
