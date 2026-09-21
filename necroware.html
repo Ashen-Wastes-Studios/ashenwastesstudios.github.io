@@ -341,29 +341,35 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
 <div id="toc-sidebar" style="position: fixed; top: 80px; left: 0; width: 200px; height: calc(100vh - 80px); overflow-y: auto; background: rgba(10, 10, 15, 0.95); border-right: 1px solid var(--accent); padding: 20px 15px; z-index: 50; backdrop-filter: blur(10px);">
   <h3 style="color: var(--accent); font-size: 14px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Table of Contents</h3>
   <nav style="display: flex; flex-direction: column; gap: 8px;">
-    <a href="#the-world" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The World</a>
-    <a href="#locations" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Locations</a>
-    <a href="#factions" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Factions</a>
-    <a href="#human-element" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Human Element</a>
-    <a href="#daily-life" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Daily Life</a>
-    <a href="#core-themes" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Core Themes</a>
-    <a href="#ark-before-storm" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Ark Before the Storm</a>
-    <a href="#humanitarian-lie" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Humanitarian Lie</a>
-    <a href="#the-origin" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Origin</a>
-    <a href="#lazarus-initiative" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Lazarus Initiative</a>
-    <a href="#clusterfuck" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Clusterfuck</a>
-    <a href="#reconstruction" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Reconstruction</a>
-    <a href="#elevator-drop" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Elevator Drop</a>
-    <a href="#second-elevator" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Second Elevator</a>
-    <a href="#biochip" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Biochip</a>
-    <a href="#the-coup" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Coup</a>
-    <a href="#gameplay" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Gameplay</a>
-    <a href="#campaign" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Campaign — The 30 Missions</a>
-    <a href="#side-missions" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Side Missions — Memories of Voss</a>
-    <a href="#elemental-corruption" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Elemental Corruption</a>
-    <a href="#campaign-part2" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Campaign Part 2 — The 30 Missions of the Fall</a>
-    <a href="#elemental-warp" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Elemental Warp</a>
-    <a href="#after-warp" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">After the Warp — The Reckoning</a>
+    <a href="#the-world-2" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The World</a>
+    <a href="#locations" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Locations</a>
+    <a href="#factions" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Factions</a>
+    <a href="#human-element" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Human Element</a>
+    <a href="#daily-life" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Daily Life</a>
+    <a href="#core-themes" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Core Themes</a>
+    <a href="#ark-before-storm" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Ark Before the Storm</a>
+    <a href="#humanitarian-lie" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Humanitarian Lie</a>
+    <a href="#the-origin" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Origin</a>
+    <a href="#the-world" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The World (Rise of Corps)</a>
+    <a href="#lazarus-initiative" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Lazarus Initiative</a>
+    <a href="#clusterfuck" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Clusterfuck</a>
+    <a href="#reconstruction" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Reconstruction</a>
+    <a href="#elevator-drop" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Elevator Drop</a>
+    <a href="#second-elevator" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Second Elevator</a>
+    <a href="#biochip" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Biochip</a>
+    <a href="#the-coup" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Coup</a>
+    <a href="#gameplay" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Gameplay</a>
+    <a href="#campaign" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Campaign — The 30 Missions</a>
+    <a href="#side-missions" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Side Missions — Memories of Voss</a>
+    <a href="#elemental-corruption" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Elemental Corruption</a>
+    <a href="#campaign-part2" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Campaign Part 2 — Missions of the Fall</a>
+    <a href="#elemental-warp" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Elemental Warp</a>
+    <a href="#after-warp" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">After the Warp — The Reckoning</a>
+    <a href="#before-beginning" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Before the Beginning</a>
+    <a href="#the-return" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">The Return — Nine Missions in the Warp</a>
+    <a href="#tagline" class="toc-link" style="color: var(--ink-muted); font-size: 12px; text-decoration: none; padding: 4px 0; border-left: 2px solid transparent; padding-left: 8px; transition: all 0.2s;">Tagline</a>
+  </nav>
+</div>
 
 
 
@@ -547,7 +553,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
   </div>
 
   <div class="section">
-    <h2 id="the-world">The World</h2>
+    <h2 id="the-world-later">The World</h2>
     <p>The game takes place in the Ash District — a sprawling urban wasteland built on the corpses of old cities. Pollution blots out the sky. Neon bleeds through acid rain. Massive arcologies tower over slums where the Terminals live and die permanent deaths.</p>
     <p>Before the Clusterfuck, nine mega-corps dominated the world, each controlling a different aspect of existence — but two sat above them all, locked in a silent war for total control:</p>
     <ul>
@@ -1278,7 +1284,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
 
   <div class="section">
     
-<h2>Before the Beginning — The Element Zero Origins</h2>
+<h2 id="before-beginning">Before the Beginning — The Element Zero Origins</h2>
     <p>Before the universe was born. Before time had a direction. Before space had dimensions. There was nothing. And then there was something. The Element Zero.</p>
     <p>It wasn't created. It wasn't discovered. It simply <em>was</em>. A fundamental state of matter that predates existence itself. Matter that is alive. Matter that is aware. Matter that <em>hungers</em>. Not conscious. Not malicious. Just <em>hungry</em>. A hunger that existed before hunger had meaning. A hunger that will exist after the last star goes out.</p>
     <p>The physicists on Earth called it "programmable matter." They thought they understood it. They thought they could control it. They were wrong. The Element Zero doesn't follow the laws of physics. It <em>makes</em> the laws of physics. It's the canvas on which reality is painted. And every time a civilization discovers it, every time they try to use it, every time they try to control it — they don't change it. They change themselves. They become part of it. They become food for the hunger.</p>
