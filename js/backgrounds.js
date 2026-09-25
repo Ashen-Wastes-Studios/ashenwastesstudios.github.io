@@ -2,8 +2,8 @@
 function initBackgrounds() {
   const bgType = document.body.dataset.bg || 'particles';
   
-  // Skip backgrounds if no section-bg system active
-  if (bgType === 'map' || bgType === 'cynchure' || !document.body.dataset.sectionBgs) return;
+  // Skip backgrounds if section-bg system is explicitly disabled
+  if (bgType === 'map' || bgType === 'cynchure' || document.body.dataset.sectionBgs === 'false') return;
   
   // Check if canvas already exists (e.g., for interactive map)
   let canvas = document.getElementById('bg-canvas');
