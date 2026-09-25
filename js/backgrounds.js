@@ -2,8 +2,8 @@
 function initBackgrounds() {
   const bgType = document.body.dataset.bg || 'particles';
   
-  // Skip backgrounds for interactive map (handled by necroware-map.js)
-  if (bgType === 'map') return;
+  // Skip backgrounds for interactive map or Cynchure Core image
+  if (bgType === 'map' || bgType === 'cynchure') return;
   
   // Check if canvas already exists (e.g., for interactive map)
   let canvas = document.getElementById('bg-canvas');
@@ -42,7 +42,8 @@ function initBackgrounds() {
     matrix: { colors: ['#00ff41', '#39ff14', '#00ff00', '#7fff00', '#dc143c'], spiralArms: [2, 3], gridSpacing: 400, connectionDist: 500 },
     wireframe: { colors: ['#dc143c', '#ff4757', '#ff6348', '#f8b500', '#48dbfb', '#54a0ff'], spiralArms: [4, 5, 6], gridSpacing: 350, connectionDist: 450 },
     starfield: { colors: ['#dc143c', '#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3'], spiralArms: [2, 3, 4, 5], gridSpacing: 280, connectionDist: 380 },
-    wave: { colors: ['#dc143c', '#c44569', '#f8b500', '#48dbfb', '#54a0ff', '#5f27cd'], spiralArms: [2, 3], gridSpacing: 380, connectionDist: 480 }
+    wave: { colors: ['#dc143c', '#c44569', '#f8b500', '#48dbfb', '#54a0ff', '#5f27cd'], spiralArms: [2, 3], gridSpacing: 380, connectionDist: 480 },
+    cynchure: { colors: ['#dc143c', '#ff4757', '#ff6b6b', '#ff8e53'], spiralArms: [3, 4], gridSpacing: 300, connectionDist: 400 }
   };
 
   const theme = themes[bgType] || themes.particles;
