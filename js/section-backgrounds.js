@@ -9,13 +9,13 @@
   const useSectionBgs = document.body.dataset.sectionBgs === 'true';
   if (!useSectionBgs) return;
 
-  // Background image mapping by section id
+  // Background image mapping by section id and mission elements
   const sectionImages = {
     // World-building / lore sections
     'ark-before-storm': 'img/ark-corporate-boardroom.jpg',
     'humanitarian-lie': 'img/ark-corporate-boardroom.jpg',
-    'the-origin': 'img/ark-corporate-boardroom.jpg',
-    'lazarus-initiative': 'img/military-training-facility.jpg',
+    'the-origin': 'img/kuiper-belt-discovery.jpg',
+    'lazarus-initiative': 'img/lazarus-training-facility.jpg',
     'the-coup': 'img/coup-boardroom-chaos.jpg',
     'biochip': 'img/voss-statue-crystal.jpg',
     'prelude': 'img/player-alone-room.jpg',
@@ -29,7 +29,7 @@
     // Side story / epilogue
     'song-from-beyond': 'img/underground-warlord-territory.jpg',
     'epilogue': 'img/ai-mindscape.jpg',
-    'before-beginning': 'img/cosmic-warp-journey.jpg',
+    'before-beginning': 'img/kethvar-primordial-void.jpg',
     
     // Fallback sections use dark gradient
     'the-world-2': null,
@@ -48,6 +48,11 @@
     'gameplay': null,
     'tagline': null,
     'tagline-final': null
+  };
+  
+  // Mission-specific background images (checked first)
+  const missionImages = {
+    'mission-section': 'img/cynchure-core-people.jpg'
   };
 
   // Current and target background
@@ -72,18 +77,30 @@
 
   // Get the section image for a given section id
   function getSectionImage(sectionId) {
-    return sectionImages[sectionId] || null;
+    return missionImages[sectionId] || sectionImages[sectionId] || null;
   }
 
-  // Get currently visible section
+  // Get currently visible section (checks mission-level elements first)
   function getVisibleSection() {
-    const sections = document.querySelectorAll('section[id], [id]');
+    const sections = document.querySelectorAll('section[id], [id], .mission-section');
     const viewportCenter = window.innerHeight / 2;
     let closestSection = null;
     let closestDistance = Infinity;
 
     sections.forEach(section => {
       const rect = section.getBoundingClientRect();
+      // Check for mission-section class first
+      if (section.classList.contains('mission-section')) {
+        const sectionId = 'mission-section';
+        if (rect.top < viewportCenter && rect.bottom > viewportCenter * 0.3) {
+          const distance = Math.abs(rect.top - viewportCenter);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestSection = sectionId;
+          }
+        }
+        return;
+      }
       const sectionId = section.id;
       
       // Skip sections without id or without background mapping
