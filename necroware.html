@@ -281,9 +281,10 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('[id]').forEach(section => observer.observe(section));
 </script>
 </head>
-<body data-bg="cynchure" data-section-bgs="true">
+<body data-bg="cynchure" data-section-bgs="false">
 
-<div id="section-bg-container" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:1;transition:opacity 0.3s ease;background:linear-gradient(180deg, rgba(3,3,8,0.8) 0%, rgba(8,4,4,0.6) 50%, rgba(3,3,8,0.8) 100%);"></div>
+<div id="section-bg-container" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.7;background-image:url('img/cynchure-core-people.jpg');background-size:cover;background-position:center;background-repeat:no-repeat;"></div>
+<div style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0.5;pointer-events:none;background:linear-gradient(180deg, rgba(3,3,8,0.65) 0%, rgba(8,4,4,0.4) 50%, rgba(3,3,8,0.7) 100%);"></div>
 
 <div id="map-overlay" style="position: fixed; top: 80px; left: 20px; z-index: 10; background: transparent; border: 1px solid var(--accent); border-radius: 4px; padding: 15px; max-width: 300px; max-height: 80vh; overflow-y: auto; backdrop-filter: blur(10px);">
   <h3 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">Necroware World Map — 2197</h3>
