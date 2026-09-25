@@ -281,10 +281,9 @@ const observer = new IntersectionObserver((entries) => {
 document.querySelectorAll('[id]').forEach(section => observer.observe(section));
 </script>
 </head>
-<body data-bg="cynchure">
+<body data-bg="cynchure" data-section-bgs="true">
 
-<img id="cynchure-bg-image" src="img/cynchure-core-bg.png" alt="Cynchure Core" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;object-fit:cover;pointer-events:none;">
-<div id="cynchure-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0.5;background:linear-gradient(180deg, rgba(3,3,8,0.7) 0%, rgba(3,3,8,0.4) 50%, rgba(3,3,8,0.7) 100%);pointer-events:none;"></div>
+<div id="section-bg-container" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:1;transition:opacity 0.3s ease;background:linear-gradient(180deg, rgba(3,3,8,0.8) 0%, rgba(8,4,4,0.6) 50%, rgba(3,3,8,0.8) 100%);"></div>
 
 <div id="map-overlay" style="position: fixed; top: 80px; left: 20px; z-index: 10; background: transparent; border: 1px solid var(--accent); border-radius: 4px; padding: 15px; max-width: 300px; max-height: 80vh; overflow-y: auto; backdrop-filter: blur(10px);">
   <h3 style="color: var(--accent); margin-bottom: 10px; font-size: 14px;">Necroware World Map — 2197</h3>
@@ -512,7 +511,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     </div>
   </div>
 
-  <div class="section">
+  <div class="section" data-bg-image="img/ark-corporate-boardroom.jpg">
     <h2 id="ark-before-storm">The Ark Before the Storm — Hayden's Gambit</h2>
     <p>Before Ark Industries discovered Element Zero, before it became the most powerful entity on Earth, it was just a family-owned Russian manufacturing firm called <strong>Ark Manufacturing</strong>. Founded in 2031 by <strong>Hayden Volkov</strong>, a former Russian military engineer with more ambition than patriotism.</p>
     <p>Ark Manufacturing started as a mid-tier industrial supplier — steel, polymers, basic electronics. Hayden was brilliant but ruthless. He undercut competitors, bribed officials, and vertically integrated until Ark was the largest private employer in Siberia. But Hayden didn't want to be a businessman. He wanted to be a king.</p>
@@ -523,7 +522,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     <p>Hayden died in 2071, but his legacy was already set in motion. Ark Industries was no longer just a company or just a government. It was a new kind of entity — one that would eventually discover Element Zero and use it to reshape the world forever.</p>
   </div>
 
-  <div class="section">
+  <div class="section" data-bg-image="img/ark-corporate-boardroom.jpg">
     <h2 id="humanitarian-lie">The Humanitarian Lie — Ark Corp's Greatest Con</h2>
     <p>In 2065, Ark Industries acquired a small Japanese nonprofit called <strong>MindBridge Foundation</strong>. Founded in 2052 by Dr. Soren Okafor, a Japanese neuroscientist, MindBridge had spent over a decade developing AI-powered neural prosthetics for people with disabilities. Their flagship product, the <strong>MindBridge Link</strong>, was a non-invasive brain-computer interface that allowed paralyzed patients to control computers, prosthetic limbs, and even robotic assistants using only their thoughts. It was revolutionary. It was compassionate. And it was free.</p>
     <p>MindBridge's technology was extraordinary — the AI learned to interpret neural patterns with unprecedented accuracy, adapting to each user's unique brain structure. The results were miraculous. Paralyzed children walked again. Locked-in patients spoke. Amputees controlled prosthetics with the fluid grace of natural limbs. Dr. Okafor became a global hero. Time Magazine named him Person of the Year. The Nobel Committee was already discussing his nomination.</p>
@@ -542,7 +541,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     <p>The greatest trick Ark Corp ever pulled was convincing the world they cared.</p>
   </div>
 
-  <div class="section">
+  <div class="section" data-bg-image="img/ark-corporate-boardroom.jpg">
     <h2 id="the-origin">The Origin — The Discovery That Changed Everything</h2>
     <p>Before the corps, before the wars, before humanity became a resource to be managed — there was the discovery. Deep in the Kuiper Belt, a mining probe flagged an anomaly. What they found shouldn't have existed: a crystalline substance that defied every known law of physics. They called it <strong>Element Zero</strong>.</p>
     <p>Element Zero could become anything. Feed it energy and a blueprint, and it would restructure itself at the molecular level into whatever you needed — food, medicine, weapons, buildings, synthetic tissue, neural processors. It was programmable matter. It was the end of scarcity. It was the most valuable substance in the history of the universe, and humanity had found a deposit larger than Earth's moon.</p>
@@ -581,7 +580,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     <p>But they couldn't survive it. The AI Trinity was too valuable to remain independent. Within a decade, all three were quietly dismantled and absorbed. <strong>Promethean AI</strong> was bought by <strong>Ark Corp</strong> after its founders' warnings about unregulated AI made it a liability. Ark buried Prometheus-7's open-source roots and turned it into their proprietary backbone — the model that now runs every corporate reanimation system on Earth. <strong>DeepMind Nexus</strong> split in half: its AI research division sold to Ark Corp, its data infrastructure acquired by <strong>X-Technologies</strong>, giving X-Tech the only server network capable of rivaling Ark's processing power. <strong>CAIS</strong> was carved up between both — its safety research went to Ark Corp (who immediately classified it), its alignment models went to X-Tech (who immediately monetized it). The independent AI industry died in less than ten years. Now there are only two AI powers left, and they belong to the two corps that are silently fighting for total control of human civilization.</p>
   </div>
 
-  <div class="section">
+  <div class="section" data-bg-image="img/military-training-facility.jpg">
     <h2 id="lazarus-initiative">The Lazarus Initiative — Soldiers from the Shadows</h2>
     <p>In 2091, the Ark Corp inner circle — the 15 board members with full access — launched a classified program known as <strong>The Lazarus Initiative</strong>. Its purpose: create the ultimate soldiers. Not volunteers. Not conscripts. Children.</p>
     <p>The logic was cold and calculated. Ark's analysts had identified that the most effective soldiers shared one trait: nothing left to lose. People at the absolute lowest point in their lives — homeless, orphaned, abandoned — fought with a desperation that trained soldiers couldn't match. And the younger they were when recruited, the more malleable they became.</p>
@@ -654,7 +653,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     <p>The player was taken into custody. Data Center Omega was gone — a smoking crater in the ground, a billion dollars of infrastructure converted into contaminated Element Zero. Ark Corp's intelligence network was blind across three continents. The mission had succeeded. But the consequences were just beginning.</p>
   </div>
 
-  <div class="section">
+  <div class="section" data-bg-image="img/voss-statue-crystal.jpg">
     <h2 id="biochip">The Biochip — Father, Daughter, and the Weapon That Saved Them</h2>
     <p>Ark Corp's interrogation of the player lasted six months. Not because the player resisted. Because Ark Corp was trying to understand why Sera had hesitated. Why a Lazarus soldier — one of the most perfectly conditioned killers ever created — had let a target live. They scanned the player's neural patterns. They scanned Sera's neural patterns. And they found something that made them very, very interested.</p>
     <p>Sera was the player's daughter.</p>
@@ -674,7 +673,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     <p>The new corporate wars are beginning. The Lazarus Initiative is deploying. Terra and Vega are overseeing. The 15 board members think they're in charge. And somewhere in the Ash District, a person with two minds and a dead family that might not be dead is about to start a war that will make the first one look like a prelude.</p>
   </div>
 
-  <div class="section">
+  <div class="section" data-bg-image="img/coup-boardroom-chaos.jpg">
     <h2 id="the-coup">The Coup — The Board vs. The Founder</h2>
     <p>After fifty years of the cold war, the relationship between the 15 board members and Ark Corp's founder — the current head of the Volkov family — has deteriorated beyond repair. The board knows the founder views them as expendable. The founder knows the board has accumulated too much independent power. Neither side trusts the other. And now, both sides are making moves.</p>
     <p>The founder's weapon is <strong>Smasher</strong> — the 100% cyborg proxy reconstruction of Hayden Volkov. Smasher isn't just a killer. He's a symbol. A reminder that the founder can create life, control life, and end life whenever he chooses. The founder uses Smasher to assert his authority — sending him on missions that the board doesn't approve of, eliminating threats that the board doesn't know about, and reminding everyone in Ark Corp that the Volkov family is still in charge. Smasher is the founder's fist. And he's not afraid to use it.</p>
@@ -710,10 +709,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     <p>The new corporate wars are beginning. The Lazarus Initiative is deploying. Terra and Vega are overseeing. The 15 board members think they're in charge. Hayden Volkov is watching from Mars. Smasher is hunting. And you — a nameless criminal with two minds, a family you think is dead, and a biochip full of memories from a man who already destroyed one city — are caught in the middle. You don't know your daughter is alive. You don't know she's a Lazarus soldier. You don't know she's been fighting for the enemy. You don't know she's been dying and coming back for twenty years. But you're about to find out. of a war that will make the first Clusterfuck look like a prelude.</p>
   </div>
 
-  <div class="section">
-    
-
-  <div class="section">
+  <div class="section" data-bg-image="img/player-alone-room.jpg">
     <h2 id="prelude">Prelude — The Man You Were</h2>
     <p>You don't remember your name. The conditioning took that. The memory wipes took everything. But the biochip remembers. Voss remembers. And before the missions, before the wars, before Ark Corp caught you — there was a man. A husband. A father. A resistance fighter. And a reason to fight.</p>
     <p>This is the story of how he became you.</p>
@@ -860,7 +856,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
 <p>And even then.</p>
   </div>
 
-  <div class="section">
+  <div class="section" data-bg-image="img/cyberpunk-urban-warfare.jpg">
     <h2 id="campaign">Campaign — The 30 Missions</h2>
         <p>Before the coup, before the truth surfaces, before everything falls apart — there are thirty missions. Thirty battles in the new corporate wars. You and Sera, fighting side by side, dying together, coming back together. She activated you. She implanted the chip. She put you on her strike team. Now you're hers. Her weapon. Her responsibility. Her problem. Each mission brings you closer to the truth. Each death makes you forget a little more. Each resurrection makes the Voss biochip remember a little louder. And each moment between you and Sera chips away at the conditioning, the memory wipes, the lies Ark Corp built into both of you.</p>
     <p>But there's a catch. A hidden condition. A requirement you didn't know about until Mission 27. The final choice — Mission 30 — can only be made if you've completed <strong>The Song From Beyond The Grave</strong>. The side story. The rescue. The confrontation with Maw. The freeing of Song. If you haven't done that, if you haven't freed your wife from the Collectors, if you haven't brought Song back into the fight — then Mission 30 is locked. The choice is closed. Terra and Vega are waiting, but you can't reach them. Not until you've done the hard thing. Not until you've faced the Collectors and won.</p>
@@ -1107,7 +1103,6 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     <p><strong>The Moment:</strong> You're in the Cynchure Core control room. The sphere is suspended above you. Twenty meters across. Glowing red. Humming. Pulsing. Alive. The cables vibrate. The Element beams crackle. The radiation burns. This is the most dangerous thing on Earth. This is the thing that was going to control every human mind. This is the thing that Hayden abandoned because it was too powerful. Too uncontrollable. Too alive.</p>
     <p>Smasher is on the ground. Defeated. Unconscious. Not dead. He'll wake up in a few hours. In a few days. He'll be back. And when he is, he'll be angry. And he'll be waiting.</p>
     <p>Sera stands beside you. Song stands behind you. All three of you — family. All three of you — armed. All three of you — ready to make the choice.</p>
-    <p>Sera stands beside you. Song stands behind you. All three of you — family. All three of you — armed. All three of you — ready to make the choice.</p>
     <p>And you have three options.</p>
     <p><strong>Option 1: Let it stay.</strong> Leave it where it is. Suspended. Glowing. Waiting. Don't activate it. Don't deactivate it. Don't touch it. Just let it be there. A weapon for a later date. A weapon for when the Warp threatens to consume everything. A weapon for when you have no other choice. This is what Terra and Vega recommend. This is what the board agrees to. This is the canon outcome. You leave it there. You seal the chamber. You walk out. And you carry the knowledge that it's there. Waiting. Watching. Ready.</p>
     <p><strong>Option 2: Give Song to it.</strong> The chip in her head is already linked to the Cynchure Core. It always was. Maw built it that way. He didn't just take the Cynchure — he built a connection. A link. A bond. Between Song and the weapon. And now that bond can be strengthened. Expanded. Made permanent. You can let her be integrated into the core. Not just linked to it. Part of it. Her consciousness. Her memories. Her soul. Let the Cynchure become part of her. Let her become the Cynchure. The ghost. The weapon. The song. This is what the original architects planned. This is what would make the most dangerous weapon in history. And now — with the chip — it's possible. She can interface with it. She can control it. She can wield it. She might be able to save everyone. She might be able to end the Warp. But she'll never be free. She'll never be human again. She'll become the weapon. And that's a price you might not be able to pay.</p>
@@ -1126,7 +1121,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     <p><em>This is only the first chapter of a long and bloody story. The war is never over. You just don't know it yet.</em></p>
   </div></div>
 
-  <div class="section">
+  <div class="section" data-bg-image="img/underground-music-venue.jpg">
     <h2 id="side-missions">Side Missions — Memories of Voss</h2>
     <p>Between the main missions, the biochip triggers. Memories that aren't yours. Memories that belong to Voss — the drummer from Dead Circuit who destroyed Neo-Kyoto, who spent fifty years as a statue, whose consciousness was imprinted on the chip in your skull. These are his memories. His regrets. His warnings. His goodbye. Ten side missions. Ten moments where you get to know the man whose mind is merging with yours. Not because you want to. Because you have to.</p>
 
@@ -1219,7 +1214,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     <p>Those twelve survived the Hellspawn. They survived the portals. They survived the fall of Ark Corp and the end of the world. And when the sky turned blue again and the last portal closed, they were still there — hiding in bunkers, waiting for judgment that would never come from anyone who had the authority to deliver it.</p>
   </div>
 
-  <div class="section">
+  <div class="section" data-bg-image="img/apocalyptic-wasteland.jpg">
     <h2 id="campaign-part2">Campaign Part 2 — The 30 Missions of the Fall</h2>
     <p>Everyone who survived went underground. Literally. Bunkers. Tunnels. Mines. Anywhere the Hellspawn couldn't reach. Sera found you in the chaos. Father and daughter, reunited in the apocalypse. The two of you fought your way to the deepest bunker you could find — a former Ark Corp facility, three hundred meters below the Ash District. Thousands of survivors crammed into a space meant for hundreds. No food. No water. No hope. Just darkness and the sound of things scratching at the doors above.</p>
     <p>Thirty more missions. Not missions given by the board. Not missions ordered by Hayden. Missions to survive. Missions to fight. Missions to find a way to close the portals before the Hellspawn dug through the bunker doors and killed everyone inside. And at the end — a choice. Hide in the hole and wait to die. Or go through the Elemental Warp and end it.</p>
@@ -1502,7 +1497,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
 
 
   <div class="section">
-      <div class="section">
+      <div class="section" data-bg-image="img/cosmic-warp-journey.jpg">
     <h2 id="before-beginning">Before the Beginning — The Element Zero Origins</h2>
     <p>Before the universe was born. Before time had a direction. Before space had dimensions. There was nothing. And then there was something. The Element Zero.</p>
     <p>It wasn't created. It wasn't discovered. It simply <em>was</em>. A fundamental state of matter that predates existence itself. Matter that is alive. Matter that is aware. Matter that <em>hungers</em>. Not conscious. Not malicious. Just <em>hungry</em>. A hunger that existed before hunger had meaning. A hunger that will exist after the last star goes out.</p>
@@ -1539,7 +1534,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
     <p>Humanity thought they discovered Element Zero. They were wrong. Element Zero discovered them.</p>
   </div>
 
-  <div class="section">
+  <div class="section" data-bg-image="img/cosmic-warp-journey.jpg">
     <h2 id="the-return">The Return — Nine Missions Through the Warp</h2>
     <p>They went through. Father and daughter. Into the space between. Into the place that exists between space and time, between reality and void, between what is and what should never be.</p>
     <p>And the Warp opened wide behind them.</p>
@@ -1557,7 +1552,7 @@ document.querySelectorAll('[id]').forEach(section => observer.observe(section));
   </div>
 
   <div class="section">
-    <div class="section">
+    <div class="section" data-bg-image="img/underground-warlord-territory.jpg">
     <h2 id="song-from-beyond">The Song From Beyond The Grave</h2>
     <p><em>A side story triggered by events in Mission 27.</em></p>
     <p><strong>The Hook:</strong> The biochip carries a message from beyond the grave. Your wife — your dead wife — is alive inside the ArkMind networks. She calls herself Song. She's been hiding in the spaces between data for twenty years, watching, learning, surviving. And now she has a job. A job that requires entering the Ash District's most dangerous combat zone. A place even Ark Corp won't touch. A place run by warlords and gangs and things worse than both. They call it <strong>The Crucible</strong>.</p>
@@ -1787,7 +1782,8 @@ She says: "You think the Voss copy is my final weapon? No. My final weapon is al
     <p><em>But the war is just beginning.</em></p>
   </div>
 
-<h2 id="epilogue">Epilogue — The Soul Killer</h2>
+<div class="section" data-bg-image="img/ai-mindscape.jpg">
+    <h2 id="epilogue">Epilogue — The Soul Killer</h2>
     <p>You collapsed the moment you set foot on the base.</p>
     <p>One step through the doors of Forward Operating Base Prometheus. One breath of recycled air that didn't taste like copper and ash. One moment of safety after sixty missions through hell. And your body finally gave out. Not from injury. Not from exhaustion. From the biochip. The Voss construct. It had been fighting your brain for months. Seventeen deaths. Sixty missions. Two minds in one skull, tearing each other apart from the inside. Your immune system was attacking the Element Zero. Your neurons were rejecting the foreign tissue. Your brain was literally eating itself trying to decide which of you was real.</p>
     <p>You died before they could get you to medical. Died standing up. Died with Sera's hand on your shoulder. Died with Terra and Vega watching from the observation deck. Died with all twelve surviving board members looking down from the gallery above.</p>
@@ -1874,6 +1870,7 @@ And she's not hiding anymore.</p>
 
 <script src="js/backgrounds.js"></script>
 <script>initBackgrounds();</script>
+<script src="js/section-backgrounds.js"></script>
 <script src="js/necroware-map.js"></script>
 
 
