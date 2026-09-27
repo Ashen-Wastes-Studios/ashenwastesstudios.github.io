@@ -12,6 +12,7 @@ The official website for Ashen Wastes Studios — a game development studio and 
 | `gaming-technology.html` | Wasteland Engine and Nova Renderer — Vulkan-first, AI-powered ray tracing |
 | `wasteland-engine-docs.html` | Complete Wasteland Engine documentation — all systems, APIs, components, panels |
 | `games.html` | Current and upcoming titles — The Never Ending War, Wasteland |
+| `necroware.html` | Necroware game page — 60-mission cyberpunk campaign, interactive world map, extensive lore (Cynchure Core, brain biochip, Element Zero, Warp, Hellspawn) |
 | `donor-assistance.html` | Donor Assistance Program — direct help for donors |
 | `philosophy.html` | Company philosophy — open source, anti-monopoly, safety over speed |
 
@@ -43,6 +44,15 @@ Open `http://localhost:8000` in your browser.
 - DM Serif Display + Inter + JetBrains Mono typography (Google Fonts)
 - Cyberpunk theme — blood red accent, scanlines, neon glow effects
 - Responsive layout via CSS Grid and Flexbox
+
+## Necroware Page Systems
+
+The `necroware.html` page includes:
+
+- **`js/necroware-map.js`** — Interactive WebGL/Canvas flooded Earth map with pan, zoom, and lore location markers
+- **`js/section-backgrounds.js`** — Scroll-based section transition system with mission-level background support
+- **`js/backgrounds.js`** — Galaxy, neural, and Cynchure Core background particle effects
+- Blood red theme (`#dc143c`) with warm orange and coral complements
 
 ## License
 
