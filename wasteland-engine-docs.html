@@ -560,11 +560,14 @@
         <li><a href="#core">Core Systems</a></li>
         <li><a href="#scene">Scene System</a></li>
         <li><a href="#rendering">Rendering</a></li>
+        <li><a href="#nova">Nova Ray Tracer</a></li>
+        <li><a href="#post">Post-Processing</a></li>
         <li><a href="#resources">Rendering Resources</a></li>
         <li><a href="#physics">Physics</a></li>
         <li><a href="#scripting">Scripting</a></li>
         <li><a href="#editor">DemonCore Editor</a></li>
         <li><a href="#volumetrics">Volumetrics &amp; Water</a></li>
+        <li><a href="#profiling">Profiling</a></li>
         <li><a href="#building">Building</a></li>
         <li><a href="#premake">Build Configuration</a></li>
         <li><a href="#structure">Project Structure</a></li>
@@ -580,8 +583,9 @@
     <div id="overview" class="docs-section">
       <h2>Overview</h2>
       <p>Wasteland Engine is a 2D/3D game engine built from scratch in C++17. It uses a layered architecture with an
-        Application core, a Scene/Entity system built on EnTT, multiple rendering backends (OpenGL, DirectX 11/12,
-        Vulkan via NVRHI), AI-powered ray tracing (Nova), and a full editor (DemonCore-Editor).</p>
+        Application core, a Scene/Entity system built on EnTT, four interchangeable rendering backends (OpenGL, D3D11,
+        D3D12, and Vulkan — the last three through NVRHI), the Nova GPU path tracer, Python scripting via pybind11, and
+        a full editor (DemonCore-Editor).</p>
 
       <h3>Key Facts</h3>
       <table>
@@ -595,7 +599,7 @@
         </tr>
         <tr>
           <td>Build System</td>
-          <td>Premake5</td>
+          <td>Premake5 (MSVC toolset v145)</td>
         </tr>
         <tr>
           <td>Entity System</td>
@@ -603,7 +607,11 @@
         </tr>
         <tr>
           <td>Rendering</td>
-          <td>OpenGL, D3D11, D3D12, Vulkan</td>
+          <td>OpenGL, D3D11, D3D12, Vulkan (via NVRHI)</td>
+        </tr>
+        <tr>
+          <td>Path Tracer</td>
+          <td>Nova — native D3D11/D3D12 compute</td>
         </tr>
         <tr>
           <td>Physics</td>
@@ -611,17 +619,33 @@
         </tr>
         <tr>
           <td>Scripting</td>
-          <td>Python (pybind11)</td>
+          <td>Python 3.14 (pybind11)</td>
+        </tr>
+        <tr>
+          <td>Scene Format</td>
+          <td>YAML (.wastescene)</td>
         </tr>
         <tr>
           <td>Editor</td>
-          <td>DemonCore-Editor (ImGui)</td>
+          <td>DemonCore-Editor (Dear ImGui)</td>
         </tr>
         <tr>
           <td>Platform</td>
           <td>Windows, Linux, macOS</td>
         </tr>
+        <tr>
+          <td>Engine Source</td>
+          <td>~29,300 lines C++ (excluding vendor)</td>
+        </tr>
       </table>
+
+      <h3>Runtime API Switching</h3>
+      <p>The rendering backend is chosen at runtime, not at build time. <code>Window::SwitchRendererAPI()</code> tears
+        down the current device and swap chain, rebuilds every GPU resource through <code>RecreateResources()</code>,
+        and brings up the target backend — no relink, no separate executable. The Nova path tracer attaches to whichever
+        Direct3D backend is active (D3D11 or D3D12); Vulkan and OpenGL run the raster path.</p>
+      <p>Device loss is detected and recovered: <code>NVRHIContext</code> tracks a lost-device flag and can recreate the
+        device, swap chain, and all ImGui-side descriptor resources in place.</p>
     </div>
 
     <!-- Core Systems -->
@@ -630,54 +654,105 @@
 
       <h3>Application (<code>Wasteland/Core/Application.h</code>)</h3>
       <p>The <code>Application</code> class is the entry point for all Wasteland programs. It owns the window, runs the
-        main loop, and manages the layer stack.</p>
+        main loop, and manages the layer stack. Each executable supplies a <code>CreateApplication()</code> factory that
+        the shared <code>EntryPoint.h</code> calls.</p>
       <pre><code>class Application {
 public:
-    Application(const std::string& name = "Wasteland App");
+    Application(const std::string&amp; name = "Wasteland App");
     void Run();
-    void PushLayer(Layer* layer);
-    void PushOverlay(Layer* layer);
+    void OnEvent(Event &amp;e);
+    void PushLayer(Layer *layer);
+    void PushOverlay(Layer *layer);
     void Close();
-    static Application& Get();
+
+    inline static Application &amp;Get() { return *s_Instance; }
+    static bool IsInitialized() { return s_Instance != nullptr; }
 };</code></pre>
       <p>The main loop calls <code>OnUpdate()</code> on every layer, renders ImGui overlays, and swaps the window
-        buffer. The static <code>Get()</code> singleton allows global access.</p>
+        buffer. <code>IsInitialized()</code> exists so that code reachable from Python can null-check the singleton
+        before dereferencing it — calling <code>Get()</code> before the app exists is a fault, not a null.</p>
+
+      <h3>Entry Point (<code>Wasteland/Core/EntryPoint.h</code>)</h3>
+      <p>Every executable includes this header last. It resolves the asset working directory by walking up from the
+        executable until it finds an <code>assets/</code> directory, initializes the logger, then brackets three profiled
+        sessions around app construction, <code>Run()</code>, and teardown. This is why the editor and Sandbox can be
+        launched from any working directory.</p>
 
       <h3>Layer (<code>Wasteland/Core/Layer.h</code>)</h3>
       <p>Layers are the primary unit of engine functionality. Both the editor and game systems are implemented as
         layers.</p>
       <pre><code>class Layer {
 public:
+    Layer(const std::string &amp;name = "Layer");
     virtual void OnAttach() {}
     virtual void OnDetach() {}
     virtual void OnUpdate(Timestep ts) {}
     virtual void OnImGuiRender() {}
-    virtual void OnEvent(Event& event) {}
+    virtual void OnEvent(Event &amp;event) {}
+    inline const std::string &amp;GetName() const { return m_DebugName; }
 };</code></pre>
-      <p>The <code>EditorLayer</code> (in DemonCore-Editor) and <code>Sandbox2D</code> are the two main layer
-        implementations.</p>
+      <p><code>LayerStack</code> maintains two lists — regular layers and overlays — so ImGui always renders above
+        gameplay regardless of push order.</p>
+
+      <h3>Platform Layer (<code>Wasteland/src/Platform/</code>)</h3>
+      <p>Windowing and input are split per-OS under <code>Platform/</code> — <code>Windows/</code>,
+        <code>Linux/</code>, and <code>Mac/</code> each provide a window class, an input class, and platform utils. The
+        rendering backends live beside them in <code>Platform/OpenGL/</code> and <code>Platform/NVRHI/</code>. This is
+        the largest single area of the engine at ~8,400 lines.</p>
 
       <h3>Timestep (<code>Wasteland/Core/Timestep.h</code>)</h3>
-      <p>A simple wrapper around a float representing seconds since last frame. Provides <code>GetSeconds()</code> and
+      <p>A float wrapper representing seconds since the last frame. Provides <code>GetSeconds()</code> and
         <code>GetMilliseconds()</code>.</p>
 
       <h3>Window (<code>Wasteland/Core/Window.h</code>)</h3>
-      <p>Abstracts platform-specific window creation (GLFW-backed). Handles input callbacks, vsync, and resize events.
-      </p>
-
-      <h3>Events (<code>Wasteland/Events/Event.h</code>)</h3>
-      <p>Blocking event system. Event types include:</p>
+      <p>Abstracts platform-specific window creation. Beyond the usual size/vsync/native-handle access it owns two
+        graphics-specific responsibilities:</p>
       <ul>
-        <li><code>WindowClose</code>, <code>WindowResize</code>, <code>WindowFocus</code></li>
-        <li><code>KeyPressed</code>, <code>KeyReleased</code>, <code>KeyTyped</code></li>
-        <li><code>MouseButtonPressed</code>, <code>MouseButtonReleased</code>, <code>MouseMoved</code>,
-          <code>MouseScrolled</code></li>
+        <li><code>SwitchRendererAPI(RendererAPI::API)</code> — hot-swaps the backend at runtime</li>
+        <li><code>GetCurrentContext()</code> — returns the <code>GraphicsContext</code> owning the device and command
+          list</li>
       </ul>
-      <p>Events are dispatched immediately via <code>EventDispatcher</code> which routes to handler functions.</p>
+
+      <h3>GraphicsContext (<code>Wasteland/Renderer/GraphicsContext.h</code>)</h3>
+      <p>The minimal surface a window must satisfy for rendering: <code>Init()</code>, <code>SwapBuffers()</code>, and an
+        optional <code>BeginFrame()</code>. <code>OpenGLContext</code> and <code>NVRHIContext</code> implement it.</p>
+
+      <h3>RendererAPI (<code>Wasteland/Renderer/RendererAPI.h</code>)</h3>
+      <p>The abstract backend interface — <code>Init</code>, <code>SetViewport</code>, <code>SetClearColor</code>,
+        <code>Clear</code>, <code>DrawIndexed</code>, <code>DrawLines</code>, <code>SetLineWidth</code>, and
+        <code>SetActiveTextures</code>. The active <code>API</code> enum is a static on the class, and
+        <code>RenderCommand</code> is a static inline facade over the current instance, so all render paths dispatch
+        through one call site.</p>
+
+      <h3>Events (<code>Wasteland/Events/</code>)</h3>
+      <p>Blocking event system dispatched immediately through <code>EventDispatcher</code>. Events carry a bitmask
+        category (<code>Application</code>, <code>Input</code>, <code>Keyboard</code>, <code>Mouse</code>,
+        <code>MouseButton</code>) so a handler can filter by <code>IsInCategory()</code>:</p>
+      <ul>
+        <li><code>WindowCloseEvent</code>, <code>WindowResizeEvent</code></li>
+        <li><code>KeyPressedEvent</code> (with repeat count), <code>KeyReleasedEvent</code>, <code>KeyTypedEvent</code></li>
+        <li><code>MouseButtonPressed/ReleasedEvent</code>, <code>MouseMovedEvent</code>,
+          <code>MouseScrolledEvent</code></li>
+      </ul>
+
+      <h3>Input (<code>Wasteland/Core/Input.h</code>)</h3>
+      <p>Static facade over the per-platform input implementation, exposing <code>IsKeyPressed</code>,
+        <code>IsMouseButtonPressed</code>, and <code>GetMousePosition</code>. <code>GetMouseDelta()</code> is
+        deliberately stateful — it diffs against the previous sample and consumes the cache, so a second call within the
+        same frame correctly returns <code>(0, 0)</code>. Call it exactly once per frame.</p>
+
+      <h3>UUID (<code>Wasteland/Core/UUID.h</code>)</h3>
+      <p>64-bit entity identifier with spdlog formatter support. Every entity carries one, which is what scene
+        serialization and the editor's AI entity tools key on.</p>
 
       <h3>Log (<code>Wasteland/Core/Log.h</code>)</h3>
-      <p>Static logger using spdlog. <code>WL_CORE_INFO()</code>, <code>WL_CORE_ERROR()</code>, etc. for engine-side
-        logging.</p>
+      <p>Static logger using spdlog. <code>WL_CORE_INFO()</code>, <code>WL_CORE_ERROR()</code>, and the
+        <code>WL_ERROR()</code> family. <code>WL_ASSERT</code> / <code>WL_CORE_ASSERT</code> are compiled out entirely
+        outside Debug builds.</p>
+
+      <h3>Math (<code>Wasteland/Math/Math.h</code>)</h3>
+      <p>Small math helpers layered over GLM — notably <code>DecomposeTransform()</code>, which pulls translation,
+        rotation, and scale back out of a composed matrix.</p>
     </div>
 
     <!-- Scene System -->
@@ -692,19 +767,37 @@ public:
         <li><code>OnUpdateRuntime()</code> — Play mode</li>
         <li><code>OnUpdateSimulation()</code> — Physics-only simulation</li>
       </ul>
-      <p>The scene also manages volumetric volumes (fog, clouds), water surfaces, and light submission to the renderer.
-      </p>
+      <p>Each is bracketed by a matching start/stop pair (<code>OnRuntimeStart/Stop</code>,
+        <code>OnSimulationStart/Stop</code>) that spins up and tears down the relevant systems.</p>
+      <p>The scene also owns the per-frame gather that feeds the renderer — <code>RenderScene()</code> walks the registry
+        and dispatches to <code>SubmitVolumetricVolumes()</code>, <code>SubmitSceneLights()</code>,
+        <code>UpdateWater()</code>, and <code>SubmitWaterSurfaces()</code>. Water gameplay queries
+        (<code>GetWaterHeightAt</code>, <code>IsUnderwater</code>) live here and are forwarded through
+        <code>Entity</code>, so C++ and Python see the same surface.</p>
 
       <h3>Entity (<code>Wasteland/Scene/Entity.h</code>)</h3>
       <p>An Entity is a lightweight handle wrapping an <code>entt::entity</code> and its parent <code>Scene</code>. It
         provides a templated component API:</p>
       <pre><code>Entity entity = scene.CreateEntity("Player");
 entity.AddComponent&lt;TransformComponent&gt;();
-auto& transform = entity.GetComponent&lt;TransformComponent&gt;();
-bool has = entity.HasComponent&lt;SpriteRendererComponent&gt;();</code></pre>
+auto &amp;transform = entity.GetComponent&lt;TransformComponent&gt;();
+bool has = entity.HasComponent&lt;SpriteRendererComponent&gt;();
+auto *maybe = entity.TryGetComponent&lt;MaterialComponent&gt;();  // null instead of asserting</code></pre>
+      <p><code>GetComponent</code> asserts on a missing component; <code>TryGetComponent</code> returns a pointer. This
+        distinction matters in scripting, where a missing component is an expected case rather than a bug.</p>
+
+      <h3>TransformComponent</h3>
+      <p>Translation, Rotation, and Scale as <code>glm::vec3</code>, with a cached matrix that is rebuilt only when one
+        of the three changes. <code>GetTransform()</code> returns the cached TRS matrix; <code>SetTransform()</code>
+        decomposes an incoming matrix back into TRS.</p>
+      <p><strong>Rotation is stored in radians.</strong> The editor converts to and from degrees at the UI boundary, but
+        the value that reaches <code>glm::quat()</code> — and the value a script must write — is radians. Writing
+        degrees produces a camera that faces somewhere other than where the script aimed it.</p>
 
       <h3>Components (<code>Wasteland/Scene/Components.h</code>)</h3>
-      <p>All ECS components are plain structs:</p>
+      <p>All ECS components are plain structs. Grouped by purpose:</p>
+
+      <h4>Core</h4>
       <table>
         <tr>
           <th>Component</th>
@@ -723,6 +816,26 @@ bool has = entity.HasComponent&lt;SpriteRendererComponent&gt;();</code></pre>
           <td>Translation, rotation, scale (cached matrix)</td>
         </tr>
         <tr>
+          <td>CameraComponent</td>
+          <td>SceneCamera reference, primary flag, fixed aspect</td>
+        </tr>
+        <tr>
+          <td>ScriptComponent</td>
+          <td>Python script path + class name</td>
+        </tr>
+        <tr>
+          <td>NativeScriptComponent</td>
+          <td>C++ script instance + function-pointer factory</td>
+        </tr>
+      </table>
+
+      <h4>2D Rendering</h4>
+      <table>
+        <tr>
+          <th>Component</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
           <td>SpriteRendererComponent</td>
           <td>Color + texture + tiling for 2D</td>
         </tr>
@@ -730,49 +843,114 @@ bool has = entity.HasComponent&lt;SpriteRendererComponent&gt;();</code></pre>
           <td>CircleRendererComponent</td>
           <td>Circle primitive for 2D</td>
         </tr>
+      </table>
+
+      <h4>3D Rendering</h4>
+      <table>
         <tr>
-          <td>CameraComponent</td>
-          <td>SceneCamera reference</td>
+          <th>Component</th>
+          <th>Purpose</th>
         </tr>
         <tr>
-          <td>ScriptComponent</td>
-          <td>Python script instance</td>
+          <td>CubeRendererComponent</td>
+          <td>Textured cube mesh</td>
+        </tr>
+        <tr>
+          <td>SphereRendererComponent</td>
+          <td>UV sphere with radius / sectors / stacks</td>
+        </tr>
+        <tr>
+          <td>MaterialComponent</td>
+          <td>PBR — albedo, metallic, roughness, emission, normal strength, displacement</td>
+        </tr>
+      </table>
+
+      <h4>2D Physics (Box2D)</h4>
+      <table>
+        <tr>
+          <th>Component</th>
+          <th>Purpose</th>
         </tr>
         <tr>
           <td>Rigidbody2DComponent</td>
-          <td>Box2D body definition</td>
+          <td>Body type, fixed rotation</td>
         </tr>
         <tr>
           <td>BoxCollider2DComponent</td>
           <td>Box2D box shape</td>
         </tr>
         <tr>
-          <td>Rigidbody3DComponent</td>
-          <td>Box3D body definition</td>
+          <td>CircleCollider2DComponent</td>
+          <td>Box2D circle shape</td>
+        </tr>
+      </table>
+      <p>2D colliders carry density, friction, restitution, and restitution threshold. Each holds an opaque
+        <code>void*</code> runtime fixture handle.</p>
+
+      <h4>3D Physics (Box3D)</h4>
+      <table>
+        <tr>
+          <th>Component</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>RigidBody3DComponent</td>
+          <td>Body type, gravity scale, linear/angular damping, per-axis rotation lock</td>
         </tr>
         <tr>
           <td>BoxCollider3DComponent</td>
-          <td>Box3D box shape</td>
+          <td>Box shape via half extents</td>
+        </tr>
+        <tr>
+          <td>SphereCollider3DComponent</td>
+          <td>Sphere shape via radius</td>
+        </tr>
+        <tr>
+          <td>CapsuleCollider3DComponent</td>
+          <td>Capsule shape via radius + height</td>
+        </tr>
+      </table>
+      <p>3D bodies and shapes store their handles as <code>uint64_t</code> (Box3D's <code>b3BodyId</code> /
+        <code>b3ShapeId</code>), kept opaque to the component header. Note the capital B in
+        <code>RigidBody3DComponent</code> — it does not match the 2D naming.</p>
+
+      <h4>Lighting</h4>
+      <table>
+        <tr>
+          <th>Component</th>
+          <th>Purpose</th>
         </tr>
         <tr>
           <td>DirectionalLightComponent</td>
-          <td>Sun/main directional light</td>
+          <td>Sun — color + intensity, aimed by entity rotation</td>
         </tr>
         <tr>
           <td>PointLightComponent</td>
-          <td>Omnidirectional point light</td>
+          <td>Omnidirectional, with range and falloff</td>
         </tr>
         <tr>
           <td>SpotLightComponent</td>
-          <td>Cone spotlight</td>
+          <td>Cone with inner and outer angle</td>
         </tr>
         <tr>
-          <td>MaterialComponent</td>
-          <td>PBR material (albedo, roughness, metallic)</td>
+          <td>AreaLightComponent</td>
+          <td>Rectangular emitter, optionally double-sided</td>
+        </tr>
+      </table>
+      <p>Analytic lights need no geometry — they are gathered per frame and uploaded to the renderer, up to
+        <code>MaxAnalyticLights</code> (8), first-submitted wins. Light travels along the entity's local
+        <code>-Z</code>. They are shadowed in the Nova path; the raster preview path has no shadow maps and lights them
+        unshadowed.</p>
+
+      <h4>Atmosphere &amp; Water</h4>
+      <table>
+        <tr>
+          <th>Component</th>
+          <th>Purpose</th>
         </tr>
         <tr>
           <td>VolumetricFogComponent</td>
-          <td>Volumetric fog volume</td>
+          <td>Raymarched fog volume</td>
         </tr>
         <tr>
           <td>VolumetricCloudsComponent</td>
@@ -782,56 +960,276 @@ bool has = entity.HasComponent&lt;SpriteRendererComponent&gt;();</code></pre>
           <td>WaterComponent</td>
           <td>Gerstner-wave water surface</td>
         </tr>
-        <tr>
-          <td>MeshComponent</td>
-          <td>3D mesh + submeshes</td>
-        </tr>
-        <tr>
-          <td>AnimationComponent</td>
-          <td>Skeletal animation state</td>
-        </tr>
       </table>
+      <p>For both volume components the entity transform <em>is</em> the volume box: translation is the center and
+        scale is the full box size, axis-aligned in world space.</p>
+
+      <h3>Scene Serialization (<code>Wasteland/Scene/SceneSerializer.h</code>)</h3>
+      <p>YAML-backed, producing <code>.wastescene</code> files. The serializer exposes both a static and a runtime
+        variant of each direction — <code>Serialize</code>/<code>Deserialize</code> for editor scenes and
+        <code>SerializeRuntime</code>/<code>DeserializeRuntime</code> for cooked output. <code>Scene::Copy()</code>
+        duplicates a scene for play mode.</p>
     </div>
 
     <!-- Rendering -->
     <div id="rendering" class="docs-section">
       <h2>Rendering</h2>
 
-      <h3>Renderer (<code>Wasteland/Renderer/Renderer.h</code>)</h3>
-      <p>The static <code>Renderer</code> class initializes the active API and provides
-        <code>BeginScene()</code>/<code>EndScene()</code>/<code>Submit()</code> for the 2D pipeline.</p>
+      <h3>Two 3D Paths</h3>
+      <p><code>Renderer3D</code> runs one of two paths, selected by whether ray tracing is enabled and which backend is
+        active:</p>
+      <ul>
+        <li><strong>Raster (Basic)</strong> — the classic forward path (<code>Renderer3D_Basic</code>). Runs on every
+          backend including Vulkan and OpenGL. Unshadowed, analytic lights only.</li>
+        <li><strong>Nova</strong> — the GPU path tracer. Native compute on D3D11 and D3D12.</li>
+      </ul>
+      <p>Both consume the same per-frame submissions from the scene, so an entity looks the same either way apart from
+        shadows, reflections, and indirect light.</p>
+
+      <h3>Renderer3D (<code>Wasteland/Renderer/Renderer3D.h</code>)</h3>
+      <p>The static 3D entry point. Quality is set through <code>QualityPreset</code>:</p>
+      <pre><code>enum class QualityPreset : int { Low = 0, Medium = 1, High = 2, Ultra = 3 };</code></pre>
+      <p>The preset scales volumetric step counts and turns on a fast-path branch for fog below High, and it is uploaded
+        to the Nova shader as <code>u_QualityLevel</code> so the path tracer adapts its own sampling.</p>
+
+      <h3>Resolution &amp; Performance</h3>
+      <table>
+        <tr>
+          <th>Control</th>
+          <th>Detail</th>
+        </tr>
+        <tr>
+          <td>Render scale</td>
+          <td>Adjustable at runtime; traces run at a fraction of display resolution and composite upscales</td>
+        </tr>
+        <tr>
+          <td>Dynamic resolution</td>
+          <td>Holds a target FPS by scaling between a configured floor and 1.0</td>
+        </tr>
+        <tr>
+          <td>Target FPS</td>
+          <td>The budget dynamic resolution steers toward</td>
+        </tr>
+        <tr>
+          <td>Samples per pixel</td>
+          <td>Path-tracer sample budget</td>
+        </tr>
+        <tr>
+          <td>GPU timing</td>
+          <td>Current frame time and GPU tier name reported to the UI</td>
+        </tr>
+      </table>
+
+      <h3>Sky</h3>
+      <p>A two-color vertical gradient — bottom and top color — used as the environment background and, in the Nova path,
+        as the miss radiance for rays that escape the scene. A sun direction is set independently and, when a
+        directional light entity exists, the analytic light's direction and color override it.</p>
 
       <h3>Renderer2D (<code>Wasteland/Renderer/Renderer2D.h</code>)</h3>
-      <p>Batch-renderer for 2D primitives. Draws quads, rotated quads, circles, and lines. All 2D draws are batched into
-        a single vertex buffer per flush.</p>
+      <p>Batch renderer for 2D primitives — quads, rotated quads, circles, lines, and rects, in 2D and 3D position
+        overloads, with texture and sub-texture variants. All draws batch into a single vertex buffer per flush. An
+        <code>entityID</code> parameter on several calls supports viewport picking.</p>
       <pre><code>Renderer2D::BeginScene(camera);
 Renderer2D::DrawQuad(position, size, color);
 Renderer2D::DrawRotatedQuad(pos, size, rotation, texture);
 Renderer2D::EndScene();</code></pre>
 
-      <h3>Renderer3D (<code>Wasteland/Renderer/Renderer3D.h</code>)</h3>
-      <p>Full 3D renderer with PBR materials, ray tracing support, volumetric effects, and water rendering. Key
-        features:</p>
-      <ul>
-        <li><code>QualityPreset</code>: Low, Medium, High, Ultra</li>
-        <li>Dynamic resolution scaling (0.5–1.0) with target FPS</li>
-        <li>Ray tracing accumulation for progressive refinement</li>
-        <li>Render scale adjustable at runtime</li>
-      </ul>
+      <h3>Renderer (<code>Wasteland/Renderer/Renderer.h</code>)</h3>
+      <p>A thin static facade over the active <code>RendererAPI</code>, plus the 2D scene-data struct that batches
+        quads before submission.</p>
 
-      <h3>NVRHI (<code>Wasteland/vendor/nvrhi</code>)</h3>
-      <p>NVIDIA Rendering Hardware Interface provides DirectX 11, DirectX 12, and Vulkan backends. The engine can switch
-        APIs at runtime — all GPU resources are rebuilt via <code>RecreateResources()</code>.</p>
-
-      <h3>Nova Renderer</h3>
-      <p>Nova is the AI-powered rendering pipeline. It sits on top of Renderer3D and provides:</p>
+      <h3>NVRHI (<code>Wasteland/src/Platform/NVRHI/</code>)</h3>
+      <p>NVIDIA's Rendering Hardware Interface provides the D3D11, D3D12, and Vulkan backends behind one device
+        abstraction. The engine's NVRHI layer is a full parallel implementation of the resource classes — buffer,
+        texture, vertex array, shader, framebuffer — plus:</p>
       <ul>
-        <li>AI denoising for ray-traced frames</li>
-        <li>AI upscaling (DLSS-like) for performance</li>
-        <li>Intelligent sample distribution to reduce noise</li>
-        <li>Volumetric fog and cloud raymarching</li>
-        <li>Gerstner wave simulation for water</li>
+        <li><code>NVRHIContext</code> — device, command list, swap chain, and per-backend ImGui resource wiring
+          (D3D11 RTVs, D3D12 descriptor heaps and command objects, Vulkan descriptor pool and render pass)</li>
+        <li><code>NVRHIRendererAPI</code> — pipeline, compute pipeline, and binding-set caches keyed on shader and
+          vertex-array pointers</li>
+        <li><code>RecreateResources()</code> on every resource class, driven by the API switch</li>
       </ul>
+      <p>Vulkan additionally uses <code>VulkanDispatch.cpp</code> for volk-based function loading, defining
+        <code>VULKAN_HPP_DISPATCH_LOADER_DYNAMIC</code> in exactly one translation unit.</p>
+    </div>
+
+    <!-- Nova Ray Tracer -->
+    <div id="nova" class="docs-section">
+      <h2>Nova Ray Tracer</h2>
+      <p>Nova is Wasteland's GPU path tracer. It is not a post-process filter over the raster path — it is a compute
+        pipeline that traces the scene directly, and it ships as a native D3D11 and D3D12 implementation rather than
+        going through NVRHI, so the shaders can use the native compute and resource APIs of each API.</p>
+
+      <h3>Scene Representation</h3>
+      <p>Every drawable is flattened into a <code>RayTracingInstance</code> structure buffer carrying its inverse and
+        world transform, albedo, material parameters, AABB bounds, emission, LOD level, texture slot, and texture
+        scale. A BVH is built and flattened on the CPU, uploaded as a second structured buffer, and instances are
+        reordered to match BVH primitive order. Emissive instances are indexed into a third buffer so the path tracer
+        can sample them as light sources.</p>
+      <p>The BVH is rebuilt only when the scene actually changes — detected by comparing against the previous frame's
+        instance list — so a static scene pays the build cost once.</p>
+
+      <h3>Resources</h3>
+      <table>
+        <tr>
+          <th>Resource</th>
+          <th>Count</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>Structured buffers</td>
+          <td>3</td>
+          <td>Instances, BVH nodes, light indices</td>
+        </tr>
+        <tr>
+          <td>Images</td>
+          <td>8</td>
+          <td>Ping-pong G-buffer and history</td>
+        </tr>
+        <tr>
+          <td>Compute dispatch</td>
+          <td>8×8</td>
+          <td>Threads per group</td>
+        </tr>
+      </table>
+      <p>Each dispatch reads immutable snapshots of its own images rather than binding a resource as both SRV and UAV
+        — D3D11 in particular will not permit the aliasing, so the native layer copies every image to a snapshot
+        texture at the start of each dispatch. The history image is snapshotted for temporal reprojection and updated
+        after accumulation; the denoise result is committed back into the history slot.</p>
+
+      <h3>Compute Passes</h3>
+      <p>The shader is a single entry point switched on <code>u_PassID</code>:</p>
+      <table>
+        <tr>
+          <th>Pass</th>
+          <th>Name</th>
+        </tr>
+        <tr>
+          <td>0</td>
+          <td>Visibility + Velocity</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>Hybrid Trace (direct + indirect rays)</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Temporal Indirect Accumulation (velocity-reprojected)</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>Bloom Blur Horizontal</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>Bloom Blur Vertical</td>
+        </tr>
+        <tr>
+          <td>6</td>
+          <td>Composite — always at full resolution</td>
+        </tr>
+        <tr>
+          <td>7</td>
+          <td>Bilateral Blur (denoise)</td>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>Upscale</td>
+        </tr>
+        <tr>
+          <td>9</td>
+          <td>Generate Material Maps (Sobel)</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>God Rays</td>
+        </tr>
+      </table>
+      <p>The per-frame sequence is <code>1 → 0 → 2 → CommitHistory</code>, then up to four bilateral-blur iterations
+        with a doubling step size, then composite at full resolution, then bloom and god rays. Everything except
+        composite runs at the internal trace resolution.</p>
+
+      <h3>Progressive Refinement</h3>
+      <p>When accumulation is enabled, the blend weight is <code>max(0.02, 1 / (frame + 1))</code>, so a static camera
+        converges over successive frames while a moving one keeps re-sampling rather than smearing. Camera movement is
+        detected by comparing the current and previous view-projection matrices, and a scene change resets the frame
+        index and clears the accumulation buffers.</p>
+      <p>Anti-aliasing uses a Halton sequence: <code>Halton(index, base)</code> and
+        <code>GetCurrentJitter(frameIndex, viewportSize)</code> produce the per-frame sub-pixel offset.</p>
+
+      <h3>Neural Detail</h3>
+      <p>The shader contains in-shader MLP blocks that add detail to three channels independently — texture, lighting,
+        and material — each with its own strength slider. The feature is separately toggleable, and
+        <code>GenerateMaterialMaps</code> (pass 9) derives normal and roughness maps from an albedo with Sobel edges,
+        driven by normal strength and roughness bias.</p>
+
+      <h3>Shaders</h3>
+      <p>Two hand-maintained ports live in <code>assets/shaders/</code>: <code>Renderer3D_NovaRenderer.glsl</code>
+        (~2,240 lines) and <code>Renderer3D_NovaRenderer.hlsl</code> (~2,340 lines). They implement identical math and
+        pass structure. The HLSL port keeps the GLSL binding numbers as register slots so the C++ wiring maps 1:1
+        across both APIs, and works around the SM5 restriction on dynamic texture-array indexing with an explicit
+        32-way texture-slot switch.</p>
+      <p>Parity is not complete by design: the parallax occlusion mapping UV-space march is not portable to SM5, which
+        has no dynamically-indexed texture reads. <code>ApplyPOM</code> keeps push, bump-normal, self-occlusion, and
+        sun-shadow at the base UV, with the screen-space ray anchor still ray-correct.</p>
+
+      <h3>Failure Handling</h3>
+      <p>A dispatch that throws is caught in <code>Renderer3D::Flush()</code>, logged, and disables ray tracing for the
+        session rather than taking down the frame — the renderer falls back to the raster path and the application keeps
+        running.</p>
+    </div>
+
+    <!-- Post-Processing -->
+    <div id="post" class="docs-section">
+      <h2>Post-Processing</h2>
+      <p>Every effect below is independently toggleable and has a matching getter/setter pair on
+        <code>Renderer3D</code>, so each is adjustable at runtime from the editor or from a script. In the Nova path
+        most are compute passes; in the raster path they are applied in the post chain.</p>
+      <table>
+        <tr>
+          <th>Effect</th>
+          <th>Controls</th>
+        </tr>
+        <tr>
+          <td>Bloom</td>
+          <td>Intensity, threshold</td>
+        </tr>
+        <tr>
+          <td>Bilateral blur</td>
+          <td>Pass count (up to 4, doubling step size)</td>
+        </tr>
+        <tr>
+          <td>God rays</td>
+          <td>Intensity, decay, sample count, density, color</td>
+        </tr>
+        <tr>
+          <td>Vignette</td>
+          <td>Intensity, radius, softness</td>
+        </tr>
+        <tr>
+          <td>Chromatic aberration</td>
+          <td>Intensity</td>
+        </tr>
+        <tr>
+          <td>Color grading</td>
+          <td>Temperature, tint, gamma</td>
+        </tr>
+        <tr>
+          <td>Film grain</td>
+          <td>Intensity</td>
+        </tr>
+        <tr>
+          <td>Global fog</td>
+          <td>Density, color, base height, height falloff, distance attenuation</td>
+        </tr>
+        <tr>
+          <td>Volumetric step scale</td>
+          <td>Global multiplier on all raymarch step counts</td>
+        </tr>
+      </table>
+      <p>God rays are validated per frame: the sun is projected to screen space, and the pass only runs when the sun is
+        in front of the camera and above the horizon. God rays read a directional light's position and color when one
+        exists, falling back to the global sun direction and a warm default.</p>
     </div>
 
     <!-- Rendering Resources -->
@@ -839,8 +1237,9 @@ Renderer2D::EndScene();</code></pre>
       <h2>Rendering Resources</h2>
 
       <h3>Shader (<code>Wasteland/Renderer/Shader.h</code>)</h3>
-      <p>Abstract shader API. Supports uniform setting for int, float, vec2/3/4, and mat4. A <code>ShaderLibrary</code>
-        manages loaded shaders.</p>
+      <p>Abstract shader API. Supports uniform setting for int, int arrays, float, vec2/3/4, and mat4. A
+        <code>ShaderLibrary</code> manages loaded shaders by name, with <code>Get</code> and <code>Exists</code>
+        lookups. Shaders can be created either from a file or from inline vertex/fragment source.</p>
       <pre><code>Ref&lt;Shader&gt; shader = Shader::Create("assets/shaders/PBR.glsl");
 shader->Bind();
 shader->SetFloat3("u_Color", color);
@@ -848,32 +1247,40 @@ shader->SetMat4("u_ViewProjection", vp);</code></pre>
 
       <h3>Buffer (<code>Wasteland/Renderer/Buffer.h</code>)</h3>
       <p>Vertex and index buffers. <code>BufferElement</code> describes vertex attributes (Float, Float2, Float3, Mat4,
-        Int, etc.). The layout is auto-calculated with offsets and strides.</p>
+        Int, and others) and reports its component count. <code>BufferLayout</code> owns a set of elements and
+        auto-calculates offsets and stride.</p>
 
       <h3>VertexArray (<code>Wasteland/Renderer/VertexArray.h</code>)</h3>
-      <p>VAO wrapper. Binds vertex buffers and an index buffer together for draw calls.</p>
+      <p>VAO wrapper. Holds a list of vertex buffers plus one index buffer for draw calls.</p>
 
-      <h3>Texture (<code>Wasteland/Renderer/Texture.h</code>)</p>
-        <p>Abstract texture with <code>Texture2D</code> subclass. Created from file path or dimensions. Under NVRHI,
-          <code>GetNativeSRV()</code> returns a D3D shader resource view for ImGui rendering.</p>
+      <h3>Texture (<code>Wasteland/Renderer/Texture.h</code>)</h3>
+      <p>Abstract texture with a <code>Texture2D</code> subclass, created from a file path or from dimensions, and
+        resizable at runtime. Under NVRHI, <code>GetNativeSRV()</code> returns the backend-native shader resource view
+        — a D3D11 SRV, a D3D12 resource, or a Vulkan image view — which is also what ImGui binds for rendering.</p>
 
-        <h3>Framebuffer (<code>Wasteland/Renderer/Framebuffer.h</code>)</h3>
-        <p>Render target supporting multiple color attachments and depth/stencil. Used for the editor viewport,
-          post-processing, and ray tracing targets. Format options: RGBA8, RED_INTEGER (for picking), DEPTH24STENCIL8.
-        </p>
+      <h3>SubTexture2D (<code>Wasteland/Renderer/SubTexture2D.h</code>)</h3>
+      <p>A rectangular region of a texture, used for sprite sheets. <code>CreateFromCoords</code> takes a texture, cell
+        coordinates, cell size, and sprite size, and returns a sub-texture usable anywhere a texture is.</p>
 
-        <h3>Camera (<code>Wasteland/Renderer/Camera.h</code>)</h3>
-        <p>Abstract base camera. Provides view and projection matrices.</p>
+      <h3>Framebuffer (<code>Wasteland/Renderer/Framebuffer.h</code>)</h3>
+      <p>Render target supporting multiple color attachments and depth/stencil. Used for the editor viewport,
+        post-processing, and the ray-trace target. It also serves the editor's picking: <code>ReadPixel</code> and
+        <code>ClearAttachment</code> read back and reset the integer attachment that records which entity is under the
+        cursor.</p>
 
-        <h3>SceneCamera (<code>Wasteland/Scene/SceneCamera.h</code>)</h3>
-        <p>Supports perspective and orthographic projection. Configurable FOV, near/far clips, and aspect ratio.
-          Automatically recalculates projection on change.</p>
+      <h3>Camera (<code>Wasteland/Renderer/Camera.h</code>)</h3>
+      <p>Abstract base camera providing view and projection matrices.</p>
 
-        <h3>EditorCamera (<code>Wasteland/Renderer/EditorCamera.h</code>)</h3>
-        <p>Fly-style camera for the editor. Pan, zoom, rotate. Orthographic mode for 2D editing.</p>
+      <h3>SceneCamera (<code>Wasteland/Scene/SceneCamera.h</code>)</h3>
+      <p>Perspective and orthographic projection with configurable FOV, near/far clips, and aspect ratio. Recalculates
+        its projection when any of those change.</p>
 
-        <h3>OrthographicCameraController (<code>Wasteland/Renderer/OrthographicCameraController.h</code>)</h3>
-        <p>2D camera with zoom and pan. Used in the editor viewport for 2D scenes.</p>
+      <h3>EditorCamera (<code>Wasteland/Renderer/EditorCamera.h</code>)</h3>
+      <p>Fly-style camera for the editor — pan, zoom, rotate, plus an orthographic mode for 2D editing.</p>
+
+      <h3>OrthographicCamera (<code>Wasteland/Renderer/OrthographicCamera.h</code>)</h3>
+      <p>Simple orthographic camera. The <code>OrthographicCameraController</code> beside it adds zoom and pan, and is
+        what the Sandbox uses for 2D.</p>
     </div>
 
     <!-- Physics -->
@@ -881,36 +1288,132 @@ shader->SetMat4("u_ViewProjection", vp);</code></pre>
       <h2>Physics</h2>
 
       <h3>Box2D (<code>Wasteland/vendor/Box2D</code>)</h3>
-      <p>2D physics engine. Bodies and colliders are created via <code>Rigidbody2DComponent</code> and
-        <code>BoxCollider2DComponent</code>. The scene calls
-        <code>OnPhysics2DStart()</code>/<code>OnPhysics2DStop()</code> to manage the physics world lifecycle.</p>
+      <p>2D physics engine. Bodies and colliders are created via <code>Rigidbody2DComponent</code> with
+        <code>BoxCollider2DComponent</code> or <code>CircleCollider2DComponent</code>. The scene calls
+        <code>OnPhysics2DStart()</code> / <code>OnPhysics2DStop()</code> to manage the world lifecycle, and the
+        runtime fixture handles are stored inside the components.</p>
 
       <h3>Box3D (<code>Wasteland/vendor/Box3D</code>)</h3>
-      <p>3D physics engine (fork of Box3D). Managed by <code>Rigidbody3DComponent</code> and
-        <code>BoxCollider3DComponent</code>. Provides 3D collision detection and rigid body dynamics.</p>
+      <p>3D physics engine — the upstream Box3D project, not a fork. Managed by <code>RigidBody3DComponent</code> with
+        box, sphere, or capsule colliders, stepped from <code>OnPhysics3DStart/Stop</code> and
+        <code>OnUpdateSimulation()</code> with a four-velocity-iteration substep count.</p>
+      <p>Body and shape identifiers are stored as <code>uint64_t</code> and reconstructed with
+        <code>b3LoadBodyId</code> / <code>b3LoadShapeId</code> at use, which keeps the Box3D types out of the component
+        headers.</p>
     </div>
 
     <!-- Scripting -->
     <div id="scripting" class="docs-section">
       <h2>Scripting</h2>
+      <p>Python 3.14 is embedded in the engine through pybind11 and exposed as a module named <code>Wasteland</code>,
+        built as the <code>WastelandPython</code> shared library (<code>Wasteland.pyd</code>). Roughly 150 classes and
+        free functions are bound, covering the full renderer, scene, ECS, and UI surface — a script can draw, spawn
+        entities, read input, and drive post-processing settings.</p>
 
-      <h3>Python Integration (<code>Wasteland/vendor/pybind11</code>)</h3>
-      <p>Python 3.14+ is embedded via pybind11. Game scripts inherit from <code>ScriptableEntity</code> and can override
-        <code>OnCreate()</code>, <code>OnUpdate()</code>, and <code>OnDestroy()</code>.</p>
-      <pre><code>class PlayerController(script.ScriptableEntity):
-    def OnCreate(self):
-        print("Player spawned")
-    def OnUpdate(self, ts):
-        transform = self.GetComponent(TransformComponent)
-        transform.Translation.x += 1.0 * ts</code></pre>
+      <h3>Script Model</h3>
+      <p>A script is a plain Python class, not a subclass of an engine type. The engine constructs it once with the
+        owning entity, then calls one method every frame:</p>
+      <ol>
+        <li>Add a <code>ScriptComponent</code> to an entity in the Scene Hierarchy.</li>
+        <li>Set <code>ScriptPath</code> to the file, e.g. <code>assets/scripts/Player.py</code>.</li>
+        <li>Set <code>ScriptName</code> to the class name inside it, e.g. <code>Player</code>.</li>
+        <li>Press Play.</li>
+      </ol>
+      <p><code>ScriptEngine</code> imports the module, instantiates <code>ScriptName(entity)</code>, and calls
+        <code>OnUpdateEntity(dt)</code> per frame where <code>dt</code> is a <code>Timestep</code>. A script whose
+        module is already loaded is reloaded rather than re-imported, and one that fails to import is recorded in a
+        failure set and skipped thereafter rather than throwing every frame.</p>
 
-      <h3>ScriptableEntity (<code>Wasteland/Scene/ScriptableEntity.h</code>)</h3>
-      <p>Base class for all script components. Wraps an <code>Entity</code> and provides component access methods that
-        delegate to the entity.</p>
+      <pre><code>import Wasteland
 
-      <h3>ScriptComponent (<code>Components.h</code>)</h3>
-      <p>Stores a <code>ScriptableEntity*</code> instance. Created when a Python script file is attached to an entity in
-        the editor.</p>
+class Mover:
+    def __init__(self, entity):
+        self.entity = entity
+        self.speed = 5.0
+
+    def OnUpdateEntity(self, dt):
+        if not self.entity.IsValid():
+            return
+        t = self.entity.GetTransform()
+        t.Translation.x += self.speed * dt.GetSeconds()
+        self.entity.SetTransform(t.Translation, t.Rotation, t.Scale)</code></pre>
+
+      <h3>Transforms from Python</h3>
+      <p><code>Entity.GetTransform()</code> returns a <strong>copy</strong> of the transform component, not a live
+        reference. Mutating it has no effect until <code>Entity.SetTransform(translation, rotation, scale)</code> commits
+        it. This is deliberate — it makes the read-modify-write explicit — but a script that mutates and forgets to
+        commit will run cleanly and never move.</p>
+      <p><strong>Rotation is in radians.</strong> The editor's inspector shows and accepts degrees and converts at the
+        UI boundary, but <code>TransformComponent.Rotation</code> itself is radians, because that is what feeds
+        <code>glm::quat()</code>. A first-person controller that writes degrees looks correct in the numbers and points
+        the wrong way in the world.</p>
+      <p>Rotation is XYZ Euler order, and the scene camera builds its view as the inverse of the entity transform — so
+        with a right-handed basis, forward is local <code>-Z</code> and right is local <code>+X</code>.</p>
+
+      <h3>Available API</h3>
+      <table>
+        <tr>
+          <th>Area</th>
+          <th>Examples</th>
+        </tr>
+        <tr>
+          <td>Math types</td>
+          <td>Vec2, Vec3 (with Length, LengthSquared, Normalize), Vec4, Mat4</td>
+        </tr>
+        <tr>
+          <td>Entity</td>
+          <td>IsValid, GetUUID, GetName, GetTransform, SetTransform, GetComponent(name), IsUnderwater, GetWaterHeightAt</td>
+        </tr>
+        <tr>
+          <td>Components</td>
+          <td>Per-component Has / Get / TryGet / Add / AddOrReplace / Remove accessors</td>
+        </tr>
+        <tr>
+          <td>Scene</td>
+          <td>CreateEntity, DestroyEntity</td>
+        </tr>
+        <tr>
+          <td>Input</td>
+          <td>IsKeyPressed, IsMouseButtonPressed, GetMousePosition, GetMouseDelta, GetMouseX, GetMouseY</td>
+        </tr>
+        <tr>
+          <td>Renderer2D / 3D</td>
+          <td>Draw calls, and the full Renderer3D settings surface (quality, ray tracing, every post-processing toggle)</td>
+        </tr>
+        <tr>
+          <td>Resources</td>
+          <td>Shader, ShaderLibrary, Texture, SubTexture2D, Buffer, VertexArray, Framebuffer</td>
+        </tr>
+        <tr>
+          <td>UI</td>
+          <td>ImGuiLayer, file dialogs</td>
+        </tr>
+        <tr>
+          <td>Events</td>
+          <td>SetEventHandler / GetEventHandler, plus all event classes</td>
+        </tr>
+        <tr>
+          <td>Utilities</td>
+          <td>Math_DecomposeTransform, ScriptEngine lifecycle</td>
+        </tr>
+      </table>
+      <p>Key codes are exposed as module constants named <code>WL_KEY_</code> followed by the key — 122 of them, from
+        <code>WL_KEY_A</code> through <code>WL_KEY_Z</code> and <code>WL_KEY_0</code>–<code>WL_KEY_9</code> to
+        <code>WL_KEY_F1</code>–<code>WL_KEY_F12</code>, the modifiers, and the arrows.</p>
+
+      <h3>Calling the Engine from C++</h3>
+      <p>The <code>extern "C"</code> hooks <code>Wasteland_SetPythonEventHandler</code> and
+        <code>Wasteland_GetPythonEventHandler</code> let the engine push events into Python. Because a callback invoked
+        from a window procedure is an unwind boundary, the dispatch path catches everything rather than letting a
+        Python exception cross back into C.</p>
+
+      <h3>Shipped Scripts</h3>
+      <p><code>assets/scripts/</code> contains eight reference scripts exercising different parts of the API:
+        <code>Player</code> (first-person controller with stances and mouse look), <code>Mover</code>,
+        <code>Rotator</code>, <code>ColorCycler</code>, <code>Floaty</code>, <code>Bouncer</code>,
+        <code>Follower</code>, and <code>Spawner</code> (entity lifecycle).
+        <code>assets/ai/engine_reference.md</code> is the scripting reference the editor's AI panel injects into its
+        system prompt.</p>
     </div>
 
     <!-- Editor -->
@@ -919,58 +1422,67 @@ shader->SetMat4("u_ViewProjection", vp);</code></pre>
 
       <h3>EditorLayer (<code>DemonCore-Editor/src/EditorLayer.h</code>)</h3>
       <p>The main editor layer. Owns the active scene, viewport framebuffer, gizmo state, and all editor panels. Handles
-        scene serialization (YAML), play/stop/simulation modes, and toolbar rendering.</p>
+        scene serialization, the play / stop / simulation state machine, entity duplication, script creation, and toolbar
+        rendering. It is by far the largest single file in the project after the renderers.</p>
 
       <h3>Editor Panels</h3>
       <table>
         <tr>
           <th>Panel</th>
-          <th>File</th>
           <th>Purpose</th>
         </tr>
         <tr>
-          <td>AIChatPanel</td>
-          <td>AIChatPanel.h</td>
-          <td>AI chat with tool execution and agentic mode</td>
+          <td>SceneHierarchyPanel</td>
+          <td>Entity tree, creation/deletion, and the full per-component inspector</td>
         </tr>
         <tr>
-          <td>SceneHierarchyPanel</td>
-          <td>SceneHierarchyPanel.h</td>
-          <td>Entity tree view + creation/deletion</td>
+          <td>ContentBrowserPanel</td>
+          <td>Asset file browser</td>
         </tr>
         <tr>
           <td>ScriptEditorPanel</td>
-          <td>ScriptEditorPanel.h</td>
           <td>Code editor with syntax highlighting</td>
         </tr>
         <tr>
           <td>ScriptInspectorPanel</td>
-          <td>ScriptInspectorPanel.h</td>
           <td>Script property inspector</td>
         </tr>
         <tr>
-          <td>ContentBrowserPanel</td>
-          <td>ContentBrowserPanel.h</td>
-          <td>Asset file browser</td>
+          <td>AIChatPanel</td>
+          <td>AI chat with tool execution and agentic mode</td>
         </tr>
         <tr>
           <td>ModelDownloaderPanel</td>
-          <td>ModelDownloaderPanel.h</td>
           <td>3D model download utility</td>
         </tr>
       </table>
+      <p>Three support classes sit behind the AI panel: <code>HttpClient</code> (a small HTTP implementation for the
+        chat and download requests), <code>JsonMini</code> (JSON parsing without a dependency), and
+        <code>ApiKeyStore</code> (credential and endpoint persistence).</p>
 
       <h3>AIChatPanel (<code>DemonCore-Editor/src/Panels/AIChatPanel.h</code>)</h3>
       <p>Connects to any OpenAI-compatible API endpoint. Features:</p>
       <ul>
-        <li>Chat history with user/assistant/tool roles</li>
-        <li>Agentic mode: AI can call tools (file ops, entity inspection) and loop until done</li>
-        <li>Engine context injection — loads <code>assets/ai/engine_reference.md</code> into system prompt</li>
+        <li>Chat history with user, assistant, error, and tool roles</li>
+        <li><strong>Agentic mode</strong> — the model can call engine tools and loop until the task is done, up to 10
+          iterations per request</li>
+        <li>Engine context injection — loads <code>assets/ai/engine_reference.md</code> into the system prompt, cached
+          after the first read</li>
         <li>Settings: API key, base URL, model, temperature, system prompt</li>
+        <li>Writes performed by the agent auto-open in the script editor</li>
       </ul>
+      <p>Requests run on a background worker thread so the editor stays responsive while a model is generating, and
+        panel state carries a pending-file-open queue back to the UI thread.</p>
+
+      <h3>Credentials</h3>
+      <p><code>ApiKeyStore</code> keeps API keys and endpoint settings outside the repository —
+        <code>%APPDATA%\Wasteland\ai_keys.cfg</code> on Windows, <code>~/.config/Wasteland/</code> elsewhere — so a key
+        is never committed. Values are not written to the log.</p>
 
       <h3>ToolServer (<code>DemonCore-Editor/src/Panels/ToolServer.h</code>)</h3>
-      <p>Singleton that exposes engine tools to AI agents. Tools available:</p>
+      <p>A singleton that exposes engine tools to the AI agent. Tool definitions are emitted as a JSON array and
+        injected into the system prompt; <code>ExecuteTool()</code> dispatches a call by name with a JSON argument
+        object. Nine tools are implemented:</p>
       <table>
         <tr>
           <th>Tool</th>
@@ -978,45 +1490,43 @@ shader->SetMat4("u_ViewProjection", vp);</code></pre>
         </tr>
         <tr>
           <td>read_file</td>
-          <td>Read a text file</td>
+          <td>Read the full contents of a file</td>
         </tr>
         <tr>
           <td>write_file</td>
-          <td>Create/overwrite a file</td>
+          <td>Write content to a file, creating or overwriting</td>
         </tr>
         <tr>
           <td>edit_file</td>
-          <td>Replace text in a file</td>
+          <td>Replace exact text in a file</td>
         </tr>
         <tr>
           <td>list_files</td>
-          <td>List directory contents</td>
+          <td>List files in a directory recursively</td>
         </tr>
         <tr>
           <td>memory_read</td>
-          <td>Read persistent memory</td>
+          <td>Read the AI's persistent memory</td>
         </tr>
         <tr>
           <td>memory_append</td>
-          <td>Append to persistent memory</td>
+          <td>Append a note to persistent memory for future sessions</td>
         </tr>
         <tr>
           <td>list_entities</td>
-          <td>List all scene entities</td>
+          <td>List all entities with UUID, name, and components</td>
         </tr>
         <tr>
           <td>get_entity_info</td>
-          <td>Get entity transform + components</td>
+          <td>Get an entity's transform, tag, and components</td>
         </tr>
         <tr>
-          <td>get_entity_script_state</td>
-          <td>Get script instance variables</td>
-        </tr>
-        <tr>
-          <td>get_component_info</td>
-          <td>Inspect a specific component</td>
+          <td>get_script_state</td>
+          <td>Read the live instance variables of a running script</td>
         </tr>
       </table>
+      <p>Persistent memory is stored alongside the editor's config, so an agent can carry lessons between sessions
+        without those notes entering the scene file.</p>
     </div>
 
     <!-- Volumetrics & Water -->
@@ -1024,23 +1534,93 @@ shader->SetMat4("u_ViewProjection", vp);</code></pre>
       <h2>Volumetrics &amp; Water</h2>
 
       <h3>Volumetric Fog (<code>VolumetricFogComponent</code>)</h3>
-      <p>Screen-space raymarched fog. Submitted via <code>SubmitVolumetricVolumes()</code> between BeginScene/EndScene.
-        Supports density, scattering, and absorption parameters.</p>
+      <p>A box volume raymarched inside the fragment and path-tracing shaders. Density, Henyey-Greenstein anisotropy
+        (forward scattering), height falloff, 3D-noise breakup with drift, and a per-volume step count control its cost.
+        Up to <code>MaxFogVolumes</code> (4) render at once.</p>
 
       <h3>Volumetric Clouds (<code>VolumetricCloudsComponent</code>)</h3>
-      <p>Raymarched volumetric clouds with noise-based density. Rendered as a post-process pass with lighting
-        integration.</p>
+      <p>Raymarched cloud volumes with billow noise, coverage, density, high-frequency erosion for detail, wind-driven
+        drift, silver-lining forward scatter around the sun, and self-shadowing. Up to <code>MaxCloudVolumes</code> (2)
+        render at once. An ambient tint keeps the interiors from going fully black.</p>
+      <p>Both volume types are raymarched in the raster path and the Nova path, so they look consistent whichever is
+        active. <code>SetVolumetricStepScale()</code> scales every volume's step count globally — the cheapest quality
+        lever in the renderer.</p>
 
-      <h3>Water System (<code>WaterComponent</code>)</h3>
-      <p>Gerstner wave simulation for water surfaces. Features:</p>
+      <h3>Water (<code>WaterComponent</code>)</h3>
+      <p>The surface is a six-component directional Gerstner spectrum, simulated on the CPU so that gameplay queries and
+        the render mesh evaluate the same field and never disagree.</p>
+
+      <h4>Spectrum</h4>
+      <p>Each component carries a fixed length ratio, amplitude share, fan angle, and phase offset relative to the
+        primary wave. Amplitudes fall off from the primary swell, and <code>Chop</code> scales the high-frequency
+        detail — 0 gives a single glassy swell, 1 a full choppy sea. Each component adds a second harmonic to sharpen
+        crests and flatten troughs, and phase speed follows deep-water dispersion (ω = √(gk)), so long swells genuinely
+        outrun short chop instead of moving in lockstep.</p>
+
+      <h4>Evaluation</h4>
+      <p><code>EvaluateSurface()</code> returns height, horizontal displacement, and an analytic normal in one pass.
+        From it:</p>
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Returns</th>
+        </tr>
+        <tr>
+          <td>SampleHeightAt</td>
+          <td>Heightfield column — what buoyancy uses, stable by construction</td>
+        </tr>
+        <tr>
+          <td>SampleNormalAt</td>
+          <td>Analytic surface normal</td>
+        </tr>
+        <tr>
+          <td>CrestFactorAt</td>
+          <td>0 = trough to 1 = crest, for foam whitening</td>
+        </tr>
+        <tr>
+          <td>SampleFlow</td>
+          <td>Current vector for river advection</td>
+        </tr>
+      </table>
+
+      <h4>Spectral LOD</h4>
+      <p>The renderer passes roughly twice the mesh cell size as a minimum wavelength, and components shorter than that
+        fade out across the Nyquist band instead of popping. Without it the water aliases into shimmer at distance; with
+        it, distant water costs less and reads as smoother. Gameplay queries pass 0 and keep the full spectrum.</p>
+
+      <h4>Body Types</h4>
+      <p><code>ApplyPreset()</code> configures a lake, river, or ocean — different color, amplitude, wavelength, flow,
+        and foam. Rivers set <code>FlowDirection</code> and <code>FlowSpeed</code>, which advect the whole wave field
+        downstream and drive the shore foam.</p>
+
+      <h4>Appearance</h4>
+      <p>Shallow-to-deep absorption color over a configurable depth, crest and shore foam with its own scale and band
+        width, transparency, and specular sharpness. Up to <code>MaxWaterSurfaces</code> (8) render at once.</p>
+
+      <h4>Gameplay Queries</h4>
+      <p>Both queries are available on <code>Scene</code> and forwarded through <code>Entity</code>, and both are bound
+        to Python:</p>
       <ul>
-        <li>Configurable wave parameters (amplitude, length, speed, choppiness)</li>
-        <li>Phase wrapping (mod 2π) to prevent floating-point drift</li>
-        <li>Distance LOD to reduce aliasing at distance</li>
-        <li>Buoyancy queries: <code>GetWaterHeightAt()</code> returns still level + wave height</li>
-        <li>Flow vectors for river currents</li>
-        <li>Underwater detection: <code>IsUnderwater()</code></li>
+        <li><code>GetWaterHeightAt(worldPos)</code> — still level plus wave height, optionally returning the local flow
+          vector</li>
+        <li><code>IsUnderwater(worldPos, margin)</code> — for camera effects and swim state</li>
       </ul>
+      <p>The renderer skips water entirely for entities flagged <code>!wlWater</code>, which is how a hidden water body
+        can still serve gameplay queries.</p>
+    </div>
+
+    <!-- Profiling -->
+    <div id="profiling" class="docs-section">
+      <h2>Profiling</h2>
+      <p>A built-in instrumentor (<code>Wasteland/Debug/Instrumentor.h</code>) times named scopes and writes Chrome
+        trace JSON.</p>
+      <pre><code>WL_PROFILE_BEGIN_SESSION("Runtime", "WastelandProfile-Runtime.json");
+WL_PROFILE_FUNCTION();          // times the enclosing function
+WL_PROFILE_SCOPE("SceneUpdate");
+WL_PROFILE_END_SESSION();</code></pre>
+      <p><code>EntryPoint.h</code> already brackets three sessions — Startup, Runtime, and Shutdown — writing
+        <code>WastelandProfile-Startup.json</code>, <code>-Runtime.json</code>, and <code>-Shutdown.json</code>. The
+        whole facility compiles out when <code>WL_PROFILE</code> is undefined, so it costs nothing when off.</p>
     </div>
 
     <!-- Building -->
@@ -1057,15 +1637,15 @@ shader->SetMat4("u_ViewProjection", vp);</code></pre>
         </tr>
         <tr>
           <td>Compiler</td>
-          <td>Visual Studio 2022+</td>
+          <td>Visual Studio 2022 or newer (toolset v145)</td>
           <td>GCC/Clang</td>
           <td>Xcode CLI Tools</td>
         </tr>
         <tr>
           <td>Python</td>
-          <td>3.14+</td>
-          <td>3.14+</td>
-          <td>3.14+</td>
+          <td>3.14</td>
+          <td>3.14</td>
+          <td>3.14</td>
         </tr>
         <tr>
           <td>CMake</td>
@@ -1080,37 +1660,57 @@ shader->SetMat4("u_ViewProjection", vp);</code></pre>
           <td>—</td>
         </tr>
       </table>
+      <p>On Windows the Python location and the Vulkan SDK path are both hard-coded in <code>premake5.lua</code>. A
+        different Python install or a newer Vulkan SDK means editing those two entries and regenerating — the paths are
+        not probed.</p>
 
       <h3>Step 1: Clone</h3>
-      <pre><code>git clone https://github.com/Ashen-Wastes-Studios/Wasteland-Engine.git
+      <pre><code>git clone https://github.com/WastelandProductions/Wasteland-Engine.git
 cd Wasteland-Engine</code></pre>
 
-      <h3>Step 2: Generate Projects</h3>
-      <pre><code># Windows
-.\scripts\Win-GenProjects.bat
-
-# Linux
-./scripts/Linux-GenProjects.sh
-
-# macOS
-./scripts/Mac-GenProjects.sh</code></pre>
-
-      <h3>Step 3: Build NVRHI</h3>
-      <pre><code>cd Wasteland\vendor\nvrhi
-mkdir build && cd build
+      <h3>Step 2: Build NVRHI</h3>
+      <p>NVRHI is built separately with CMake and consumed as a static library. Build <strong>both</strong> configurations
+        — <code>premake5.lua</code> looks for <code>nvrhi*.lib</code> under <code>build/%{cfg.buildcfg}/</code>, so a
+        missing config fails to link.</p>
+      <pre><code>cd Wasteland/vendor/nvrhi
+mkdir build &amp;&amp; cd build
 cmake .. -G "Visual Studio 17 2022" -A x64
 cmake --build . --config Release
 cmake --build . --config Debug</code></pre>
+      <p>This also fetches the DirectX and Vulkan headers into <code>build/_deps/</code>, which the engine's include
+        paths point at directly. <code>docs/NVRHI_SETUP.md</code> covers the integration in full.</p>
 
-      <h3>Step 4: Build Engine</h3>
-      <pre><code># Windows
+      <h3>Step 3: Generate Projects</h3>
+      <pre><code># Windows — tries VS2026, falls back to VS2022, then emits a gmake2
+# compilation database for VS Code
+.\scripts\Win-GenProjects.bat
+
+# Linux / macOS
+./scripts/Linux-GenProjects.sh
+./scripts/Mac-GenProjects.sh</code></pre>
+
+      <h3>Step 4: Build</h3>
+      <pre><code># Visual Studio
 msbuild Wasteland.slnx -property:Configuration=Release -property:Platform=x64
+msbuild Wasteland.slnx -property:Configuration=Debug   -property:Platform=x64
 
-# Linux & macOS
+# Linux &amp; macOS
 make config=release_x64</code></pre>
+      <p>Verify with real build output — both configurations must succeed, not just the one being iterated on.</p>
 
       <h3>Step 5: Run</h3>
       <pre><code>.\bin\Release-windows-x86_64\DemonCore-Editor\DemonCore-Editor.exe</code></pre>
+      <p>The editor's post-build step copies <code>assets/</code> and the Python runtime (DLL, stdlib, and extension
+        modules) next to the executable, which is what lets the shared <code>EntryPoint.h</code> find
+        <code>assets/</code> without any working-directory setup.</p>
+
+      <h3>Testing Backend Switching Headlessly</h3>
+      <p>Environment variables let the editor switch renderers on a timer, for reproducing backend-switch behavior
+        without a human at the settings combo:</p>
+      <pre><code>WL_AUTO_SWITCH_TO=3          # 2=D3D11, 3=D3D12, 4=Vulkan
+WL_AUTO_SWITCH_QUIT=120     # close after N frames
+WL_AUTO_SWITCH_TO2=2        # optional second switch
+WL_AUTO_SWITCH_TO2_FRAME=60</code></pre>
     </div>
 
     <!-- premake5.lua -->
@@ -1118,40 +1718,157 @@ make config=release_x64</code></pre>
       <h2>Build Configuration (premake5.lua)</h2>
       <p>The workspace defines three configurations:</p>
       <ul>
-        <li><strong>Debug</strong> — No optimizations, debug symbols, validation layers enabled</li>
-        <li><strong>Release</strong> — Optimized, some validation</li>
-        <li><strong>Dist</strong> — Fully optimized, no validation, distribution build</li>
+        <li><strong>Debug</strong> — <code>WL_DEBUG</code>, no optimization, symbols on. Enables
+          <code>WL_ENABLE_ASSERTS</code>, so <code>WL_ASSERT</code> and <code>WL_CORE_ASSERT</code> are live and
+          trap on failure.</li>
+        <li><strong>Release</strong> — <code>WL_RELEASE</code>, optimized.</li>
+        <li><strong>Dist</strong> — <code>WL_DIST</code>, optimized, no asserts.</li>
       </ul>
-      <p>Output directory: <code>bin/{cfg}-{system}-{arch}/</code></p>
-      <p>Dependencies included:</p>
-      <pre><code>GLFW, Glad, ImGui, glm, stb_image, entt,
-yaml-cpp, ImGuizmo, Box2D, Box3D,
-pybind11, NVRHI, VulkanSDK</code></pre>
+      <p>Output lands in <code>bin/{cfg}-{system}-{arch}/</code> per project, with intermediates in
+        <code>bin-int/</code>.</p>
+
+      <h3>Projects</h3>
+      <table>
+        <tr>
+          <th>Project</th>
+          <th>Kind</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>Wasteland</td>
+          <td>StaticLib</td>
+          <td>The engine core — everything under <code>Wasteland/src/</code></td>
+        </tr>
+        <tr>
+          <td>WastelandPython</td>
+          <td>SharedLib (.pyd)</td>
+          <td>pybind11 bindings, compiled from a single translation unit</td>
+        </tr>
+        <tr>
+          <td>DemonCore-Editor</td>
+          <td>ConsoleApp</td>
+          <td>The editor (startup project)</td>
+        </tr>
+        <tr>
+          <td>Sandbox</td>
+          <td>ConsoleApp</td>
+          <td>2D test app with a GPU particle system</td>
+        </tr>
+      </table>
+
+      <h3>Dependencies</h3>
+      <pre><code>GLFW, Glad, ImGui (+ TextEditor), ImGuizmo, glm, stb_image,
+entt, yaml-cpp, spdlog, Box2D, Box3D, pybind11,
+NVRHI (d3d11 / d3d12 / vk), VulkanSDK, volk</code></pre>
+      <p>Linux additionally needs <code>libglfw3-dev</code> and <code>libgl1-mesa-dev</code>; macOS needs
+        <code>brew install glfw</code>.</p>
+
+      <h3>Platform Defines</h3>
+      <p><code>WL_PLATFORM_WINDOWS</code>, <code>WL_PLATFORM_LINUX</code>, or <code>WL_PLATFORM_MACOS</code> select the
+        per-OS window and input implementations. <code>Core.h</code> also detects these independently and rejects
+        unsupported targets outright — x86, iOS, and Android fail the build with an explicit error rather than
+        miscompiling.</p>
+
+      <h3>Two Build Details Worth Knowing</h3>
+      <ul>
+        <li><strong><code>/bigobj</code> is mandatory on MSVC</strong> for every project that includes pybind11 headers.
+          Without it the COFF section limit is exceeded and the compile fails. Because it is set in
+          <code>premake5.lua</code>, editing a <code>.vcxproj</code> directly is lost on the next premake run.</li>
+        <li><strong>The Vulkan SDK path is pinned.</strong> Both the NVRHI-fetched headers and the SDK provide
+          <code>vulkan/vulkan.hpp</code>, so include order matters. <code>VULKAN_HPP_DISPATCH_LOADER_DYNAMIC</code> is
+          defined in exactly one translation unit to keep that unambiguous.</li>
+      </ul>
     </div>
 
     <!-- Project Structure -->
     <div id="structure" class="docs-section">
       <h2>Project Structure</h2>
-      <pre><code>Wasteland/
-├── Wasteland/                    # Static library (engine core)
-│   └── src/
-│       ├── Wasteland/Core/       # Application, Layer, Timestep, Log, Input, Window
-│       ├── Wasteland/Events/     # Event types and dispatcher
-│       ├── Wasteland/Renderer/   # Renderer2D, Renderer3D, Nova, Shaders, Buffers
-│       ├── Wasteland/Scene/      # Scene, Entity, Components, Camera
-│       ├── Wasteland/ImGui/      # ImGuiLayer, ImGui build
-│       ├── Wasteland/Scripting/  # Python/scripting utilities
-│       └── Wasteland/vendor/     # All third-party dependencies
-├── DemonCore-Editor/             # Editor executable
-│   └── src/
-│       ├── EditorLayer.h/cpp     # Main editor layer
-│       └── Panels/               # All editor panels
-├── Sandbox/                      # Test application
-├── docs/                         # NVRHI_SETUP.md
-├── scripts/                      # Win/Mac/Linux build scripts
-├── vendor/bin/premake/           # Premake binary
-├── premake5.lua                  # Build configuration
-└── Wasteland.slnx                # Visual Studio solution</code></pre>
+      <pre><code>Wasteland-Engine/
+├── Wasteland/                        # Engine static library
+│   ├── src/
+│   │   ├── wlpch.h / wlpch.cpp       # Precompiled header
+│   │   ├── Wasteland.h               # Umbrella header
+│   │   ├── Wasteland/
+│   │   │   ├── Core/                 # Application, Layer, LayerStack, Input,
+│   │   │   │                         # Log, Timestep, UUID, Window, KeyCodes
+│   │   │   ├── Events/               # Event, dispatcher, key/mouse/window events
+│   │   │   ├── Renderer/             # Renderer2D/3D, RendererAPI, RenderCommand,
+│   │   │   │                         # Shader, Buffer, Texture, Framebuffer,
+│   │   │   │                         # Cameras, GraphicsContext
+│   │   │   ├── Scene/                # Scene, Entity, Components, SceneCamera,
+│   │   │   │                         # SceneSerializer, ScriptableEntity
+│   │   │   ├── Scripting/            # ScriptEngine + pybind11 Bindings.cpp
+│   │   │   ├── ImGui/                # ImGuiLayer + ImGui build
+│   │   │   ├── Math/                 # Math helpers
+│   │   │   ├── Debug/                # Instrumentor
+│   │   │   └── Utils/                # PlatformUtils (file dialogs)
+│   │   └── Platform/                 # Per-OS and per-backend implementations
+│   │       ├── Windows/ Linux/ Mac/  # Window, Input, platform utils
+│   │       ├── OpenGL/               # GL backend + context
+│   │       └── NVRHI/                # NVRHI backend, context, resource classes,
+│   │                                 # DX11Nova, DX12Nova, VulkanDispatch
+│   └── vendor/                       # All third-party dependencies
+├── DemonCore-Editor/                 # Editor executable
+│   ├── src/
+│   │   ├── EditorLayer.h / .cpp
+│   │   └── Panels/                   # All editor panels + ToolServer
+│   └── assets/                       # Scenes, scripts, shaders, textures
+├── Sandbox/                          # 2D test application
+├── docs/NVRHI_SETUP.md               # NVRHI integration guide
+├── scripts/                          # Win/Mac/Linux project generation
+├── vendor/bin/premake/               # Premake binary
+├── premake5.lua                      # Build configuration
+├── Wasteland.slnx                    # Visual Studio solution
+└── Makefile                          # Linux/macOS build</code></pre>
+
+      <h3>Codebase Size</h3>
+      <table>
+        <tr>
+          <th>Area</th>
+          <th>Lines</th>
+        </tr>
+        <tr>
+          <td>Platform (windowing + backends)</td>
+          <td>~8,400</td>
+        </tr>
+        <tr>
+          <td>DemonCore-Editor</td>
+          <td>~6,800</td>
+        </tr>
+        <tr>
+          <td>Renderer</td>
+          <td>~5,600</td>
+        </tr>
+        <tr>
+          <td>Scene</td>
+          <td>~3,200</td>
+        </tr>
+        <tr>
+          <td>Scripting</td>
+          <td>~2,200</td>
+        </tr>
+        <tr>
+          <td>ImGui</td>
+          <td>~1,100</td>
+        </tr>
+        <tr>
+          <td>Core</td>
+          <td>~1,000</td>
+        </tr>
+        <tr>
+          <td>Events</td>
+          <td>~330</td>
+        </tr>
+        <tr>
+          <td>Sandbox</td>
+          <td>~350</td>
+        </tr>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td><strong>~29,300</strong></td>
+        </tr>
+      </table>
+      <p>Excludes <code>vendor/</code>. Shaders add roughly 7,100 lines across the GLSL and HLSL pairs.</p>
     </div>
 
   </div>
