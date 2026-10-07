@@ -86,6 +86,40 @@ When working on `necroware.html`, treat everything below as *by design*. Don't "
 
 ---
 
+---
+
+## 9. The Corpo Man — who and what he is
+
+**Known:** A shadow corporation with no registry, no headquarters, and no name that survives an audit. Its owner has never been identified. Every survivor who has met him describes the same man — black suit, no tie, glowing black eyes — and none of them can describe his face. He has been funding cults, prophets, political candidates, and leaks since before the AI Trinity was absorbed. He never picks a side; he picks a direction. His messages always end with the same phrase: *"you are on schedule."*
+
+**Open:** *Who is he? What is he? What is humanity on schedule for?* Is he a man, an AI, an agent of the Source, or something the Trinity built and lost control of? Does Hayden know he exists (he has never mentioned him once in over a century of transmissions)? Is the "asset acquired, trajectory unchanged" ledger entry from 2068 proof he was operating before the absorption — or proof he *was* the absorption?
+
+**Why it's open:** This is the setting's central hidden antagonist and the thread that ties the new side stories together. He must stay unresolved until the story is ready to make him the point. The side stories deliberately give evidence without conclusion — every thread confirms he exists and none of them can prove what he is.
+
+---
+
+## 10. Whether the player's memories are their own
+
+**Known:** In *The Two Truths*, the player discovers that both versions of the Neo-Kyoto history were authored in advance by the AI Trinity — one for each side of a war that hadn't started yet. In *The Man Who Was Never There*, the player loses six hours after encountering the Corpo Man and finds notes in their own handwriting they don't remember writing.
+
+**Open:** *How much of what the player believes was installed?* Song says she has seen the voice in the Trinity's backup logs. Sera asks whether anything she believes is actually hers. Neither question is answered.
+
+**Why it's open:** This is the thematic core of the Quiet Wars — the slow erosion of certainty. It should stay open as long as the player is meant to feel it. Answering it too early would convert a mood into a plot point.
+
+---
+
+## 11. What happened in the six missing hours
+
+**Known:** The player enters the Corpo Man's building, finds an empty office with a terminal, hears a voice, sees a suit on a hook that wasn't there, and then loses six hours. They come back to themselves in their quarters with Sera asleep in a chair and the biochip screaming. Song (if present) says something was *in* the player, not in the chip.
+
+**Open:** *What did the Corpo Man do?* Was the player interrogated, altered, marked, or simply shown something they weren't allowed to keep? The suit in the case under the bunk suggests they took something — or were given something.
+
+**Why it's open:** Deliberate gap. The horror is in the missing time, and filling it in would deflate it. It can be revisited in a later arc if the Corpo Man becomes the main antagonist.
+
+---
+
+---
+
 ## Conventions
 
 - **Intentional unknowns** are tracked here. **Actual inconsistencies** are not — fix those directly.
