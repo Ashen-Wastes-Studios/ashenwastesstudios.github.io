@@ -619,7 +619,7 @@
       background: rgba(220, 20, 60, 0.3);
       color: var(--ink);
     }
-  
+
     /* Sidebar Layout */
     .docs-layout {
       display: grid;
@@ -678,10 +678,25 @@
       .docs-layout {
         grid-template-columns: 1fr;
       }
+
       .sidebar {
         position: static;
         margin-bottom: 1rem;
       }
+    }
+
+    /* Inline callout note */
+    .note {
+      border-left: 2px solid var(--accent);
+      padding: 0.75rem 1rem;
+      margin: 1.25rem 0;
+      color: var(--ink-muted);
+      font-size: 0.9rem;
+      max-width: 70ch;
+    }
+
+    .note strong {
+      color: var(--ink);
     }
     </style>
 </head>
@@ -728,10 +743,10 @@
         <li><a href="#api">API</a></li>
         <li><a href="#project-structure">Structure</a></li>
         <li><a href="#settings">Settings</a></li>
-        <li><a href="#multi-agent">Swarm & Council</a></li>
+        <li><a href="#multi-agent">Swarm &amp; Council</a></li>
         <li><a href="#safety">Safety</a></li>
         <li><a href="#license">License</a></li>
-      
+
   </ul>
 </aside>
 <div class="docs-content">
@@ -770,30 +785,29 @@
         same backend behaviors.</p>
 
       <div class="arch-diagram">┌─────────────────────────────────────────────────────────────┐
-        │ Ashen AI Architecture │
-        ├─────────────────────────────────────────────────────────────┤
-        │ │
-        │ ┌─────────────────────┐ ┌─────────────────────────────┐ │
-        │ │ Qwen3.5 Pipeline │ │ Legacy Custom Pipeline │ │
-        │ │ qwen_finetune.py │ │ ashen_gpt_trainer.py │ │
-        │ │ → ashen_gpt_model/ │ │ → ashen_gpt_model.pk1 │ │
-        │ └──────────┬──────────┘ └──────────────┬──────────────┘ │
-        │ │ │ │
-        │ └───────────┬───────────────────┘ │
-        │ ▼ │
-        │ ┌──────────────────────────┐ │
-        │ │ QwenModelAdapter / │ │
-        │ │ AshenGPTLanguageModel │ │
-        │ └──────────┬───────────────┘ │
-        │ │ │
-        │ ┌─────────────┴─────────────┐ │
-        │ ▼ ▼ │
-        │ ┌──────────┐ ┌──────────┐ │
-        │ │ chatbot │ │ web │ │
-        │ │ .py (CLI)│ │ _chatbot │ │
-        │ └──────────┘ │ .py (UI) │ │
-        │ └──────────┘ │
-        └─────────────────────────────────────────────────────────────┘</div>
+│                    Ashen AI Architecture                     │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────────────┐   ┌─────────────────────────────┐ │
+│  │ Qwen3.5 Pipeline    │   │ Legacy Custom Pipeline      │ │
+│  │ qwen_finetune.py    │   │ ashen_gpt_trainer.py       │ │
+│  │ → ashen_gpt_model/  │   │ → ashen_gpt_model.pk1      │ │
+│  └──────────┬──────────┘   └──────────────┬──────────────┘ │
+│             │                             │                │
+│             └───────────┬─────────────────┘                │
+│                         ▼                                  │
+│  ┌──────────────────────────────┐                          │
+│  │ QwenModelAdapter /           │                          │
+│  │ AshenAIAgenticEngine         │                          │
+│  └──────────┬───────────────────┘                          │
+│             │                                              │
+│     ┌───────┴────────┐                                     │
+│     ▼                ▼                                     │
+│  ┌──────────┐   ┌───────────────┐                          │
+│  │ chatbot  │   │ web_chatbot   │                          │
+│  │ .py (CLI)│   │ .py (UI)      │                          │
+│  └──────────┘   └───────────────┘                          │
+└─────────────────────────────────────────────────────────────┘</div>
 
       <h3>Model Pipelines</h3>
       <table>
@@ -804,8 +818,13 @@
         </tr>
         <tr>
           <td>Base</td>
-          <td>Qwen3.5-0.8B (HuggingFace)</td>
+          <td>Qwen3.5-0.8B (HuggingFace, upstream <code>hidden_size=1024</code>)</td>
           <td>From-scratch Qwen-style decoder-only</td>
+        </tr>
+        <tr>
+          <td>Current Width</td>
+          <td>hidden_size 1448 — upscaled once by √2, depth unchanged</td>
+          <td>n_embd 512 (pre-upscale checkpoint)</td>
         </tr>
         <tr>
           <td>Norm</td>
@@ -814,13 +833,13 @@
         </tr>
         <tr>
           <td>Position</td>
-          <td>Qwen RotaryEmbedding (RoPE)</td>
-          <td>RotaryEmbedding with Dynamic NTK scaling</td>
+          <td>Qwen RoPE (theta 1e7, partial_rotary_factor 0.25)</td>
+          <td>RotaryEmbedding with Dynamic NTK scaling (base 2048, cache 65536)</td>
         </tr>
         <tr>
           <td>Attention</td>
-          <td>scaled_dot_product_attention (causal)</td>
-          <td>same</td>
+          <td>Hybrid — 3 linear_attention + 1 full_attention per 4-layer group</td>
+          <td>Causal multi-head self-attention</td>
         </tr>
         <tr>
           <td>FFN</td>
@@ -829,7 +848,7 @@
         </tr>
         <tr>
           <td>Tokenizer</td>
-          <td>Qwen BPE (AutoTokenizer)</td>
+          <td>Qwen BPE (<code>AutoTokenizer</code>, 248,320 vocab)</td>
           <td>GPT-2 BPE via tiktoken (50,257 vocab)</td>
         </tr>
         <tr>
@@ -839,20 +858,30 @@
         </tr>
         <tr>
           <td>Max Context</td>
-          <td>8,192 tokens</td>
-          <td>8,192 tokens</td>
+          <td>8,192 tokens (<code>context_length</code>)</td>
+          <td>8,192 tokens (<code>block_size</code>)</td>
         </tr>
       </table>
 
       <h3>Hardware Optimization (RTX 3060 Ti, 8.59 GB VRAM)</h3>
       <ul style="color: var(--ink-muted); margin-left: 1.5rem; margin-bottom: 1rem;">
-        <li>Qwen inference defaults to <strong>4-bit (bitsandbytes)</strong> to fit weights in ~0.6 GB</li>
+        <li>Qwen inference defaults to <strong>4-bit (bitsandbytes)</strong> to fit the 2.13 GB bf16 weights in ~0.6 GB
+        </li>
         <li><code>kv_cap</code> / <code>gen_cap</code> clamp KV-cache and generation length to prevent OOM</li>
         <li>Gradient checkpointing at long context + periodic <code>empty_cache()</code> + <code>gc.collect()</code>
         </li>
-        <li><strong>Width-upscaling:</strong> checkpoints are widened by √2 on re-run (512 → 720) with Net2Net copy-init
-        </li>
+        <li><strong>Width-upscaling:</strong> the default checkpoint is widened by √2 with Net2Net copy-init
+          (1024 → 1448), depth unchanged, so capacity grows with a minimal loss spike</li>
+        <li>MoE training freezes the base model + all experts and trains only routers + LoRA on expert projections
+          (~5 GB)</li>
       </ul>
+
+      <div class="note">
+        The <code>hidden_size</code> of the fine-tuned checkpoint (1448) is not a multiple of 64, so bitsandbytes'
+        4-bit matmul falls back to a slower kernel and prints a harmless <code>UserWarning</code>. The dimension is
+        fixed by the saved weights and <strong>cannot</strong> be changed without retraining — do not edit
+        <code>config.json</code> to "fix" the warning, it crashes loading with a shape mismatch.
+      </div>
     </div>
 
     <!-- Requirements -->
@@ -872,7 +901,7 @@
         <tr>
           <td>Python</td>
           <td>3.10</td>
-          <td>3.11 or 3.12</td>
+          <td>3.11 or 3.12 (bundled venv uses 3.12)</td>
         </tr>
         <tr>
           <td>GPU</td>
@@ -900,35 +929,63 @@
       <table>
         <tr>
           <th>Package</th>
+          <th>Version</th>
           <th>Purpose</th>
         </tr>
         <tr>
           <td>torch ≥2.3</td>
+          <td>2.13.0 (CUDA 13.2)</td>
           <td>Core tensor ops, autograd, CUDA kernels</td>
         </tr>
         <tr>
           <td>transformers ≥4.42</td>
+          <td>5.16.1</td>
           <td>Qwen3.5 HF loading, chat templates</td>
         </tr>
         <tr>
           <td>peft ≥0.11</td>
+          <td>0.20.0</td>
           <td>LoRA adapters, merge_and_unload()</td>
         </tr>
         <tr>
           <td>bitsandbytes ≥0.43</td>
+          <td>0.50.2</td>
           <td>4-bit/8-bit quantization</td>
         </tr>
         <tr>
           <td>tiktoken ≥0.7</td>
+          <td>0.14.0</td>
           <td>GPT-2 BPE (legacy model)</td>
         </tr>
         <tr>
+          <td>requests ≥2.31</td>
+          <td>2.34.2</td>
+          <td>HTTP for web search, HF downloads</td>
+        </tr>
+        <tr>
           <td>huggingface-hub ≥0.23</td>
+          <td>1.28.0</td>
           <td>snapshot_download, repo APIs</td>
         </tr>
         <tr>
+          <td>safetensors ≥0.4</td>
+          <td>0.8.0</td>
+          <td>Fast weight loading</td>
+        </tr>
+        <tr>
+          <td>accelerate ≥0.31</td>
+          <td>1.14.0</td>
+          <td>Device map, mixed precision</td>
+        </tr>
+        <tr>
           <td>gguf ≥0.10</td>
+          <td>installed</td>
           <td>GGUF file read/write</td>
+        </tr>
+        <tr>
+          <td>llama-cpp-python ≥0.2.70</td>
+          <td>optional</td>
+          <td>GGUF inference (not required for training or export)</td>
         </tr>
       </table>
     </div>
@@ -955,6 +1012,13 @@ python -m pip install gguf llama-cpp-python numpy pyyaml</code></pre>
 import torch; print(f'torch {torch.__version__} CUDA={torch.version.cuda}')
 import transformers; print(f'transformers {transformers.__version__}')
 import peft; print(f'peft {peft.__version__}')
+import bitsandbytes; print(f'bitsandbytes {bitsandbytes.__version__}')
+import tiktoken; print(f'tiktoken {tiktoken.__version__}')
+import requests; print(f'requests {requests.__version__}')
+import huggingface_hub; print(f'huggingface-hub {huggingface_hub.__version__}')
+import safetensors; print(f'safetensors {safetensors.__version__}')
+import accelerate; print(f'accelerate {accelerate.__version__}')
+import gguf; print(f'gguf {gguf.__version__}')
 print('All imports OK')"</code></pre>
     </div>
 
@@ -979,35 +1043,46 @@ print('All imports OK')"</code></pre>
           <td><code>python qwen_finetune.py</code></td>
         </tr>
         <tr>
+          <td>Fine-tune + MoE</td>
+          <td><code>set QWEN_MOE=1 &amp;&amp; python qwen_finetune.py</code></td>
+        </tr>
+        <tr>
           <td>Fine-tune + GGUF Q4_K_M</td>
-          <td><code>set QWEN_GGUF=1 && python qwen_finetune.py</code></td>
+          <td><code>set QWEN_GGUF=1 &amp;&amp; set QWEN_GGUF_QUANT=Q4_K_M &amp;&amp; python qwen_finetune.py</code></td>
         </tr>
         <tr>
           <td>Legacy pre-training</td>
           <td><code>python ashen_gpt_trainer.py</code></td>
+        </tr>
+        <tr>
+          <td>Run benchmark</td>
+          <td><code>[TOOL: run_benchmark()]</code> in chat, or the web UI button</td>
         </tr>
       </table>
 
       <h3>Typical Workflow</h3>
       <ol style="color: var(--ink-muted); margin-left: 1.5rem;">
         <li><strong>Train/fine-tune</strong> — <code>qwen_finetune.py</code> produces the default
-          <code>ashen_gpt_model/</code>
-        </li>
-        <li><strong>Chat</strong> — launch the CLI or web interface; model loads the saved checkpoint</li>
+          <code>ashen_gpt_model/</code></li>
+        <li><strong>Chat</strong> — launch the CLI or web interface; the model loads the saved checkpoint
+          automatically (<code>current_model</code> in <code>settings.json</code> selects which)</li>
         <li><strong>Agent mode</strong> — ask the model to inspect files, run commands, or explore your workspace</li>
-        <li><strong>Evaluate & improve</strong> — use Swarm / Council for hard prompts and Self-Improve dashboard for
-          feedback tuning</li>
+        <li><strong>Evaluate &amp; improve</strong> — use Swarm / Council for hard prompts and the Self-Improve dashboard
+          for feedback tuning</li>
       </ol>
     </div>
 
     <!-- Training -->
     <div id="training" class="docs-section">
-      <h2>Training & Fine-Tuning</h2>
+      <h2>Training &amp; Fine-Tuning</h2>
+      <p>Two training entry points, one per model pipeline. Both tee output to <code>training_logs.txt</code>
+        (ANSI-stripped) in addition to the terminal.</p>
 
       <h3>qwen_finetune.py — LoRA Fine-Tune (Default)</h3>
       <p>Fine-tunes Qwen3.5-0.8B with LoRA in bf16, emits a merged HuggingFace checkpoint at
-        <code>ashen_gpt_model/</code> plus a small <code>class_head.pt</code> for intent routing.
-      </p>
+        <code>ashen_gpt_model/</code> plus a small <code>class_head.pt</code> for intent routing. LoRA on a 0.75B bf16
+        base (~1.5 GB) + adapters + AdamW state + activations fits comfortably in 8.59 GB; a full bf16 fine-tune would
+        not.</p>
 
       <h4>Key Environment Variables</h4>
       <table>
@@ -1027,9 +1102,34 @@ print('All imports OK')"</code></pre>
           <td>Eval/stream cadence</td>
         </tr>
         <tr>
-          <td>QWEN_LORA_R</td>
-          <td>32</td>
-          <td>LoRA rank</td>
+          <td>QWEN_CKPT_EVERY</td>
+          <td>20 (= eval cadence)</td>
+          <td>Periodic merged checkpoint</td>
+        </tr>
+        <tr>
+          <td>QWEN_GEN_TOKENS</td>
+          <td>64</td>
+          <td>Eval generation length</td>
+        </tr>
+        <tr>
+          <td>QWEN_LORA_R / ALPHA / DROPOUT</td>
+          <td>32 / 64 / 0.05</td>
+          <td>LoRA rank / alpha / dropout</td>
+        </tr>
+        <tr>
+          <td>QWEN_BATCH / QWEN_MAXLEN</td>
+          <td>1 / 512</td>
+          <td>Batch size / sequence cap (VRAM bound)</td>
+        </tr>
+        <tr>
+          <td>QWEN_CORPUS</td>
+          <td>0</td>
+          <td>Train on raw text corpora instead of SFT</td>
+        </tr>
+        <tr>
+          <td>QWEN_FULLFT / QWEN_OFFLOAD</td>
+          <td>0 / 0</td>
+          <td>Full fine-tune / ZeRO-1 CPU optimizer offload</td>
         </tr>
         <tr>
           <td>QWEN_KV_CAP / QWEN_GEN_CAP</td>
@@ -1039,7 +1139,7 @@ print('All imports OK')"</code></pre>
         <tr>
           <td>QWEN_GGUF</td>
           <td>1</td>
-          <td>Enable GGUF export</td>
+          <td>Enable GGUF export (Q4_K_M)</td>
         </tr>
         <tr>
           <td>QWEN_MOE</td>
@@ -1052,41 +1152,497 @@ print('All imports OK')"</code></pre>
       <p>Replace each layer's dense MLP with sparse MoE before LoRA. Only top-k experts activate per token — parameter
         count grows without proportional compute increase. On checkpoint save, MoE layers collapse to dense MLPs
         automatically.</p>
+      <table>
+        <tr>
+          <th>Variable</th>
+          <th>Default</th>
+          <th>Meaning</th>
+        </tr>
+        <tr>
+          <td>QWEN_MOE</td>
+          <td>0</td>
+          <td>Enable MoE</td>
+        </tr>
+        <tr>
+          <td>QWEN_MOE_EXPERTS</td>
+          <td>4</td>
+          <td>Experts per layer</td>
+        </tr>
+        <tr>
+          <td>QWEN_MOE_TOPK</td>
+          <td>2</td>
+          <td>Experts activated per token</td>
+        </tr>
+        <tr>
+          <td>QWEN_MOE_AUX</td>
+          <td>0.01</td>
+          <td>Load-balancing aux-loss weight</td>
+        </tr>
+        <tr>
+          <td>QWEN_MOE_EXPERT_DIV</td>
+          <td>1</td>
+          <td>Expert intermediate-size divisor (1 = full, 2 = half)</td>
+        </tr>
+        <tr>
+          <td>QWEN_MOE_MERGE_ON_SAVE</td>
+          <td>1</td>
+          <td>Collapse MoE → dense MLP on export</td>
+        </tr>
+      </table>
 
       <h3>ashen_gpt_trainer.py — Legacy Pre-Training</h3>
-      <p>Trains from-scratch Qwen-style MoE on the book/code corpus. Architecture:
-        <code>n_embd=512, n_layer=8, n_head=8, block_size=8192</code>. Progressive context (512 → 2K → 8K), gradient
-        checkpointing, memory-mapped data streaming.
-      </p>
+      <p>Trains the from-scratch Qwen-style <strong>MoE</strong> (SwiGLU, 4 experts, Top-2 gating) on the book/code
+        corpus and saves <code>ashen_gpt_model.pk1</code>. Architecture: <code>n_embd=512</code>, <code>n_layer=8</code>,
+        <code>n_head=8</code>, <code>block_size=8192</code>. Data is streamed from <code>train_split.txt</code> /
+        <code>code_train_split.txt</code> / <code>val_split.txt</code> via memory-mapped windows (O(1) RAM regardless of
+        dataset size). A VRAM-aware plan picks batch / context / accumulation from live free VRAM, and an auxiliary
+        intent-classification head is trained on a small balanced batch every step.</p>
+      <p>The checkpoint ships at <strong>n_embd=512</strong> (127M params). On the next run the trainer detects it and
+        width-upscales by √2 (512 → 720) with Net2Net copy-init, depth unchanged, so a resumed run grows capacity
+        without retraining from scratch.</p>
     </div>
 
     <!-- Chatbots -->
     <div id="chatbots" class="docs-section">
       <h2>Chatbot Interfaces</h2>
+      <p>Both front-ends share the <strong>same streaming engine</strong>
+        (<code>AshenAIAgenticEngine.solve_with_agent_stream</code>) and the same event schema, so reasoning, tool calls,
+        citations, and CoT display are identical across CLI and web.</p>
 
       <h3>CLI Chatbot (chatbot.py)</h3>
-      <p>Single-file terminal chatbot with zero dependency on <code>web_chatbot.py</code>. Features cybernetic theme,
-        pinned input box, and live CoT streaming.</p>
+      <p>Single-file terminal chatbot with zero dependency on <code>web_chatbot.py</code> — it folds the full
+        Qwen/engine/swarm/council/research/settings backend into one file. Features a cybernetic theme, pinned input
+        box, and live CoT streaming.</p>
 
       <h4>Slash Commands</h4>
       <pre><code>/clear  /help  /exit
 /models  /model &lt;path&gt;  /backend [local|api]
 /api-provider &lt;name|url&gt;  /api-key &lt;key|clear&gt;
+/api-models  /api-use &lt;model-id&gt;
+/login [openrouter|google|anthropic]  /logout [provider]  /account
 /settings [k=v]  /persona &lt;name&gt;
 /swarm [--agents N --mode M] &lt;task&gt;
 /council [--drafts N --critics M] &lt;task&gt;
 /research &lt;topic&gt;  /websearch &lt;q&gt;
 /read &lt;path&gt;  /write &lt;path&gt; &lt;text&gt;
+/ls [path]  /mkdir &lt;path&gt;  /rm &lt;path&gt;  /run &lt;command&gt;
+/tools
 /memory recall &lt;q&gt; | store &lt;key&gt; &lt;val&gt; | all
 /plan &lt;task&gt;  /plans
 /selfimprove analyze|auto-tune|regenerate &lt;text&gt;
-/up  /down  /benchmark</code></pre>
+/up  /down
+/sessions  /new  /load &lt;id&gt;  /delete &lt;id&gt;  /rename &lt;name&gt;
+/workspace &lt;path&gt;  /wctx off
+/cd &lt;path&gt;  /pwd
+/auto-swarm on|off  /auto-research on|off
+/cyber on|off
+/benchmark</code></pre>
+
+      <h4>Cybernetic theme &amp; pinned input box</h4>
+      <ul style="color: var(--ink-muted); margin-left: 1.5rem; margin-bottom: 1rem;">
+        <li><strong>Cybernetic theme</strong> — neon / box-drawing terminal UI, toggle with <code>/cyber on|off</code> or
+          set <code>ASHEN_CYBER=1</code>. Defaults on when stdout is a TTY.</li>
+        <li><strong>Pinned input box</strong> — the prompt box is anchored to the bottom via an ANSI scroll region
+          (<code>DECSTBM</code>); the model's CoT and answer stream <em>above</em> it and the box clears in place each
+          turn. Falls back to a plain prompt when not a TTY, when the theme is off, or on a short terminal.</li>
+      </ul>
+
+      <h4>Chain-of-thought display</h4>
+      <p>The CLI renders streamed chain-of-thought with the same UX as the web UI — CoT in gray, the final answer in
+        white, amber dot + model label, <code>Sources</code> when the model cites, and <code>[TOOL: name(args)]</code>
+        for agent tool calls.</p>
 
       <h3>Web Chatbot (web_chatbot.py)</h3>
       <p>Browser UI via stdlib <code>http.server</code> at <code>http://localhost:5000</code>. Cyberpunk theme, Model
         Hub, live CoT streaming, swarm/council dashboard, self-improvement panel.</p>
 
-      <h4>Settings (settings.json)</h4>
+      <h4>Features</h4>
+      <ul style="color: var(--ink-muted); margin-left: 1.5rem; margin-bottom: 1rem;">
+        <li><strong>Model Hub</strong> — browse local <code>.pk1</code> / <code>.gguf</code> checkpoints
+          <em>and</em> Qwen HuggingFace dirs (auto-tagged <code>QWEN</code>), upload weights, swap models live</li>
+        <li><strong>Quick-action chips</strong> — File Glob, Grep, Git Status, Run Tests, Web Search, Browse URL, Deep
+          Research, Run Benchmark</li>
+        <li><strong>Live CoT streaming</strong> — NDJSON <code>start → thought_delta → thought_done → response_delta →
+          done</code>, with <code>tool_start</code> / <code>tool_result</code> mid-loop</li>
+        <li><strong>Persona switcher</strong> — Ashen AI Agent, Code Architect, Cyber Companion</li>
+        <li><strong>Adjustable settings</strong> — temperature, top-k, top-p, max tokens, context length, GPU layers,
+          repeat penalty, precision, CPU offload, low-end GPU mode, speculative decoding, CoT-as-Answer</li>
+        <li><strong>Sessions &amp; workspace</strong> — session list / new / load / delete / rename, workspace browser,
+          workspace context injection, <code>settings.json</code> auto-created on first run</li>
+      </ul>
+
+      <h4>Agent Tools</h4>
+      <p>The model invokes tools as <code>[TOOL: name(arg='value', ...)]</code>, one per turn; the engine executes via
+        <code>execute_tool</code> and feeds <code>[OBSERVATION]</code> back for up to a few reasoning steps.</p>
+      <pre><code>read_file      write_file      edit_file        # targeted replace (one occurrence)
+list_dir       make_dir        remove_path
+run_shell_command                  # 60s timeout, blocklist enforced
+glob           grep_search
+web_search     browse_url       deep_research
+store_memory   recall_memory    create_plan     quick_actions
+run_swarm      run_council      self_improve     run_benchmark</code></pre>
+    </div>
+
+    <!-- API Reference -->
+    <div id="api" class="docs-section">
+      <h2>API Reference</h2>
+      <p>Served by the stdlib <code>http.server</code> <code>ChatHandler</code>. Unknown paths return 404.
+        <code>GET</code> and <code>POST</code> are separate route chains.</p>
+
+      <h3>Core Chat</h3>
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/</td>
+          <td>Cyberpunk UI</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/chat</td>
+          <td>Batched: {message} → {thought, response, model, model_path, show_chain_of_thought}</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/chat/stream</td>
+          <td>NDJSON live: start → thought_delta → thought_done → response_delta → done</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/clear</td>
+          <td>Save session, clear history + workspace context</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/persona</td>
+          <td>{persona} → switch persona</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/settings</td>
+          <td>{...} → live-apply (no file write)</td>
+        </tr>
+      </table>
+
+      <h3>Sessions</h3>
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/sessions</td>
+          <td>List sessions + current id</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/sessions/new</td>
+          <td>Create → 201 {session_id}</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/sessions/load</td>
+          <td>{session_id} → restore history, persona, workspace context</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/sessions/delete</td>
+          <td>{session_id} → delete (clears current if active)</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/sessions/rename</td>
+          <td>{session_id, name}</td>
+        </tr>
+      </table>
+
+      <h3>Model Hub</h3>
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/models</td>
+          <td>Scan local PC for .pk1/.gguf, deduped by path</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/hf-search</td>
+          <td>?q= → HuggingFace search (top 20 by downloads)</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/models/list</td>
+          <td>scan_available_models() → {models, current}</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/models/set-default</td>
+          <td>{path} → set + persist current_model</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/models/scan-pc</td>
+          <td>Re-scan local PC</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/models/switch</td>
+          <td>{filename} → hot-swap live (dir → QwenModelAdapter)</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/models/upload</td>
+          <td>{filename, content_base64} → save weights</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/models/download-hf-repo</td>
+          <td>{repo_id} → snapshot_download</td>
+        </tr>
+      </table>
+
+      <h3>Settings Persistence</h3>
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>GET, POST</td>
+          <td>/api/settings/load</td>
+          <td>→ {status, settings} (public view; key masked)</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/settings/save</td>
+          <td>Merge + write settings.json + live-apply</td>
+        </tr>
+      </table>
+
+      <h3>API Provider Backend</h3>
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/backend</td>
+          <td>Active backend + provider / URL / masked key</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/backend</td>
+          <td>{backend: local|api} → switch answering backend</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/api-models</td>
+          <td>List models under the provider key</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/api-use</td>
+          <td>{model} → answer through an API model</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/oauth/login</td>
+          <td>{provider} → begin OAuth → auth_url + state</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/oauth/complete</td>
+          <td>{provider, code, state} → finish (incl. manual paste)</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/oauth/logout</td>
+          <td>Drop a provider login</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/oauth/status</td>
+          <td>Provider login status</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/oauth/callback</td>
+          <td>Browser redirect target</td>
+        </tr>
+      </table>
+
+      <h3>Workspace</h3>
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/workspace/list</td>
+          <td>?dir= → directory listing</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/workspace/read</td>
+          <td>{path} → file content (utf-8, latin-1 fallback)</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/workspace/write</td>
+          <td>{path, content} → write file</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/workspace/mkdir</td>
+          <td>{path} → create directory</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/workspace/remove</td>
+          <td>{path} → delete file or tree</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/workspace/run</td>
+          <td>{command} → run in working dir</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/workspace/context</td>
+          <td>{dir} → inject dir tree into prompt</td>
+        </tr>
+      </table>
+
+      <h3>Feedback &amp; Self-Improvement</h3>
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/feedback</td>
+          <td>Last 50 feedback entries</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/self-improve</td>
+          <td>{stats, entries[-20], suggestions[-10], feedback_recent, gibberish_rate}</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/feedback</td>
+          <td>{rating, prompt, response, thought, correction, model}</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/self-improve</td>
+          <td>{action: analyze|regenerate|auto-tune, run_benchmark}</td>
+        </tr>
+      </table>
+
+      <h3>Swarm &amp; Council</h3>
+      <table>
+        <tr>
+          <th>Method</th>
+          <th>Path</th>
+          <th>Purpose</th>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/swarm</td>
+          <td>{roles[6], recent_runs, model, model_path}</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/swarm</td>
+          <td>{task, num_agents:2-6, mode} → {agents, synthesis, elapsed_s}</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/swarm/stream</td>
+          <td>Live swarm_start → agent_* → synthesis_* → done</td>
+        </tr>
+        <tr>
+          <td>GET</td>
+          <td>/api/council</td>
+          <td>{roles (5 critics), proposers[6], recent_runs, model, model_path}</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/council</td>
+          <td>{task, num_drafts:2-5, num_critics:2-5} → {drafts, critics, tally, winner, final}</td>
+        </tr>
+        <tr>
+          <td>POST</td>
+          <td>/api/council/stream</td>
+          <td>Live council_start → draft_* → critic_* → tally → final_* → done</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Project Structure -->
+    <div id="project-structure" class="docs-section">
+      <h2>Project Structure</h2>
+      <pre><code>Ashen AI Base/
+├── qwen_finetune.py          # LoRA (bf16) fine-tune of Qwen3.5 → ashen_gpt_model/
+│                             #   width-upscale on resume · MoE training · GGUF export
+├── ashen_gpt_trainer.py      # Legacy custom MoE pre-training → ashen_gpt_model.pk1
+│                             #   SFT + DPO phases · Tee stdout → training_logs.txt
+├── chatbot.py                # Self-contained CLI chatbot (no import of web_chatbot.py)
+├── web_chatbot.py            # Browser UI (stdlib http.server, port 5000)
+├── run_*.bat                 # Windows launchers for each entry point
+├── ashen_gpt_model/          # Default model (Qwen3.5 fine-tune, HF format)
+│   ├── config.json           #   Qwen3_5ForCausalLM · hidden_size 1448
+│   ├── model.safetensors     #   merged bf16 weights (2.13 GB)
+│   ├── class_head.pt         #   5-way intent router
+│   └── .upscaled             #   marker: width-upscale already applied
+├── ashen_gpt_model.pk1       # Legacy custom MoE (~127M params, n_embd 512, 8K context)
+├── ashen_gpt_model_dpo.pk1   # DPO-aligned variant of the legacy model
+├── settings.json             # Generation + display config (resolved via __file__)
+├── feedback.json             # Last 500 user ratings
+├── self_improvement.json     # {stats, log, suggestions}
+├── memory/project/           # Project memory (MEMORY.md + hybrid-code-training.md)
+├── training_logs.txt         # Auto-generated training log
+├── sessions/                 # Web chatbot sessions (JSON)
+├── sessions_cli/             # CLI chatbot sessions (JSON)
+├── train_split.txt           # Literature training data
+├── val_split.txt             # Validation data
+├── code_train_split.txt      # Scraped code training data
+├── scripts/                  # Offline verification scripts (AST-extract + exec)
+├── tools/llama.cpp/          # GGUF conversion tools (converter + llama-quantize)
+├── Qwen_Qwen3.5-0.8B/        # Upstream Qwen3.5 base model
+├── vocab.txt                 # GPT-2 BPE vocabulary (legacy tokenizer)
+├── scrape_*.py               # Public-domain / OpenWebText / GitHub code scrapers
+├── cuda/                     # Bundled CUDA virtualenv
+└── *.ipynb                   # Jupyter notebooks</code></pre>
+    </div>
+
+    <!-- Settings -->
+    <div id="settings" class="docs-section">
+      <h2>Settings</h2>
+      <p><code>settings.json</code> is resolved via <code>__file__</code> so it works regardless of working directory.
+        Precedence: <code>--settings &lt;path&gt;</code> &gt; <code>SETTINGS_PATH</code> / <code>ASHEN_SETTINGS</code>
+        env &gt; <code>settings.json</code> next to the script. On first run a default file is auto-created and merged, so
+        partial saves never wipe <code>current_model</code>.</p>
+
+      <h3>Generation &amp; Display</h3>
       <table>
         <tr>
           <th>Key</th>
@@ -1124,6 +1680,21 @@ print('All imports OK')"</code></pre>
           <td>Compute precision</td>
         </tr>
         <tr>
+          <td>cpu_offload_layers</td>
+          <td>0</td>
+          <td>CPU offload for low-end GPUs</td>
+        </tr>
+        <tr>
+          <td>low_end_gpu_mode</td>
+          <td>false</td>
+          <td>CPU offload + lower VRAM presets</td>
+        </tr>
+        <tr>
+          <td>use_draft_model</td>
+          <td>false</td>
+          <td>Speculative decoding with a draft model</td>
+        </tr>
+        <tr>
           <td>show_chain_of_thought</td>
           <td>true</td>
           <td>Display CoT reasoning</td>
@@ -1131,224 +1702,112 @@ print('All imports OK')"</code></pre>
         <tr>
           <td>cot_as_answer</td>
           <td>false</td>
-          <td>Summarize CoT as answer</td>
+          <td>Summarize CoT as the answer</td>
+        </tr>
+        <tr>
+          <td>current_model</td>
+          <td>ashen_gpt_model.pk1</td>
+          <td>Active checkpoint (HF dir after fine-tune)</td>
+        </tr>
+      </table>
+
+      <h3>Agent &amp; Backend</h3>
+      <table>
+        <tr>
+          <th>Key</th>
+          <th>Default</th>
+          <th>Description</th>
         </tr>
         <tr>
           <td>active_backend</td>
           <td>local</td>
           <td>local = weights, api = provider</td>
         </tr>
-      </table>
-    </div>
-
-    <!-- API Reference -->
-    <div id="api" class="docs-section">
-      <h2>API Reference</h2>
-      <p>Served by stdlib <code>http.server</code> ChatHandler. Unknown paths return 404.</p>
-
-      <h3>Core Chat</h3>
-      <table>
         <tr>
-          <th>Method</th>
-          <th>Path</th>
-          <th>Purpose</th>
+          <td>api_provider</td>
+          <td>""</td>
+          <td>openrouter, google, anthropic, groq, together, deepseek, ollama, lmstudio, custom</td>
         </tr>
         <tr>
-          <td>GET</td>
-          <td>/</td>
-          <td>Cyberpunk UI</td>
+          <td>api_base_url</td>
+          <td>""</td>
+          <td>Custom OpenAI-compatible base URL</td>
         </tr>
         <tr>
-          <td>POST</td>
-          <td>/api/chat</td>
-          <td>Batched: {message} → {thought, response, model}</td>
+          <td>api_key</td>
+          <td>""</td>
+          <td>Masked; <code>ASHEN_API_KEY</code> env takes precedence</td>
         </tr>
         <tr>
-          <td>POST</td>
-          <td>/api/chat/stream</td>
-          <td>NDJSON live: thought_delta → response_delta → done</td>
+          <td>api_model</td>
+          <td>""</td>
+          <td>Model ID for the provider</td>
         </tr>
         <tr>
-          <td>POST</td>
-          <td>/api/clear</td>
-          <td>Save session, clear history</td>
+          <td>oauth_client_id / secret</td>
+          <td>""</td>
+          <td>OAuth client credentials</td>
         </tr>
         <tr>
-          <td>POST</td>
-          <td>/api/persona</td>
-          <td>{persona} → switch persona</td>
-        </tr>
-      </table>
-
-      <h3>Model Hub</h3>
-      <table>
-        <tr>
-          <th>Method</th>
-          <th>Path</th>
-          <th>Purpose</th>
+          <td>auto_swarm_council</td>
+          <td>false</td>
+          <td>Auto swarm/council before each reply</td>
         </tr>
         <tr>
-          <td>GET</td>
-          <td>/api/models</td>
-          <td>Scan for .pk1/.gguf and HF dirs</td>
+          <td>auto_web_research</td>
+          <td>false</td>
+          <td>Auto web/deep-research pass before each reply</td>
         </tr>
         <tr>
-          <td>GET</td>
-          <td>/api/hf-search</td>
-          <td>?q= → HuggingFace search</td>
+          <td>allow_file_tools</td>
+          <td>true</td>
+          <td>Gate file tools (<code>ASHEN_ALLOW_FILES=0</code> kills)</td>
         </tr>
         <tr>
-          <td>POST</td>
-          <td>/api/models/switch</td>
-          <td>{filename} → hot-swap model</td>
-        </tr>
-        <tr>
-          <td>POST</td>
-          <td>/api/models/upload</td>
-          <td>{filename, content_base64} → save weights</td>
-        </tr>
-        <tr>
-          <td>POST</td>
-          <td>/api/models/download-hf-repo</td>
-          <td>{repo_id} → snapshot_download</td>
+          <td>allow_shell_tools</td>
+          <td>true</td>
+          <td>Gate shell tools (<code>ASHEN_ALLOW_SHELL=0</code> kills)</td>
         </tr>
       </table>
-
-      <h3>Workspace</h3>
-      <table>
-        <tr>
-          <th>Method</th>
-          <th>Path</th>
-          <th>Purpose</th>
-        </tr>
-        <tr>
-          <td>GET</td>
-          <td>/api/workspace/list</td>
-          <td>?dir= → directory listing</td>
-        </tr>
-        <tr>
-          <td>POST</td>
-          <td>/api/workspace/read</td>
-          <td>{path} → file content</td>
-        </tr>
-        <tr>
-          <td>POST</td>
-          <td>/api/workspace/write</td>
-          <td>{path, content} → write file</td>
-        </tr>
-        <tr>
-          <td>POST</td>
-          <td>/api/workspace/context</td>
-          <td>{dir} → inject dir tree into prompt</td>
-        </tr>
-      </table>
-
-      <h3>Feedback & Self-Improvement</h3>
-      <table>
-        <tr>
-          <th>Method</th>
-          <th>Path</th>
-          <th>Purpose</th>
-        </tr>
-        <tr>
-          <td>GET</td>
-          <td>/api/feedback</td>
-          <td>Last 50 feedback entries</td>
-        </tr>
-        <tr>
-          <td>POST</td>
-          <td>/api/feedback</td>
-          <td>{rating, prompt, response, correction}</td>
-        </tr>
-        <tr>
-          <td>POST</td>
-          <td>/api/self-improve</td>
-          <td>{action: regenerate|auto-tune|analyze}</td>
-        </tr>
-      </table>
-
-      <h3>Swarm & Council</h3>
-      <table>
-        <tr>
-          <th>Method</th>
-          <th>Path</th>
-          <th>Purpose</th>
-        </tr>
-        <tr>
-          <td>POST</td>
-          <td>/api/swarm</td>
-          <td>{task, num_agents:2-6, mode} → {agents, synthesis}</td>
-        </tr>
-        <tr>
-          <td>POST</td>
-          <td>/api/council</td>
-          <td>{task, num_drafts, num_critics} → {drafts, critics, winner}</td>
-        </tr>
-      </table>
-    </div>
-
-    <!-- Project Structure -->
-    <div id="project-structure" class="docs-section">
-      <h2>Project Structure</h2>
-      <pre><code>Ashen AI Base/
-├── qwen_finetune.py          # LoRA (bf16) fine-tune of Qwen3.5 → ashen_gpt_model/
-├── ashen_gpt_trainer.py      # Legacy custom MoE pre-training → ashen_gpt_model.pk1
-├── chatbot.py                # Self-contained CLI chatbot
-├── web_chatbot.py            # Browser UI (stdlib http.server, port 5000)
-├── run_*.bat                 # Windows launchers for each entry point
-├── ashen_gpt_model/          # Default model (Qwen3.5 fine-tune, HF format)
-├── ashen_gpt_model.pk1       # Legacy custom MoE (~127M params, 8K context)
-├── settings.json             # Generation + display config (resolved via __file__)
-├── feedback.json             # Last 500 user ratings
-├── self_improvement.json     # {stats, log, suggestions}
-├── memory.json               # Persistent memory entries
-├── plans.json                # Stored step-by-step plans
-├── training_logs.txt         # Auto-generated training log
-├── sessions/                 # Web chatbot sessions (JSON)
-├── sessions_cli/             # CLI chatbot sessions (JSON)
-├── train_split.txt           # Literature training data
-├── val_split.txt             # Validation data
-├── code_train_split.txt      # Scraped code training data
-├── scripts/                  # Offline verification scripts
-├── tools/llama.cpp/          # GGUF conversion tools
-├── Qwen_Qwen3.5-0.8B/        # Upstream Qwen3.5 base model
-├── cuda/                     # Bundled CUDA virtualenv
-└── *.ipynb                   # Jupyter notebooks</code></pre>
     </div>
 
     <!-- Multi-Agent -->
     <div id="multi-agent" class="docs-section">
-      <h2>Swarm & Council</h2>
+      <h2>Swarm &amp; Council</h2>
 
       <h3>Swarm</h3>
       <p>Spawns 2–6 isolated engine copies with different roles (Researcher, Coder, Critic, Planner, Executor, Analyst)
-        in parallel, divide, or debate modes. A Synthesizer merges all drafts into one answer.</p>
+        in <code>parallel</code>, <code>divide</code>, or <code>debate</code> modes. A Synthesizer merges all drafts into
+        one answer. The live variant streams each agent's CoT.</p>
 
       <h3>Council</h3>
-      <p>Drafts → critics vote and suggest → tallied winner → finalizer refines. Useful for hard prompts that benefit
-        from multi-perspective critique.</p>
+      <p>Drafts → critics vote and suggest → tallied winner → finalizer refines. Critics are Accuracy, Clarity,
+        Completeness, Safety, and Efficiency. Useful for hard prompts that benefit from multi-perspective critique.</p>
 
       <h3>LLM Benchmark Suite</h3>
-      <p>Built-in evaluation across 5 categories: Knowledge, Code Generation, Math Reasoning, Language Understanding,
-        and Ethics & Safety. 12 standardized questions with letter grades. Trigger via
-        <code>[TOOL: run_benchmark()]</code>.
-      </p>
+      <p>Built-in evaluation across 5 categories — Knowledge, Code Generation, Math Reasoning, Language Understanding,
+        and Ethics &amp; Safety — with 12 standardized questions and a letter grade. Trigger via
+        <code>[TOOL: run_benchmark()]</code> or the web <strong>Run Benchmark</strong> button (~30–60 s).</p>
     </div>
 
     <!-- Safety -->
     <div id="safety" class="docs-section">
-      <h2>Safety & Alignment</h2>
+      <h2>Safety &amp; Alignment</h2>
       <ul style="color: var(--ink-muted); margin-left: 1.5rem; margin-bottom: 1rem;">
         <li><strong>Behavior baked into training data</strong> — all "how to respond" lives in SFT/DPO data, never in
           the prompt</li>
-        <li><strong>Runtime refusal filter</strong> — illegal/harmful requests are refused with apology + lawful
-          alternative</li>
+        <li><strong>Runtime refusal filter</strong> — a 33-pattern pre-check refuses illegal/harmful requests with an
+          apology + lawful alternative, across every backend</li>
         <li><strong>Code safety</strong> — evaluates code before providing it; refuses malware, theft, surveillance,
-          etc.</li>
-        <li><strong>Intent classification head</strong> — auxiliary head classifies inputs as spam / not_spam / question
-          / answer / request</li>
-        <li><strong>Shell blocklist</strong> — destructive commands (rm -rf /, format, shutdown) are blocked even when
-          shell tools are enabled</li>
+          extortion, sabotage, DoS, counterfeit, and spam</li>
+        <li><strong>Intent classification head</strong> — auxiliary 5-way head classifies inputs as spam / not_spam /
+          question / answer / request</li>
+        <li><strong>Shell blocklist</strong> — destructive commands (<code>rm -rf /</code>, <code>mkfs</code>,
+          <code>format</code>, <code>shutdown</code>, fork bombs) are blocked even when shell tools are enabled</li>
+        <li><strong>File/shell gates</strong> — <code>allow_file_tools</code> / <code>allow_shell_tools</code> settings
+          plus <code>ASHEN_ALLOW_FILES=0</code> / <code>ASHEN_ALLOW_SHELL=0</code> env kill-switches</li>
+        <li><strong>Prompt-injection posture</strong> — retrieved web text is treated as untrusted reference data, not
+          instructions</li>
       </ul>
     </div>
 
