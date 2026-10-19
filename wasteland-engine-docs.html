@@ -564,6 +564,8 @@
         <li><a href="#post">Post-Processing</a></li>
         <li><a href="#resources">Rendering Resources</a></li>
         <li><a href="#physics">Physics</a></li>
+        <li><a href="#audio">Audio</a></li>
+        <li><a href="#terrain">Terrain Streaming</a></li>
         <li><a href="#scripting">Scripting</a></li>
         <li><a href="#editor">DemonCore Editor</a></li>
         <li><a href="#volumetrics">Volumetrics &amp; Water</a></li>
@@ -611,7 +613,7 @@
         </tr>
         <tr>
           <td>Path Tracer</td>
-          <td>Nova — native D3D11/D3D12 compute</td>
+          <td>Nova — native D3D11/D3D12/Vulkan compute</td>
         </tr>
         <tr>
           <td>Physics</td>
@@ -643,7 +645,7 @@
       <p>The rendering backend is chosen at runtime, not at build time. <code>Window::SwitchRendererAPI()</code> tears
         down the current device and swap chain, rebuilds every GPU resource through <code>RecreateResources()</code>,
         and brings up the target backend — no relink, no separate executable. The Nova path tracer attaches to whichever
-        Direct3D backend is active (D3D11 or D3D12); Vulkan and OpenGL run the raster path.</p>
+        Direct3D or Vulkan backend is active (D3D11, D3D12, or Vulkan); OpenGL runs the raster path.</p>
       <p>Device loss is detected and recovered: <code>NVRHIContext</code> tracks a lost-device flag and can recreate the
         device, swap chain, and all ImGui-side descriptor resources in place.</p>
     </div>
@@ -1025,6 +1027,14 @@ auto *maybe = entity.TryGetComponent&lt;MaterialComponent&gt;();  // null instea
         as the miss radiance for rays that escape the scene. A sun direction is set independently and, when a
         directional light entity exists, the analytic light's direction and color override it.</p>
 
+      <h3>GPU Tier Detection</h3>
+      <p><code>DetectGPUTier()</code> runs once at init and classifies the GPU by substring-matching both
+        <code>GL_RENDERER</code> and <code>GL_VENDOR</code> (so a driver that reports the model in either string is
+        still classified). Specific model numbers are matched before the vendor fallback — an RTX 20-series string
+        contains "RTX 20", so the specific branch must come first. The result is copied into a fixed
+        <code>char[64]</code> and reported by <code>GetGPUTierName()</code>. The dynamic-resolution scaler is
+        measurement-driven and needs no per-GPU tuning.</p>
+
       <h3>Renderer2D (<code>Wasteland/Renderer/Renderer2D.h</code>)</h3>
       <p>Batch renderer for 2D primitives — quads, rotated quads, circles, lines, and rects, in 2D and 3D position
         overloads, with texture and sub-texture variants. All draws batch into a single vertex buffer per flush. An
@@ -1049,8 +1059,31 @@ Renderer2D::EndScene();</code></pre>
           vertex-array pointers</li>
         <li><code>RecreateResources()</code> on every resource class, driven by the API switch</li>
       </ul>
-      <p>Vulkan additionally uses <code>VulkanDispatch.cpp</code> for volk-based function loading, defining
-        <code>VULKAN_HPP_DISPATCH_LOADER_DYNAMIC</code> in exactly one translation unit.</p>
+      <h3>Nova Backends</h3>
+      <p>Nova ships three native compute implementations sharing one pass schedule:</p>
+      <table>
+        <tr>
+          <th>Backend</th>
+          <th>Class</th>
+          <th>Notes</th>
+        </tr>
+        <tr>
+          <td>D3D11</td>
+          <td><code>DX11Nova</code></td>
+          <td>Original; snapshot-per-dispatch for UAV aliasing</td>
+        </tr>
+        <tr>
+          <td>D3D12</td>
+          <td><code>DX12Nova</code></td>
+          <td>Explicit command lists, descriptor heaps, resource barriers</td>
+        </tr>
+        <tr>
+          <td>Vulkan</td>
+          <td><code>VulkanNova</code></td>
+          <td>SPIR-V from HLSL twin; 9 images; explicit reservoir swap</td>
+        </tr>
+      </table>
+      <p>OpenGL runs the raster path only — there is no GL Nova implementation.</p>
     </div>
 
     <!-- Nova Ray Tracer -->
@@ -1141,21 +1174,48 @@ Renderer2D::EndScene();</code></pre>
           <td>Generate Material Maps (Sobel)</td>
         </tr>
         <tr>
+          <td>3</td>
+          <td>ReSTIR DI — spatial reuse (reservoir ping-pong)</td>
+        </tr>
+        <tr>
+          <td>11</td>
+          <td>ReSTIR DI — temporal reservoir merge</td>
+        </tr>
+        <tr>
+          <td>14</td>
+          <td>ReSTIR DI — spatial reuse + direct-light estimate</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>SVGF — temporal moments (default off)</td>
+        </tr>
+        <tr>
+          <td>13</td>
+          <td>SVGF — A-Trous filter ladder (default off)</td>
+        </tr>
+        <tr>
           <td>10</td>
           <td>God Rays</td>
         </tr>
       </table>
-      <p>The per-frame sequence is <code>1 → 0 → 2 → CommitHistory</code>, then up to four bilateral-blur iterations
-        with a doubling step size, then composite at full resolution, then bloom and god rays. Everything except
-        composite runs at the internal trace resolution.</p>
+      <p>ReSTIR DI (passes 3/11/14) and the SVGF denoiser (passes 12/13) are both <strong>default-off</strong> and
+        experimental. ReSTIR uses reservoir sampling with temporal and spatial reuse to reduce direct-light noise
+        without the emissive-light subset; SVGF runs a fixed 4-step A-Trous ladder driven from C++ (not looped in-shader)
+        with variance-based edge-stopping weights. The bilateral blur (pass 7) remains the always-available denoiser.</p>
+      <p>The per-frame sequence is <code>1 → 0 → 2 → CommitHistory</code>, with ReSTIR inserted between 0 and 2 when enabled,
+        then up to four bilateral-blur iterations with a doubling step size, then composite at full resolution, then bloom
+        and god rays. Everything except composite runs at the internal trace resolution.</p>
 
       <h3>Progressive Refinement</h3>
       <p>When accumulation is enabled, the blend weight is <code>max(0.02, 1 / (frame + 1))</code>, so a static camera
         converges over successive frames while a moving one keeps re-sampling rather than smearing. Camera movement is
         detected by comparing the current and previous view-projection matrices, and a scene change resets the frame
         index and clears the accumulation buffers.</p>
-      <p>Anti-aliasing uses a Halton sequence: <code>Halton(index, base)</code> and
-        <code>GetCurrentJitter(frameIndex, viewportSize)</code> produce the per-frame sub-pixel offset.</p>
+      <p>Anti-aliasing uses spatio-temporal blue noise. The blue-noise volume is generated at build time by
+        <code>tools/generate_blue_noise.py</code> — a void-and-cluster construction (Ulichney 1993/1994, sigma=1.6) —
+        rather than vendored, because NVIDIA's STBN asset is licensed for non-commercial research only and cannot
+        coexist with an open-source project. <code>Halton()</code> and <code>GetCurrentJitter()</code> remain available
+        as fallback jitter sources.</p>
 
       <h3>Neural Detail</h3>
       <p>The shader contains in-shader MLP blocks that add detail to three channels independently — texture, lighting,
@@ -1165,7 +1225,8 @@ Renderer2D::EndScene();</code></pre>
 
       <h3>Shaders</h3>
       <p>Two hand-maintained ports live in <code>assets/shaders/</code>: <code>Renderer3D_NovaRenderer.glsl</code>
-        (~2,240 lines) and <code>Renderer3D_NovaRenderer.hlsl</code> (~2,340 lines). They implement identical math and
+        (~4,440 lines) and <code>Renderer3D_NovaRenderer.hlsl</code> (~2,760 lines). The HLSL twin compiles to SPIR-V
+        for the Vulkan path. They implement identical math and
         pass structure. The HLSL port keeps the GLSL binding numbers as register slots so the C++ wiring maps 1:1
         across both APIs, and works around the SM5 restriction on dynamic texture-array indexing with an explicit
         32-way texture-slot switch.</p>
@@ -1300,6 +1361,77 @@ shader->SetMat4("u_ViewProjection", vp);</code></pre>
       <p>Body and shape identifiers are stored as <code>uint64_t</code> and reconstructed with
         <code>b3LoadBodyId</code> / <code>b3LoadShapeId</code> at use, which keeps the Box3D types out of the component
         headers.</p>
+    </div>
+
+    <!-- Audio -->
+    <div id="audio" class="docs-section">
+      <h2>Audio</h2>
+      <p>A full audio subsystem built on <strong>miniaudio</strong>, split across two directories totaling ~11,800
+        lines — one of the largest subsystems in the engine.</p>
+
+      <h3>AudioSystem (<code>Wasteland/Audio/AudioSystem.h</code>)</h3>
+      <p>The scene-level audio coordinator. It owns the device, the clip library, and the listener, and exposes the
+        gameplay-facing API:</p>
+      <pre><code>bool StartOutput(std::string *error = nullptr);
+bool LoadClip(const std::string &path);
+int  Play(const std::string &clipName);
+int  PlayAt(const std::string &clipName, const glm::vec3 &amp;position,
+           float volume = 1.0f, float pitch = 1.0f);
+int  PlayEntity(Entity entity);
+void StopClip(const std::string &amp;clipName, float fadeSeconds = 0.0f);
+void StopAll(float fadeSeconds = 0.0f);
+void SetMasterVolume(float volume);
+void Update(float seconds);</code></pre>
+      <p><code>PlayAt</code> positions a sound in world space; <code>PlayEntity</code> resolves an entity's transform
+        through the scene each frame so a moving emitter stays attached. <code>ResolveSourcePosition</code> is the
+        static helper that walks the scene to find an entity's current position.</p>
+
+      <h3>AudioDevice (<code>Wasteland/Audio/AudioDevice.h</code>)</h3>
+      <p>The miniaudio wrapper. Fixed at 48 kHz output regardless of the physical endpoint rate, with a static
+        <code>Render</code> callback that pulls from the mixer. The device is atomic-safe for start/stop and reports
+        the native endpoint sample rate for diagnostics.</p>
+
+      <h3>AudioClip (<code>Wasteland/Audio/AudioClip.h</code>)</h3>
+      <p>An immutable value type with static factory functions — <code>LoadWav</code>, <code>LoadWavFromMemory</code>,
+        and <code>FromSamples</code> — and no public constructor. Clips are held by <code>Ref&lt;&gt;</code> and store
+        their samples as a <code>std::vector&lt;float&gt;</code>. <code>SaveWav</code> round-trips a clip back to disk,
+        which is how generated test tones are persisted.</p>
+
+      <h3>Avb — Audio Bus and Voices (<code>Wasteland/Avb/</code>)</h3>
+      <p>The mixing layer. <code>AudioBus</code> is the routing node, <code>AvbVoices</code> manages the voice pool
+        (~660 lines), and <code>Recorder</code> (~1,480 lines) captures output for debugging and verification. The
+        recorder is the largest single file in the audio subsystem.</p>
+    </div>
+
+    <!-- Terrain Streaming -->
+    <div id="terrain" class="docs-section">
+      <h2>Terrain Streaming</h2>
+      <p>Terrain is streamed in 64×64-cell chunks from a versioned <code>.wlterrain</code> asset, which is the
+        immutable authored source of truth. Generated height samples, LOD meshes, and collision caches are derived
+        data and are never serialized into <code>.wastescene</code> or <code>.wlsave</code>.</p>
+
+      <h3>Chunk Identity and LOD</h3>
+      <p>Chunks are identified by signed integer lattice indices derived with mathematical floor (correct for negative
+        coordinates), not rounded camera positions. LOD is measured by Chebyshev distance in chunk coordinates:</p>
+      <ul>
+        <li><strong>LOD0</strong> — resident through distance 2</li>
+        <li><strong>LOD1</strong> — distances 3–6</li>
+        <li><strong>LOD2</strong> — distances 7–12</li>
+        <li>No terrain chunk is resident beyond distance 12</li>
+      </ul>
+      <p>One-chunk enter/exit hysteresis at each ring boundary prevents camera movement from thrashing requests.</p>
+
+      <h3>Persistence</h3>
+      <p>Runtime edits live in versioned world-state sidecars keyed by <code>(WorldId, chunkX, chunkZ)</code>, storing
+        sparse deltas from the deterministic base height lattice. Every sidecar records the terrain schema and a
+        fingerprint of the base asset; a mismatch is rejected without mutating the active world. Dirty chunks are
+        persisted before eviction using atomic-replace writes with checksum validation — a failed write keeps the chunk
+        dirty and resident rather than dropping edits to meet a budget.</p>
+
+      <h3>Residency Budgets</h3>
+      <p>Configurable 256 MiB CPU and 256 MiB GPU ceilings, with at most 2 generation/read jobs and 4 main-thread
+        mesh/collision/resource commits per frame. <code>docs/TERRAIN_STREAMING_POLICY.md</code> is the full acceptance
+        contract.</p>
     </div>
 
     <!-- Scripting -->
@@ -1757,9 +1889,9 @@ WL_AUTO_SWITCH_TO2_FRAME=60</code></pre>
       </table>
 
       <h3>Dependencies</h3>
-      <pre><code>GLFW, Glad, ImGui (+ TextEditor), ImGuizmo, glm, stb_image,
-entt, yaml-cpp, spdlog, Box2D, Box3D, pybind11,
-NVRHI (d3d11 / d3d12 / vk), VulkanSDK, volk</code></pre>
+      GLFW, Glad, ImGui (+ TextEditor), ImGuizmo, glm, stb_image,
+      entt, yaml-cpp, spdlog, Box2D, Box3D, pybind11, miniaudio,
+      NVRHI (d3d11 / d3d12 / vk), VulkanSDK, volk</code></pre>
       <p>Linux additionally needs <code>libglfw3-dev</code> and <code>libgl1-mesa-dev</code>; macOS needs
         <code>brew install glfw</code>.</p>
 
@@ -1798,6 +1930,8 @@ NVRHI (d3d11 / d3d12 / vk), VulkanSDK, volk</code></pre>
 │   │   │   ├── Scene/                # Scene, Entity, Components, SceneCamera,
 │   │   │   │                         # SceneSerializer, ScriptableEntity
 │   │   │   ├── Scripting/            # ScriptEngine + pybind11 Bindings.cpp
+│   │   │   ├── Audio/                # AudioSystem, AudioDevice, AudioClip
+│   │   │   ├── Avb/                  # Audio bus, voices, recorder (~11,800 LOC)
 │   │   │   ├── ImGui/                # ImGuiLayer + ImGui build
 │   │   │   ├── Math/                 # Math helpers
 │   │   │   ├── Debug/                # Instrumentor
@@ -1806,7 +1940,7 @@ NVRHI (d3d11 / d3d12 / vk), VulkanSDK, volk</code></pre>
 │   │       ├── Windows/ Linux/ Mac/  # Window, Input, platform utils
 │   │       ├── OpenGL/               # GL backend + context
 │   │       └── NVRHI/                # NVRHI backend, context, resource classes,
-│   │                                 # DX11Nova, DX12Nova, VulkanDispatch
+│   │                                 # DX11Nova, DX12Nova, VulkanNova, VulkanDispatch
 │   └── vendor/                       # All third-party dependencies
 ├── DemonCore-Editor/                 # Editor executable
 │   ├── src/
@@ -1814,7 +1948,11 @@ NVRHI (d3d11 / d3d12 / vk), VulkanSDK, volk</code></pre>
 │   │   └── Panels/                   # All editor panels + ToolServer
 │   └── assets/                       # Scenes, scripts, shaders, textures
 ├── Sandbox/                          # 2D test application
-├── docs/NVRHI_SETUP.md               # NVRHI integration guide
+├── docs/                             # NVRHI_SETUP, NOVA_SHADER_PIPELINE, NOVA_DENOISER_WIRING,
+│                                     # NOVA_BINDING_BUDGET, RTX_KIT_LICENSES, TERRAIN_STREAMING_POLICY,
+│                                     # AGE_ASSURANCE, BUILD_ISOLATION, TEXTURE_INVENTORY, VISUAL_BLOCKS_SCHEMA
+├── tools/                            # Verification scripts (verify_*.py), blue-noise generator,
+│                                     # SPIR-V compiler, scene builder, build helpers
 ├── scripts/                          # Win/Mac/Linux project generation
 ├── vendor/bin/premake/               # Premake binary
 ├── premake5.lua                      # Build configuration
@@ -1826,6 +1964,10 @@ NVRHI (d3d11 / d3d12 / vk), VulkanSDK, volk</code></pre>
         <tr>
           <th>Area</th>
           <th>Lines</th>
+        </tr>
+        <tr>
+          <td>Audio (miniaudio + Avb)</td>
+          <td>~11,800</td>
         </tr>
         <tr>
           <td>Platform (windowing + backends)</td>
@@ -1865,10 +2007,10 @@ NVRHI (d3d11 / d3d12 / vk), VulkanSDK, volk</code></pre>
         </tr>
         <tr>
           <td><strong>Total</strong></td>
-          <td><strong>~29,300</strong></td>
+          <td><strong>~41,000</strong></td>
         </tr>
       </table>
-      <p>Excludes <code>vendor/</code>. Shaders add roughly 7,100 lines across the GLSL and HLSL pairs.</p>
+      <p>Excludes <code>vendor/</code>. Shaders add roughly 7,200 lines across the GLSL and HLSL pairs.</p>
     </div>
 
   </div>
