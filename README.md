@@ -14,7 +14,11 @@ The official website for Ashen Wastes Studios — a game development studio and 
 | `games.html` | Current and upcoming titles — The Never Ending War, Wasteland |
 | `necroware.html` | Necroware game page — 60-mission cyberpunk campaign, 45 side missions (10 Voss memories, 18 Song From Beyond The Grave, 17 The Quiet Wars), extensive lore (Cynchure Core, Brain Matrix, biochip, Element Zero, Warp, Hellspawn, the Corpo Man) |
 | `donor-assistance.html` | Donor Assistance Program — direct help for donors |
-| `philosophy.html` | Company philosophy — transparency, anti-monopoly, safety over speed |
+| `philosophy.html` | Manifesto cover — four-chapter studio philosophy |
+| `philosophy-ch1.html` | Chapter I — Open Source as Accountability |
+| `philosophy-ch2.html` | Chapter II — Technology Should Not Be a Fiefdom |
+| `philosophy-ch3.html` | Chapter III — Slow is Safe (with references) |
+| `philosophy-ch4.html` | Chapter IV — Build for the User, Not the Investor |
 
 ## Local Development
 

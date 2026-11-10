@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter II — Technology Should Not Be a Fiefdom — Ashen Wastes Studios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: transparent;
+  --surface: transparent;
+  --surface-2: transparent;
+  --ink: #e0e0e8;
+  --ink-muted: #6a6a80;
+  --accent: #dc143c;
+  --accent-dim: #a01030;
+  --accent-2: #ff6b35;
+  --accent-3: #ff4757;
+  --border: #2a2a40;
+  --glow: 0 0 10px rgba(220, 20, 60, 0.3);
+  --glow-strong: 0 0 20px rgba(220, 20, 60, 0.5);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+.container { position: relative; z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* Navigation - Cyberpunk */
+nav { position: relative; z-index: 10;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: transparent;
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--accent);
+  box-shadow: 0 0 20px rgba(220, 20, 60, 0.15), 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+nav .logo {
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.6), 0 0 20px rgba(220, 20, 60, 0.3);
+}
+
+.nav-links a {
+  position: relative;
+  padding: 0.25rem 0;
+}
+
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  box-shadow: 0 0 5px var(--accent);
+  transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after,
+.nav-links a.active::after {
+  width: 100%;
+}
+
+.nav-links a:hover {
+  text-shadow: 0 0 8px rgba(220, 20, 60, 0.6);
+}
+
+.nav-links a.active {
+  color: var(--accent) !important;
+  text-shadow: 0 0 8px rgba(220, 20, 60, 0.5);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.nav-links a {
+  color: var(--ink-muted);
+  transition: color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active { color: var(--ink); }
+
+.nav-links a.active { border-bottom: 1px solid var(--accent); padding-bottom: 2px; }
+
+/* Header */
+.page-header {
+  padding: 10rem 0 3rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 3rem;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb a { color: var(--accent); }
+
+.page-header h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 400;
+}
+
+/* Chapter */
+.chapter-meta {
+  display: flex;
+  gap: 2rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.manifesto-section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  font-weight: 400;
+}
+
+.manifesto-section p {
+  color: var(--ink-muted);
+  font-size: 1.05rem;
+  max-width: 65ch;
+  margin-bottom: 1.25rem;
+  line-height: 1.8;
+}
+
+.manifesto-section p:last-child {
+  margin-bottom: 0;
+}
+
+.lead {
+  font-size: 1.25rem;
+  color: var(--ink);
+  line-height: 1.7;
+  font-weight: 500;
+}
+
+blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 1.5rem;
+  margin: 2rem 0;
+  font-size: 1.15rem;
+  color: var(--ink);
+  font-style: italic;
+}
+
+.chapter-nav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.chapter-nav a {
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: color 0.2s;
+}
+
+.chapter-nav a:hover { color: var(--accent); }
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .nav-links { gap: 1rem; font-size: 0.85rem; }
+}
+
+/* Cyberpunk body */
+body {
+  background: var(--bg);
+  background-image:
+    linear-gradient(rgba(220, 20, 60, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(220, 20, 60, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  position: relative;
+}
+
+/* Scanline overlay */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.1) 2px,
+    rgba(0, 0, 0, 0.1) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Neon glow on headings */
+h1, h2, h3 {
+  text-shadow: 0 0 10px rgba(220, 20, 60, 0.4);
+}
+
+/* Neon border glow on cards */
+.work-card:hover, .research-card:hover, .project-card:hover,
+.game-card:hover, .repo-card:hover, .feature-card:hover {
+  border-color: var(--accent) !important;
+  box-shadow: var(--glow);
+}
+
+/* Buttons glow */
+.btn:hover, .github-btn:hover, .clone-btn:hover {
+  box-shadow: var(--glow);
+}
+
+/* Links glow on hover */
+a:hover {
+  text-shadow: 0 0 8px rgba(220, 20, 60, 0.6);
+}
+
+/* Accent color for breadcrumbs and tags */
+.breadcrumb a, .section-label, .tag, .repo-name .repo-link {
+  color: var(--accent) !important;
+  text-shadow: 0 0 5px rgba(220, 20, 60, 0.5);
+}
+
+/* Status indicator glow */
+.status-dot {
+  box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+}
+
+.status-dot.offline {
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+}
+
+/* Sharp corners on key elements */
+.btn, .github-btn, .clone-btn, .repo-card, .work-card,
+.research-card, .project-card, .game-card, .feature-card,
+.engine-spec, .toc {
+  border-radius: 2px !important;
+}
+
+/* Navigation border glow */
+nav { position: relative; z-index: 10;
+  border-bottom-color: var(--accent) !important;
+  box-shadow: 0 2px 15px rgba(220, 20, 60, 0.15);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 0;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
+}
+
+/* Selection color */
+::selection {
+  background: rgba(220, 20, 60, 0.3);
+  color: var(--ink);
+}
+</style>
+</head>
+<body data-bg="wave">
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">Ashen Wastes Studios</div>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="ai.html">AI</a></li>
+      <li><a href="ashen-gpt.html">Ashen AI</a></li>
+      <li><a href="gaming-technology.html">Gaming Technology</a></li>
+      <li><a href="wasteland-engine-docs.html">Engine Docs</a></li>
+      <li><a href="games.html">Games</a></li>
+      <li><a href="necroware.html">Necroware</a></li>
+      <li><a href="donor-assistance.html">Donor Assistance</a></li>
+      <li><a href="https://discord.gg/WBmspPQenP" target="_blank" rel="noopener">Discord</a></li>
+      <li><a href="philosophy.html" class="active">Philosophy</a></li>
+    </ul>
+  </div>
+</nav>
+
+<header class="page-header container">
+  <div class="breadcrumb"><a href="index.html">Home</a> / <a href="philosophy.html">Manifesto</a> / Chapter II</div>
+  <h1>Technology Should Not Be a Fiefdom.</h1>
+</header>
+
+<section class="container">
+  <div class="manifesto-section">
+    <div class="chapter-meta"><span>Chapter II</span><span>Power</span></div>
+    <p class="lead">The most powerful tools of our era are controlled by a handful of ultra-wealthy individuals who answer to no electorate.</p>
+    <p>When a single person or a small cabal can decide what billions of people see, say, and think — that's not innovation. That's feudalism with better UI. The concentration of technological power into private hands is the defining civil liberties issue of our time.</p>
+    <p>We reject the premise that artificial intelligence, communication infrastructure, and creative tools must be proprietary monopolies run for the enrichment of a few. Technology at scale is a public good, and public goods should be governed in the open.</p>
+  </div>
+
+  <div class="chapter-nav">
+    <a href="philosophy-ch1.html">← Chapter I</a>
+    <a href="philosophy-ch3.html">Chapter III →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <span>&copy; 2026 Ashen Wastes Studios. All rights reserved.</span>
+    <span>Unauthorized copying or redistribution prohibited.</span>
+  </div>
+</footer>
+
+<script src="js/backgrounds.js"></script>
+<script>initBackgrounds();</script>
+</body>
+</html>
